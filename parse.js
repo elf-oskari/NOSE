@@ -69,8 +69,11 @@ TextNode.prototype.encode = function(xmlEncoder, outputCharPos) {
 /** @constructor
   * Represents an XML tag captured in memory for processing. */
 var TagNode = function(node) {
+	/** Sax node object. */
 	this.node = node;
+	/** @type {Array.<Object>} Child tags, text/comment nodes or markers. */
 	this.childList = [];
+	/** @type {string} Human-readable description. */
 	this.comment=null;
 };
 
@@ -490,6 +493,9 @@ function parse() {
 			['Name'],['Title']
 		];
 
+		/** List of fields (editable SLD parameters) and how to find them.
+		  * Describes each field's parent tags up to its parent rule.
+		  * A tag's required attributes are listed in an object after its name. */
 		var fieldSpecList=[
 			{
 				path:['PolygonSymbolizer','Fill','GraphicFill','Graphic','Mark','WellKnownName']
@@ -506,6 +512,8 @@ function parse() {
 			}
 		];
 
+		/** Convert the list of a field's parent tags and their attributes into
+		  * a string. */
 		function serializeSpec(spec) {
 			return(spec.path.map(function(part) {
 				var argList;
@@ -513,12 +521,16 @@ function parse() {
 				if(typeof(part)=='object') {
 					argList=[];
 
+					// Loop through required attributes and list key-value pairs.
 					for(var key in part) {
 						argList.push(key+'\t'+part[key]);
 					}
 
+					// Sort the attributes alphabetically by key.
 					argList.sort();
 
+					// Remove keys and make a comma-separated list of required
+					// values.
 					if(argList.length) return('('+argList.map(function(arg) {
 						return(arg.split('\t')[1]);
 					}).join(',')+')');
@@ -530,6 +542,8 @@ function parse() {
 
 		rule=new Rule(ruleId++);
 
+		// Store any comment immediately before a rule.
+		// It might be a human-readable description of the rule.
 		if(node.comment) rule.setComment(node.comment);
 
 		for(var i=0;i<namePathList.length;i++) {
