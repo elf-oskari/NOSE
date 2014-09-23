@@ -5,8 +5,8 @@
  * the field.
  * Sax parses XML and calls handler functions which usually output it as is
  * which makes most data stream through the parser.
- * SLD rules and any tags inside them are first read into a JSON object.
- * When the rule's closing tag is found, the JSON is processed and encoded
+ * SLD rules and any tags inside them are first read into a Javascript object.
+ * When the rule's closing tag is found, the object is processed and encoded
  * back to XML. */
 
 'use strict';
@@ -108,7 +108,9 @@ TagNode.prototype.matchRule = function(tagName,attrTbl) {
 /** Search for a child node inside a tag. partList is a list of tag name strings.
   * Required attributes of a tag can be included in the list as an object after
   * the tag's name, like: ['Parent',{'attr:1'},'Child'] to find Child in XML like:
-  * <Tag><Parent attr="1"><Child>...</Child></Parent></Tag> */
+  * <Tag><Parent attr="1"><Child>...</Child></Parent></Tag>
+  * Always greedily moves inside a tag matching the current pathList item and
+  * moves to the next item, does not backtrack. */
 TagNode.prototype.query = function(partList) {
 	var partNum,partCount;
 	var part;
@@ -122,19 +124,26 @@ TagNode.prototype.query = function(partList) {
 
 	tag=this;
 
+	// Loop through list of nested tag names where result is supposed to be found.
 	for(partNum=0;partNum<partCount;) {
 		part=partList[partNum++];
 		attrTbl=partList[partNum];
 
+		// If tag name is followed by an object, assume it contains required
+		// attributes and their values for that tag.
 		if(typeof(attrTbl)=='object') partNum++;
 		else attrTbl=null;
 
 		childList=tag.childList;
 		childCount=childList.length;
 
+		// Loop through child nodes.
 		for(childNum=0;childNum<childCount;childNum++) {
 			child=childList[childNum];
+			// If child is a tag with name matching next item from partList,
+			// check if any required attributes were given and the tag has them.
 			if(child instanceof TagNode && child.matchRule(part,attrTbl)) {
+				// This tag is the result or one of its ancestors.
 				tag=child;
 				break;
 			}
@@ -187,17 +196,22 @@ Rule.prototype.setComment=function(txt) {
 	this.comment=txt;
 };
 
-Rule.prototype.formatNames=function() {
+Rule.prototype.formatNamesForJson=function() {
 	return(this.nameList.join(';'));
 };
 
-Rule.prototype.formatComment=function() {
+Rule.prototype.formatCommentForJson=function() {
 	return(this.comment || '');
 };
 
 /** Produce rule description for JSON output. */
 Rule.prototype.encode = function(xmlEncoder, outputCharPos) {
-	return(this.id+'\t'+outputCharPos+'\t'+this.formatNames()+'\t'+this.formatComment());
+	return(
+		this.id+'\t'+
+		outputCharPos+'\t'+
+		this.formatNamesForJson()+'\t'+
+		this.formatCommentForJson()
+	);
 };
 
 /** @constructor
@@ -245,7 +259,7 @@ EntityEncoder.prototype.encode = function(txt) {
 };
 
 /** @constructor
-  * Encodes JSON objects to XML. JSON object tree must consist of instances of
+  * Encodes Javascript objects to XML. Object tree must consist of instances of
   * the FieldMarkerNode, CommentNode, TextNode and TagNode classes. */
 var XmlEncoder = function() {
 	this.entityEncoder = new EntityEncoder();
@@ -317,11 +331,12 @@ XmlEncoder.prototype.encodeText = function(txt) {
   * Main class of the parser, pipes input data to sax and sets up handlers to
   * process XML tags. */
 var SldParser = function(outStream) {
-	/** @type {Array.<Object>} Stack for reading nested tag structures into JSON.
-	  * First tag is always an SLD rule and each tag is followed by a child. */
+	/** @type {Array.<Object>} Stack for reading nested tag structures into
+	  * JavaScript objects. First tag is always an SLD rule and each item is
+	  * nested deeper than the previous. */
 	this.captureStack = [];
 	/** @type {boolean} Flag set if sax is currently inside an SLD rule so its
-	  * output needs to be read into JSON in memory. If flag is cleared, XML
+	  * output needs to be read into an object. If flag is cleared, XML
 	  * from input is sent straight into output as unmodified as possible. */
 	this.capturing = false;
 	/** @type {number} Number of characters written into XML output. */
@@ -402,6 +417,7 @@ SldParser.prototype.captureClosingTag = function() {
 	}
 };
 
+/** Store text from input XML into memory for processing.  */
 SldParser.prototype.captureText = function(txt) {
 	this.getCurrentTag().appendChild(new TextNode(txt));
 };
@@ -423,7 +439,7 @@ SldParser.prototype.needsCapturing = function(node) {
 };
 
 /** Called when sax has read an opening tag. Recognizes if it's an SLD rule
-  * and flags everything inside it to be temporarily stored in JSON. */
+  * and flags everything inside it to be temporarily stored into an object. */
 SldParser.prototype.handleOpeningTag = function(node) {
 	var obj;
 	var needsProcessing = false;
@@ -446,7 +462,7 @@ SldParser.prototype.handleOpeningTag = function(node) {
 };
 
 /** Called when sax has read a closing tag. Passed on as is or if the tag was
-  * captured into JSON, processes it and encodes back to XML. */
+  * captured into an object, processes it and encodes back to XML. */
 SldParser.prototype.handleClosingTag = function(tagName) {
 	if (this.capturing) {
 		this.captureClosingTag();
@@ -457,6 +473,7 @@ SldParser.prototype.handleClosingTag = function(tagName) {
 	this.latestComment=null;
 };
 
+/** Called when sax has read text or whitespace. */
 SldParser.prototype.handleTextNode = function(txt) {
 	if (this.capturing) {
 		this.captureText(txt);
@@ -465,6 +482,7 @@ SldParser.prototype.handleTextNode = function(txt) {
 	}
 };
 
+/** Called when sax has read a comment. */
 SldParser.prototype.handleCommentNode = function(txt) {
 	if (this.capturing) {
 		this.captureComment(txt);
@@ -474,11 +492,16 @@ SldParser.prototype.handleCommentNode = function(txt) {
 	}
 };
 
+/** Called when sax has finished and parsing is about to terminate. */
 SldParser.prototype.handleEnd = function() {
 	this.onEnd();
 };
 
+/** Called when a tag captured into a Javascript object has been read completely
+  * and is about to be encoded back into XML. Override this method to process
+  * the decoded XML data. */
 SldParser.prototype.onProcessNode = function(node) {};
+/** Override to do something after parsing is done. */
 SldParser.prototype.onEnd = function() {};
 
 /** Main function, reads input and writes output. */
