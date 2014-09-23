@@ -510,7 +510,7 @@ function parse() {
 
 			marker=new FieldMarkerNode(fieldId++,serializeSpec(spec),field.getText(),rule);
 			field.parent.insertBefore(field,marker);
-			field.setText('');
+			field.setText('$');
 		}
 	};
 

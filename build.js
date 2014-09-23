@@ -18,7 +18,8 @@ for(lineNum=0;lineNum<lineCount;lineNum++) {
 
 	out+=template.substr(pos,+fieldList[2]-pos);
 	out+=fieldList[4];
-	pos=+fieldList[2];
+	pos=+fieldList[2]+1;
+	if(template.charAt(pos-1)!='$') console.error('Template is corrupt! No field at character offset '+pos);
 }
 
 out+=template.substr(pos);
