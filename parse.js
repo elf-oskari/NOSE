@@ -10,15 +10,15 @@ function bindToScope(scope, fn) {
 };
 
 /** @constructor */
-var MarkerNode = function(id,typeName,defaultValue,rule) {
+var FieldMarkerNode = function(id,typeName,defaultValue,rule) {
 	this.id = id;
 	this.typeName=typeName;
 	this.defaultValue=defaultValue;
 	this.rule=rule;
 };
 
-MarkerNode.prototype.encode = function(xmlEncoder, outputCharPos) {
-	console.log(this.id+'\t'+outputCharPos+'\t'+this.typeName+'\t'+this.defaultValue+'\t'+this.rule.formatNames()+'\t'+this.rule.formatComment());
+FieldMarkerNode.prototype.encode = function(xmlEncoder, outputCharPos) {
+	console.log('\t'+this.id+'\t'+outputCharPos+'\t'+this.typeName+'\t'+this.defaultValue);
 
 	return('');
 };
@@ -144,7 +144,8 @@ TagNode.prototype.setComment=function(txt) {
 };
 
 /** @constructor */
-var Rule = function() {
+var Rule = function(id) {
+	this.id=id;
 	this.nameList=[];
 	this.comment=null;
 };
@@ -163,6 +164,10 @@ Rule.prototype.formatNames=function() {
 
 Rule.prototype.formatComment=function() {
 	return(this.comment || '');
+};
+
+Rule.prototype.encode = function(xmlEncoder, outputCharPos) {
+	return(this.id+'\t'+outputCharPos+'\t'+this.formatNames()+'\t'+this.formatComment());
 };
 
 /** @constructor */
@@ -425,10 +430,11 @@ SldParser.prototype.onProcessNode = function(node) {};
 SldParser.prototype.onEnd = function() {};
 
 function parse() {
+	var ruleId=0;
 	var fieldId=0;
 
 	var inFileName = process.argv[2];
-	var outFileName = 'test.xml';
+	var outFileName = process.argv[3];
 
 	var inStream = fs.createReadStream(inFileName);
 	var outStream = fs.createWriteStream(outFileName);
@@ -437,7 +443,8 @@ function parse() {
 
 	parser.onProcessNode = function(node) {
 		var rule;
-		var strokeStyle,strokeColor,strokeWidth;
+		var spec;
+		var field;
 		var marker;
 		var nameNode;
 
@@ -445,12 +452,45 @@ function parse() {
 			['Name'],['Title']
 		];
 
-		var strokePathList=[
-			['LineSymbolizer','Stroke'],
-			['PolygonSymbolizer','Fill','GraphicFill','Graphic','Mark','Stroke']
+		var fieldSpecList=[
+			{
+				path:['PolygonSymbolizer','Fill','GraphicFill','Graphic','Mark','WellKnownName']
+			},{
+				path:['PolygonSymbolizer','Fill','GraphicFill','Graphic','Size']
+			},{
+				path:['LineSymbolizer','Stroke','CssParameter',{'name':'stroke'}]
+			},{
+				path:['LineSymbolizer','Stroke','CssParameter',{'name':'stroke-width'}]
+			},{
+				path:['PolygonSymbolizer','Fill','GraphicFill','Graphic','Mark','Stroke','CssParameter',{'name':'stroke'}]
+			},{
+				path:['PolygonSymbolizer','Fill','GraphicFill','Graphic','Mark','Stroke','CssParameter',{'name':'stroke-width'}]
+			}
 		];
 
-		rule=new Rule();
+		function serializeSpec(spec) {
+			return(spec.path.map(function(part) {
+				var argList;
+
+				if(typeof(part)=='object') {
+					argList=[];
+
+					for(var key in part) {
+						argList.push(key+'\t'+part[key]);
+					}
+
+					argList.sort();
+
+					if(argList.length) return('('+argList.map(function(arg) {
+						return(arg.split('\t')[1]);
+					}).join(',')+')');
+				} else {
+					return('/'+part);
+				}
+			}).join('').substr(1));
+		}
+
+		rule=new Rule(ruleId++);
 
 		if(node.comment) rule.setComment(node.comment);
 
@@ -461,28 +501,21 @@ function parse() {
 			}
 		}
 
-		for(var i=0;i<strokePathList.length;i++) {
-			strokeStyle=node.query(strokePathList[i]);
-			if(!strokeStyle) continue;
+		console.log('\n'+rule.encode(this.xmlEncoder,this.outputCharPos));
 
-			strokeColor=strokeStyle.queryText(['CssParameter',{'name':'stroke'}]);
-			strokeWidth=strokeStyle.queryText(['CssParameter',{'name':'stroke-width'}]);
+		for(var i=0;i<fieldSpecList.length;i++) {
+			spec=fieldSpecList[i];
+			field=node.queryText(spec.path);
+			if(!field) continue;
 
-			if(strokeColor) {
-				marker=new MarkerNode(fieldId++,'strokeColor',strokeColor.getText(),rule);
-				strokeColor.parent.insertBefore(strokeColor,marker);
-				strokeColor.setText('');
-			}
-
-			if(strokeWidth) {
-				marker=new MarkerNode(fieldId++,'strokeWidth',strokeWidth.getText(),rule);
-				strokeWidth.parent.insertBefore(strokeWidth,marker);
-				strokeWidth.setText('');
-			}
+			marker=new FieldMarkerNode(fieldId++,serializeSpec(spec),field.getText(),rule);
+			field.parent.insertBefore(field,marker);
+			field.setText('');
 		}
 	};
 
 	parser.onEnd=function() {
+		console.log('');
 	};
 
 	parser.parse(inStream);

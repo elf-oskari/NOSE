@@ -14,11 +14,11 @@ for(lineNum=0;lineNum<lineCount;lineNum++) {
 	line=lineList[lineNum];
 
 	fieldList=line.split('\t');
-	if(fieldList.length!=4) continue;
+	if(fieldList.length<5) continue;
 
-	out+=template.substr(pos,+fieldList[1]-pos);
-	out+=fieldList[3];
-	pos=+fieldList[1];
+	out+=template.substr(pos,+fieldList[2]-pos);
+	out+=fieldList[4];
+	pos=+fieldList[2];
 }
 
 out+=template.substr(pos);
