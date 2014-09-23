@@ -317,8 +317,14 @@ XmlEncoder.prototype.encodeText = function(txt) {
   * Main class of the parser, pipes input data to sax and sets up handlers to
   * process XML tags. */
 var SldParser = function(outStream) {
+	/** @type {Array.<Object>} Stack for reading nested tag structures into JSON.
+	  * First tag is always an SLD rule and each tag is followed by a child. */
 	this.captureStack = [];
+	/** @type {boolean} Flag set if sax is currently inside an SLD rule so its
+	  * output needs to be read into JSON in memory. If flag is cleared, XML
+	  * from input is sent straight into output as unmodified as possible. */
 	this.capturing = false;
+	/** @type {number} Number of characters written into XML output. */
 	this.outputCharPos = 0;
 
 	this.xmlStream = null;
@@ -330,10 +336,14 @@ var SldParser = function(outStream) {
 	this.latestComment=null;
 };
 
+/** Parser main loop is inside Node.js stream pipe operation and/or sax
+  * which are called here. */
 SldParser.prototype.parse = function(inStream) {
 	inStream.pipe(this.xmlStream);
 };
 
+/** Initialize sax and set up handlers called when sax finds tags, text,
+  * comments etc. */
 SldParser.prototype.initStream = function() {
 	var strict = true;
 	var xmlStream = sax.createStream(strict);
@@ -349,6 +359,9 @@ SldParser.prototype.initStream = function() {
 	this.xmlStream = xmlStream;
 };
 
+/** All writes to XML output file go through this method, which also tracks
+  * number of characters written so that when a marker is encountered, its
+  * character position in output is known. */
 SldParser.prototype.writeOut = function(txt) {
 	this.outStream.write(txt);
 	this.outputCharPos += txt.length;
