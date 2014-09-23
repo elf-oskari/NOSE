@@ -6,9 +6,10 @@ SLD-Editor is an Node.js based SLD backend.
 
 1. Install [Node.js](http://nodejs.org/download/) locally
 2. Follow the installation guides and if special permissions are needed, ask your Admin to add usage rights to the folders
-3. node parse.js original.sld template.sld > fields.csv
-4. Modify fields.csv
-5. node build.js template.sld fields.csv > new.sld
+3. npm install
+4. node parse.js original.sld template.sld > fields.csv
+5. Modify fields.csv
+6. node build.js template.sld fields.csv > new.sld
 
 ## Versioning
 
