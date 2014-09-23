@@ -1,15 +1,30 @@
+/* This tool parses an SLD file and replaces certain recognized fields (like
+ * colors and linestyles) with placeholders. It groups them by rules and also
+ * produces a field description file that references each placeholder.
+ * The descriptions store the original removed value and the parent tags of
+ * the field.
+ * Sax parses XML and calls handler functions which usually output it as is
+ * which makes most data stream through the parser.
+ * SLD rules and any tags inside them are first read into a JSON object.
+ * When the rule's closing tag is found, the JSON is processed and encoded
+ * back to XML. */
+
 'use strict';
 
 var fs = require('fs');
 var sax = require('sax');
 
+/** Return reference to function fn that when called, makes fn see scope
+  * as "this" variable. */
 function bindToScope(scope, fn) {
 	return function() {
 		fn.apply(scope, arguments);
 	};
 };
 
-/** @constructor */
+/** @constructor
+  * Marker that when exported as XML, outputs a field definition in JSON format
+  * to another file including the marker's character offset in XML output. */
 var FieldMarkerNode = function(id,typeName,defaultValue,rule) {
 	this.id = id;
 	this.typeName=typeName;
@@ -23,7 +38,8 @@ FieldMarkerNode.prototype.encode = function(xmlEncoder, outputCharPos) {
 	return('');
 };
 
-/** @constructor */
+/** @constructor
+  * Represents an XML comment. */
 var CommentNode = function(txt) {
 	this.txt = txt;
 };
@@ -32,7 +48,8 @@ CommentNode.prototype.encode = function(xmlEncoder, outputCharPos) {
 	return xmlEncoder.encodeComment(this.txt);
 };
 
-/** @constructor */
+/** @constructor
+  * Represents text or whitespace in an XML document. */
 var TextNode = function(txt) {
 	this.txt = txt;
 };
@@ -49,7 +66,8 @@ TextNode.prototype.encode = function(xmlEncoder, outputCharPos) {
 	return xmlEncoder.encodeText(this.txt);
 };
 
-/** @constructor */
+/** @constructor
+  * Represents an XML tag captured in memory for processing. */
 var TagNode = function(node) {
 	this.node = node;
 	this.childList = [];
@@ -68,6 +86,8 @@ TagNode.prototype.insertBefore = function(child, obj) {
 	if(pos>=0) this.childList.splice(pos,0,obj);
 };
 
+/** Check if tag's attributes matches attrTbl which is an object with
+  * required attributes as keys associated to their required values. */
 TagNode.prototype.matchRule = function(tagName,attrTbl) {
 	var attr;
 
@@ -82,6 +102,10 @@ TagNode.prototype.matchRule = function(tagName,attrTbl) {
 	return(true);
 };
 
+/** Search for a child node inside a tag. partList is a list of tag name strings.
+  * Required attributes of a tag can be included in the list as an object after
+  * the tag's name, like: ['Parent',{'attr:1'},'Child'] to find Child in XML like:
+  * <Tag><Parent attr="1"><Child>...</Child></Parent></Tag> */
 TagNode.prototype.query = function(partList) {
 	var partNum,partCount;
 	var part;
@@ -119,6 +143,7 @@ TagNode.prototype.query = function(partList) {
 	return(tag);
 };
 
+/** Works like the query method but as a last step finds a child text node. */
 TagNode.prototype.queryText = function(partList) {
 	var tag;
 	var childList;
@@ -143,7 +168,8 @@ TagNode.prototype.setComment=function(txt) {
 	this.comment=txt;
 };
 
-/** @constructor */
+/** @constructor
+  * Represents an SLD rule captured in memory. */
 var Rule = function(id) {
 	this.id=id;
 	this.nameList=[];
@@ -166,11 +192,13 @@ Rule.prototype.formatComment=function() {
 	return(this.comment || '');
 };
 
+/** Produce rule description for JSON output. */
 Rule.prototype.encode = function(xmlEncoder, outputCharPos) {
 	return(this.id+'\t'+outputCharPos+'\t'+this.formatNames()+'\t'+this.formatComment());
 };
 
-/** @constructor */
+/** @constructor
+  * Encoder for XML entities like &gt; while decoding is handled by sax. */
 var EntityEncoder = function() {
 	this.entityCodeTbl = {};
 	this.initEntityCodeTbl();
@@ -183,7 +211,7 @@ EntityEncoder.prototype.initEntityCodeTbl = function() {
 	}
 };
 
-// Encode special characters as XML entities.
+/** Encode special characters as XML entities. */
 EntityEncoder.prototype.encode = function(txt) {
 	var pos, len;
 	var chr, entityCode, out;
@@ -213,7 +241,9 @@ EntityEncoder.prototype.encode = function(txt) {
 	return out;
 };
 
-/** @constructor */
+/** @constructor
+  * Encodes JSON objects to XML. JSON object tree must consist of instances of
+  * the FieldMarkerNode, CommentNode, TextNode and TagNode classes. */
 var XmlEncoder = function() {
 	this.entityEncoder = new EntityEncoder();
 }
@@ -280,7 +310,9 @@ XmlEncoder.prototype.encodeText = function(txt) {
 	return this.entityEncoder.encode(txt);
 };
 
-/** @constructor */
+/** @constructor
+  * Main class of the parser, pipes input data to sax and sets up handlers to
+  * process XML tags. */
 var SldParser = function(outStream) {
 	this.captureStack = [];
 	this.capturing = false;
@@ -374,6 +406,8 @@ SldParser.prototype.needsCapturing = function(node) {
 	return false;
 };
 
+/** Called when sax has read an opening tag. Recognizes if it's an SLD rule
+  * and flags everything inside it to be temporarily stored in JSON. */
 SldParser.prototype.handleOpeningTag = function(node) {
 	var obj;
 	var needsProcessing = false;
@@ -395,6 +429,8 @@ SldParser.prototype.handleOpeningTag = function(node) {
 	this.latestComment=null;
 };
 
+/** Called when sax has read a closing tag. Passed on as is or if the tag was
+  * captured into JSON, processes it and encodes back to XML. */
 SldParser.prototype.handleClosingTag = function(tagName) {
 	if (this.capturing) {
 		this.captureClosingTag();
@@ -429,6 +465,7 @@ SldParser.prototype.handleEnd = function() {
 SldParser.prototype.onProcessNode = function(node) {};
 SldParser.prototype.onEnd = function() {};
 
+/** Main function, reads input and writes output. */
 function parse() {
 	var ruleId=0;
 	var fieldId=0;
@@ -441,6 +478,7 @@ function parse() {
 
 	var parser = new SldParser(outStream);
 
+	/** Handle all processing of SLD rules. */
 	parser.onProcessNode = function(node) {
 		var rule;
 		var spec;
@@ -521,4 +559,5 @@ function parse() {
 	parser.parse(inStream);
 }
 
+// This is where the program actually begins.
 parse();
