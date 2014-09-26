@@ -1,5 +1,7 @@
 var fs=require('fs');
 
+var placeHolder='$';
+
 var template=fs.readFileSync(process.argv[2],'utf-8');
 var conf=fs.readFileSync(process.argv[3],'utf-8');
 
@@ -14,12 +16,14 @@ for(lineNum=0;lineNum<lineCount;lineNum++) {
 	line=lineList[lineNum];
 
 	fieldList=line.split('\t');
-	if(fieldList.length<5) continue;
+	if(fieldList.length<6) continue;
 
-	out+=template.substr(pos,+fieldList[2]-pos);
-	out+=fieldList[4];
-	pos=+fieldList[2]+1;
-	if(template.charAt(pos-1)!='$') console.error('Template is corrupt! No field at character offset '+pos);
+	newPos=+fieldList[3];
+
+	out+=template.substr(pos,newPos-pos);
+	out+=fieldList[5];
+	pos=newPos+placeHolder.length;
+	if(template.substr(pos-1,placeHolder.length)!=placeHolder) console.error('Template is corrupt! No field at character offset '+pos);
 }
 
 out+=template.substr(pos);

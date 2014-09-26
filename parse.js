@@ -14,6 +14,8 @@
 var fs = require('fs');
 var sax = require('sax');
 
+var placeHolder='$';
+
 /** Return reference to function fn that when called, makes fn see scope
   * as "this" variable. */
 function bindToScope(scope, fn) {
@@ -33,7 +35,7 @@ var FieldMarkerNode = function(id,typeName,defaultValue,rule) {
 };
 
 FieldMarkerNode.prototype.encode = function(xmlEncoder, outputCharPos) {
-	console.log('\t'+this.id+'\t'+outputCharPos+'\t'+this.typeName+'\t'+this.defaultValue);
+	console.log('Field'+'\t'+'\t'+this.id+'\t'+outputCharPos+'\t'+this.typeName+'\t'+this.defaultValue);
 
 	return('');
 };
@@ -342,6 +344,8 @@ var SldParser = function(outStream) {
 	/** @type {number} Number of characters written into XML output. */
 	this.outputCharPos = 0;
 
+	this.nestingDepth = 0;
+
 	this.xmlStream = null;
 	this.initStream();
 
@@ -409,7 +413,7 @@ SldParser.prototype.captureClosingTag = function() {
 	if (this.captureStack.length == 0) this.capturing = false;
 
 	if (obj.needsProcessing) {
-		this.onProcessNode(obj);
+		this.onCaptureDone(obj);
 		txt = this.xmlEncoder.encodeCapturedNode(obj, this.outputCharPos);
 
 		if (this.capturing) captureText(txt);
@@ -430,8 +434,16 @@ SldParser.prototype.handleXmlHeader = function(node) {
 	this.writeOut('<?' + node.name + ' ' + node.body + '?>');
 };
 
-SldParser.prototype.needsCapturing = function(node) {
+SldParser.prototype.isCaptureNeeded = function(node) {
 	if (node.name == 'Rule') {
+		return true;
+	}
+
+	return false;
+};
+
+SldParser.prototype.isTagHandlerNeeded = function(node) {
+	if (node.name == 'FeatureTypeStyle') {
 		return true;
 	}
 
@@ -444,7 +456,11 @@ SldParser.prototype.handleOpeningTag = function(node) {
 	var obj;
 	var needsProcessing = false;
 
-	if (this.needsCapturing(node)) {
+	if(this.isTagHandlerNeeded(node)) {
+		this.onTag(node);
+	}
+
+	if (this.isCaptureNeeded(node)) {
 		this.capturing = true;
 		needsProcessing = true;
 	}
@@ -459,6 +475,7 @@ SldParser.prototype.handleOpeningTag = function(node) {
 	}
 
 	this.latestComment=null;
+	this.nestingDepth++;
 };
 
 /** Called when sax has read a closing tag. Passed on as is or if the tag was
@@ -471,6 +488,7 @@ SldParser.prototype.handleClosingTag = function(tagName) {
 	}
 
 	this.latestComment=null;
+	this.nestingDepth--;
 };
 
 /** Called when sax has read text or whitespace. */
@@ -500,12 +518,14 @@ SldParser.prototype.handleEnd = function() {
 /** Called when a tag captured into a Javascript object has been read completely
   * and is about to be encoded back into XML. Override this method to process
   * the decoded XML data. */
-SldParser.prototype.onProcessNode = function(node) {};
+SldParser.prototype.onCaptureDone = function(node) {};
 /** Override to do something after parsing is done. */
 SldParser.prototype.onEnd = function() {};
+SldParser.prototype.onTag = function() {};
 
 /** Main function, reads input and writes output. */
 function parse() {
+	var featureTypeId=0;
 	var ruleId=0;
 	var fieldId=0;
 
@@ -518,7 +538,7 @@ function parse() {
 	var parser = new SldParser(outStream);
 
 	/** Handle all processing of SLD rules. */
-	parser.onProcessNode = function(node) {
+	parser.onCaptureDone = function(node) {
 		var rule;
 		var spec;
 		var field;
@@ -589,7 +609,7 @@ function parse() {
 			}
 		}
 
-		console.log('\n'+rule.encode(this.xmlEncoder,this.outputCharPos));
+		console.log('\n'+'Rule'+'\t'+rule.encode(this.xmlEncoder,this.outputCharPos));
 
 		for(var i=0;i<fieldSpecList.length;i++) {
 			spec=fieldSpecList[i];
@@ -598,8 +618,12 @@ function parse() {
 
 			marker=new FieldMarkerNode(fieldId++,serializeSpec(spec),field.getText(),rule);
 			field.parent.insertBefore(field,marker);
-			field.setText('$');
+			field.setText(placeHolder);
 		}
+	};
+
+	parser.onTag=function(node) {
+		console.log('featureType'+'\t'+featureTypeId++);
 	};
 
 	parser.onEnd=function() {
