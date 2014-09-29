@@ -137,12 +137,20 @@ SldInserter.prototype.insertTemplate=function(templatePath) {
 	var self=this;
 
 	return(this.readFile(templatePath,'SLD template').then(function(sldTemplate) {
-		return(self.db.querySingle('INSERT INTO sld_template (content,name) VALUES ($1,$2) RETURNING id',[sldTemplate,'foobar']));
+		return(self.db.querySingle(
+			'INSERT INTO sld_template (content,name)'+
+			' VALUES ($1,$2)'+
+			' RETURNING id',[sldTemplate,'foobar']
+		));
 	}));
 };
 
 SldInserter.prototype.insertFeatureType=function(templateId) {
-	return(this.db.querySingle('INSERT INTO sld_featuretype (template_id,name,title,featuretype_name) VALUES ($1,$2,$3,$4) RETURNING id',[templateId,'','','']));
+	return(this.db.querySingle(
+		'INSERT INTO sld_featuretype (template_id,name,title,featuretype_name)'+
+		' VALUES ($1,$2,$3,$4)'+
+		' RETURNING id',[templateId,'','','']
+	));
 };
 
 SldInserter.prototype.insertRule=function(featureTypeInserted,fieldList) {
@@ -150,7 +158,11 @@ SldInserter.prototype.insertRule=function(featureTypeInserted,fieldList) {
 
 	return(featureTypeInserted.then(function(featureTypeId) {
 		var nameList=fieldList[3].split(';');
-		return(self.db.querySingle('INSERT INTO sld_rule (featuretype_id,name,title,abstract) VALUES ($1,$2,$3,$4) RETURNING id',[featureTypeId.id,nameList[0],nameList[1],nameList[2]]));
+		return(self.db.querySingle(
+			'INSERT INTO sld_rule (featuretype_id,name,title,abstract)'+
+			' VALUES ($1,$2,$3,$4)'+
+			' RETURNING id',[featureTypeId.id,nameList[0],nameList[1],nameList[2]]
+		));
 	}));
 };
 
@@ -159,18 +171,34 @@ SldInserter.prototype.insertParam=function(ruleInserted,fieldList) {
 	var defer=new Deferred();
 
 	ruleInserted.then(function(ruleId) {
-		var typeFound=self.db.querySingle('SELECT id,name,symbolizer FROM sld_type WHERE symbolizer=$1',[fieldList[4]]);
+		var typeFound=self.db.querySingle(
+			'SELECT id,name,symbolizer'+
+			' FROM sld_type'+
+			' WHERE symbolizer=$1',[fieldList[4]]
+		);
 
 		typeFound.then(function(typeRow) {
-			self.db.querySingle('INSERT INTO sld_param (rule_id,template_offset,type_id,default_value) VALUES ($1,$2,$3,$4) RETURNING id',[ruleId.id,fieldList[3],typeRow.id,fieldList[5]]).then(function() {
+			self.db.querySingle(
+				'INSERT INTO sld_param (rule_id,template_offset,type_id,default_value)'+
+				' VALUES ($1,$2,$3,$4)'+
+				' RETURNING id',[ruleId.id,fieldList[3],typeRow.id,fieldList[5]]
+			).then(function() {
 				defer.resolve();
 			});
 		});
 
 		typeFound.catch(function() {
-			return(self.db.querySingle('INSERT INTO sld_type (name,symbolizer) VALUES ($1,$2) RETURNING id',['',fieldList[4]]));
+			return(self.db.querySingle(
+				'INSERT INTO sld_type (name,symbolizer)'+
+				' VALUES ($1,$2)'+
+				' RETURNING id',['',fieldList[4]]
+			));
 		}).then(function(typeRow) {
-			self.db.querySingle('INSERT INTO sld_param (rule_id,template_offset,type_id,default_value) VALUES ($1,$2,$3,$4) RETURNING id',[ruleId.id,fieldList[3],typeRow.id,fieldList[5]]).then(function() {
+			self.db.querySingle(
+				'INSERT INTO sld_param (rule_id,template_offset,type_id,default_value)'+
+				' VALUES ($1,$2,$3,$4)'+
+				' RETURNING id',[ruleId.id,fieldList[3],typeRow.id,fieldList[5]]
+			).then(function() {
 				defer.resolve();
 			});
 		}).catch(function(err) {defer.reject(err);});
@@ -179,62 +207,63 @@ SldInserter.prototype.insertParam=function(ruleInserted,fieldList) {
 	return(defer.promise);
 };
 
-SldInserter.prototype.insertConfig=function(configPath,templateRow) {
+SldInserter.prototype.parseConfig=function(sldConfig,templateId) {
+	var defer=new Deferred();
 	var promiseList=[];
+	var lineList;
+	var lineNum,lineCount;
+	var fieldList;
+	var featureTypeInserted,ruleInserted,fieldInserted;
 
-	var self=this;
+	lineList=sldConfig.split(/\r?\n/);
+	lineCount=lineList.length;
 
-	var inputReady=this.readFile(configPath,'SLD config');
-	var ready=inputReady.then(function(sldConfig) {
-		var defer=new Deferred();
-		var lineList;
-		var lineNum,lineCount;
-		var fieldList;
-		var featureTypeInserted,ruleInserted,fieldInserted;
+	for(lineNum=0;lineNum<lineCount;lineNum++) {
+		line=lineList[lineNum];
+		if(!line) continue;
+		fieldList=line.split('\t');
 
-		lineList=sldConfig.split(/\r?\n/);
-		lineCount=sldConfig.length;
+		type=fieldList[0];
 
-		for(lineNum=0;lineNum<lineCount;lineNum++) {
-			line=lineList[lineNum];
-			if(!line) continue;
-			fieldList=line.split('\t');
-
-			type=fieldList[0];
-
-			if(type=='FeatureType') {
-				featureTypeInserted=self.insertFeatureType(templateRow.id);
-				featureTypeInserted.catch(function(err) {
-					defer.reject('Error inserting feature type: '+err);
-				});
-				promiseList.push(featureTypeInserted);
-			}
-
-			if(type=='Rule') {
-				ruleInserted=self.insertRule(featureTypeInserted,fieldList);
-				ruleInserted.catch(function(err) {
-					defer.reject('Error inserting rule: '+err);
-				});
-				promiseList.push(ruleInserted);
-			}
-
-			if(type=='Field') {
-				paramInserted=self.insertParam(ruleInserted,fieldList);
-				paramInserted.catch(function(err) {
-					defer.reject('Error inserting field: '+err);
-				});
-				promiseList.push(paramInserted);
-			}
+		if(type=='FeatureType') {
+			featureTypeInserted=this.insertFeatureType(templateId);
+			featureTypeInserted.catch(function(err) {
+				defer.reject('Error inserting feature type: '+err);
+			});
+			promiseList.push(featureTypeInserted);
 		}
 
-		Promise.all(promiseList).then(function() {
-			defer.resolve();
-		});
+		if(type=='Rule') {
+			ruleInserted=this.insertRule(featureTypeInserted,fieldList);
+			ruleInserted.catch(function(err) {
+				defer.reject('Error inserting rule: '+err);
+			});
+			promiseList.push(ruleInserted);
+		}
 
-		return(defer.promise);
+		if(type=='Field') {
+			paramInserted=this.insertParam(ruleInserted,fieldList);
+			paramInserted.catch(function(err) {
+				defer.reject('Error inserting field: '+err);
+			});
+			promiseList.push(paramInserted);
+		}
+	}
+
+	Promise.all(promiseList).then(function() {
+		defer.resolve();
 	});
 
-	return(ready);
+	return(defer.promise);
+};
+
+SldInserter.prototype.insertConfig=function(configPath,templateId) {
+	var self=this;
+	var inputReady=this.readFile(configPath,'SLD config');
+
+	return(inputReady.then(function(sldConfig) {
+		return(self.parseConfig(sldConfig,templateId));
+	}));
 };
 
 function run() {
@@ -247,7 +276,7 @@ function run() {
 	});
 
 	var configInserted=templateInserted.then(function(templateRow) {
-		return(inserter.insertConfig(process.argv[3],templateRow));
+		return(inserter.insertConfig(process.argv[3],templateRow.id));
 	});
 
 	var ready=configInserted;
