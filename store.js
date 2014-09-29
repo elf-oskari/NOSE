@@ -158,6 +158,7 @@ SldInserter.prototype.insertRule=function(featureTypeInserted,fieldList) {
 
 	return(featureTypeInserted.then(function(featureTypeId) {
 		var nameList=fieldList[3].split(';');
+		if(!nameList[1]) nameList[1]=fieldList[4];
 		return(self.db.querySingle(
 			'INSERT INTO sld_rule (featuretype_id,name,title,abstract)'+
 			' VALUES ($1,$2,$3,$4)'+
