@@ -546,7 +546,7 @@ function parse() {
 		var nameNode;
 
 		var namePathList=[
-			['Name'],['Title']
+			['Name'],['Title'],['Abstract']
 		];
 
 		/** List of fields (editable SLD parameters) and how to find them.
@@ -606,7 +606,7 @@ function parse() {
 			nameNode=node.queryText(namePathList[i]);
 			if(nameNode) {
 				rule.addName(nameNode.getText());
-			}
+			} else rule.addName('');
 		}
 
 		console.log('\n'+'Rule'+'\t'+rule.encode(this.xmlEncoder,this.outputCharPos));
@@ -623,7 +623,7 @@ function parse() {
 	};
 
 	parser.onTag=function(node) {
-		console.log('featureType'+'\t'+featureTypeId++);
+		console.log('FeatureType'+'\t'+featureTypeId++);
 	};
 
 	parser.onEnd=function() {

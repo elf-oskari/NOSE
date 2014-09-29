@@ -1,8 +1,10 @@
 {
   "name": "SLD-Editor",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "private": true,
   "dependencies": {
-    "sax": "0.6.0"
+    "sax": "0.6.0",
+    "es6-promise": "1.0.0",
+    "pg.js": "3.4.4"
   }
 }
