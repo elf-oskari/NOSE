@@ -1,13 +1,19 @@
-/* This tool parses an SLD file and replaces certain recognized fields (like
- * colors and linestyles) with placeholders. It groups them by rules and also
- * produces a field description file that references each placeholder.
- * The descriptions store the original removed value and the parent tags of
- * the field.
- * Sax parses XML and calls handler functions which usually output it as is
- * which makes most data stream through the parser.
- * SLD rules and any tags inside them are first read into a Javascript object.
- * When the rule's closing tag is found, the object is processed and encoded
- * back to XML. */
+/** @fileoverview
+  * This tool parses an SLD file and replaces certain recognized fields (like
+  * colors and linestyles) with placeholders. It groups them by rules and also
+  * produces a field description file that references each placeholder.
+  * The descriptions store the original removed value and the parent tags of
+  * the field. Use like this:
+  *
+  * node parse.js original.sld template.sld > fields.csv
+  *
+  * Sax parses XML and calls handler functions which usually output it as is
+  * which makes most data stream through the parser.
+  * SLD rules and any tags inside them are first read into a Javascript object.
+  * When the rule's closing tag is found, the object is processed and encoded
+  * back to XML.
+  *
+  * New modifiable SLD parameters can be added in the fieldSpecList variable. */
 
 'use strict';
 
