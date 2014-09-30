@@ -1,3 +1,21 @@
+/** @fileoverview
+  * This tool reads the output of parse.js and writes it into a PostgreSQL
+  * database. Use like this:
+  *
+  * node store.js template.sld fields.csv
+  *
+  * Data gets written into the following tables:
+  *
+  * - sld_template      Template XML from parse.js, with modifiable parameters
+  *                     replaced by placeholders.
+  * - sld_featuretype   FeatureTypeStyle tags.
+  * - sld_rule          Rules inside FeatureTypeStyles, and their names.
+  * - sld_param         Modifiable parameters inside rules, and their
+  *                     default values.
+  * - sld_type          Location of each parameter type in the SLD structure.
+  *                     Essentially fieldSpecList from parse.js is stored here
+  *                     in serialized form. */
+
 var fs=require('fs');
 var pg=require('pg.js');
 var Promise = require('es6-promise').Promise;
