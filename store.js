@@ -2,6 +2,7 @@ var fs=require('fs');
 var pg=require('pg.js');
 var Promise = require('es6-promise').Promise;
 
+/** Deferred encapsulates a promise that gets fulfilled by outside code. */
 var Deferred=function() {
 	var self=this;
 
@@ -19,10 +20,14 @@ function bindToScope(scope, fn) {
 	};
 };
 
+/** PostgreSQL database interface.
+  * Simple wrapper to use promises with pg.js. */
 var PgDatabase=function() {
 	this.client=null;
 };
 
+/** @param {Object} conf Contains attributes:
+  * host, port, database, user and password. */
 PgDatabase.prototype.connect=function(conf) {
 	var defer=new Deferred();
 
@@ -39,6 +44,7 @@ PgDatabase.prototype.close=function(conf) {
 	return(Promise.resolve(this.client.end()));
 }
 
+/** Execute query without reading any results. */
 PgDatabase.prototype.exec=function() {
 	var query=this.client.query.apply(this.client,arguments);
 	var defer=new Deferred();
@@ -54,6 +60,7 @@ PgDatabase.prototype.exec=function() {
 	return(defer.promise);
 }
 
+/** Send query to database and read a single result row. */
 PgDatabase.prototype.querySingle=function() {
 	var query=this.client.query.apply(this.client,arguments);
 	var defer=new Deferred();
@@ -87,11 +94,14 @@ PgDatabase.prototype.rollback=function() {
 	return(this.exec('ROLLBACK'));
 }
 
+/** SldInserter stores a parsed SLD template and field configuration
+  * into an SQL database. */
 var SldInserter=function() {
 	this.db=null;
 	this.dbConf=null;
 }
 
+/** @param {string} dbPath Name of JSON file with database address and credentials. */
 SldInserter.prototype.connect=function(dbPath) {
 	var defer=new Deferred();
 
@@ -108,18 +118,14 @@ SldInserter.prototype.connect=function(dbPath) {
 	return(defer.promise.then(this.db.connect(this.dbConf)).then(this.db.begin()));
 };
 
+/** Roll back current transaction and close connection. */
 SldInserter.prototype.abort=function() {
-	return(this.db.rollback().then(this.db.close()));
+	return(this.db.rollback().then(bindToScope(this.db,this.db.close)));
 };
 
+/** Commit current transaction and close connection. */
 SldInserter.prototype.finish=function() {
-	var self=this;
-
-	console.log('COMMIT');
-
-	return(this.db.commit().then(function() {
-		return(self.db.close());
-	}));
+	return(this.db.commit().then(bindToScope(this.db,this.db.close)));
 };
 
 SldInserter.prototype.readFile=function(path,name) {
@@ -287,7 +293,6 @@ function run() {
 		console.error(err);
 		return;
 	});
-
 
 	ready.then(function() {
 		return(inserter.finish());

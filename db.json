@@ -1,0 +1,7 @@
+{
+	"host":"database-server.example.invalid",
+	"port":5432,
+	"database":"sld_styles",
+	"user":"root",
+	"password":"secret"
+}

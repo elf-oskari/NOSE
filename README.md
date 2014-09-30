@@ -13,8 +13,9 @@ SLD-Editor is an Node.js based SLD backend.
 
 If you want to store an SLD template in a PostgreSQL database after creating it:
 
-1. Modify db.json
-2. node store.js template.sld fields.csv
+1. Use sql/sld_styles_create_tables_script.sql to set up your database
+2. Modify db.json
+3. node store.js template.sld fields.csv
 
 ## Versioning
 
