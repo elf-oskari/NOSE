@@ -20,7 +20,8 @@ var fs=require('fs');
 var pg=require('pg.js');
 var Promise = require('es6-promise').Promise;
 
-/** Deferred encapsulates a promise that gets fulfilled by outside code. */
+/** @constructor
+  * Deferred encapsulates a promise that gets fulfilled by outside code. */
 var Deferred=function() {
 	var self=this;
 
@@ -30,15 +31,18 @@ var Deferred=function() {
 	});
 };
 
-/** Return reference to function fn that when called, makes fn see scope
-  * as "this" variable. */
+/** Return a new function that calls fn making it see the desired scope
+  * through its "this" variable.
+  * @param {Object} scope Variable fn should see as "this".
+  * @param {function()} fn Function to call. */
 function bindToScope(scope, fn) {
 	return function() {
 		fn.apply(scope, arguments);
 	};
 };
 
-/** PostgreSQL database interface.
+/** @constructor
+  * PostgreSQL database interface.
   * Simple wrapper to use promises with pg.js. */
 var PgDatabase=function() {
 	this.client=null;
@@ -112,7 +116,8 @@ PgDatabase.prototype.rollback=function() {
 	return(this.exec('ROLLBACK'));
 }
 
-/** SldInserter stores a parsed SLD template and field configuration
+/** @constructor
+  * SldInserter stores a parsed SLD template and field configuration
   * into an SQL database. */
 var SldInserter=function() {
 	this.db=null;
@@ -146,17 +151,25 @@ SldInserter.prototype.finish=function() {
 	return(this.db.commit().then(bindToScope(this.db,this.db.close)));
 };
 
+/** Read a file and retuŕn its contents in a promise.
+  * @param {string} path File to read.
+  * @param {string} name Description of the file for error messages.
+  * @return {Promise} */
 SldInserter.prototype.readFile=function(path,name) {
 	var defer=new Deferred();
 
 	fs.readFile(path,{encoding:'utf-8'},function(err,data) {
-		if(err) defer.reject('Unable to read '+name+': '+err);
+		if(err) defer.reject('Unable to read '+name+' from '+path+': '+err);
 		defer.resolve(data);
 	})
 
 	return(defer.promise);
 };
 
+/** Read entire text contents of an SLD template and insert them into a single
+  * database row.
+  * @param {string} templatePath Path of file to read.
+  * @return {Promise} */
 SldInserter.prototype.insertTemplate=function(templatePath) {
 	var self=this;
 
@@ -169,6 +182,8 @@ SldInserter.prototype.insertTemplate=function(templatePath) {
 	}));
 };
 
+/** @param {number} templateId Refers to a template in the database.
+  * @return {Promise} */
 SldInserter.prototype.insertFeatureType=function(templateId) {
 	return(this.db.querySingle(
 		'INSERT INTO sld_featuretype (template_id,name,title,featuretype_name)'+
@@ -177,6 +192,10 @@ SldInserter.prototype.insertFeatureType=function(templateId) {
 	));
 };
 
+/** @param {Promise} featureTypeInserted Should resolve to the ID of an
+  * inserted feature type.
+  * @param {Array.<string>} fieldList Data describing the feature type.
+  * @return {Promise} */
 SldInserter.prototype.insertRule=function(featureTypeInserted,fieldList) {
 	var self=this;
 
@@ -191,6 +210,10 @@ SldInserter.prototype.insertRule=function(featureTypeInserted,fieldList) {
 	}));
 };
 
+/** Insert an SLD parameter description into the database.
+  * @param {Promise} ruleInserted Should resolve to the ID of an inserted rule.
+  * @param {Array.<string>} fieldList Data describing the parameter type etc.
+  * @return {Promise} */
 SldInserter.prototype.insertParam=function(ruleInserted,fieldList) {
 	var self=this;
 	var defer=new Deferred();
@@ -232,8 +255,13 @@ SldInserter.prototype.insertParam=function(ruleInserted,fieldList) {
 	return(defer.promise);
 };
 
+/** Insert rule and parameter descriptions from parse.js into the database.
+  * @param {string} sldConfig Entire config file text content to parse.
+  * @param {number} templateId Refers to a template in the database.
+  * @return {Promise} Resolved when everything has been successfully inserted. */
 SldInserter.prototype.parseConfig=function(sldConfig,templateId) {
 	var defer=new Deferred();
+	/** A separate promise for each database INSERT command to track them. */
 	var promiseList=[];
 	var lineList;
 	var lineNum,lineCount;
@@ -275,6 +303,7 @@ SldInserter.prototype.parseConfig=function(sldConfig,templateId) {
 		}
 	}
 
+	// Ready when all inserts finish.
 	Promise.all(promiseList).then(function() {
 		defer.resolve();
 	});
@@ -282,6 +311,10 @@ SldInserter.prototype.parseConfig=function(sldConfig,templateId) {
 	return(defer.promise);
 };
 
+/** Read SLD parameters and store them associated with templateId in the database.
+  * @param {string} configPath Path of file with parameter descriptions.
+  * @param {number} templateId Refers to a template in the database.
+  * @return {Promise} Resolved when everything has been successfully inserted. */
 SldInserter.prototype.insertConfig=function(configPath,templateId) {
 	var self=this;
 	var inputReady=this.readFile(configPath,'SLD config');
@@ -291,6 +324,7 @@ SldInserter.prototype.insertConfig=function(configPath,templateId) {
 	}));
 };
 
+/** Main function, reads input and writes output. */
 function run() {
 	var inserter=new SldInserter();
 
@@ -319,4 +353,5 @@ function run() {
 	});
 }
 
+// This is where the program actually begins.
 run();
