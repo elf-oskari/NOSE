@@ -53,7 +53,11 @@ function bindToScope(scope, fn) {
 	};
 };
 
+/** @constructor */
+var Node = function() {};
+
 /** @constructor
+  * @extends {Node}
   * Marker that when exported as XML, outputs a field definition in JSON format
   * to another file including the marker's character offset in XML output.
   * @param {number} id
@@ -78,6 +82,7 @@ FieldMarkerNode.prototype.encode = function(xmlEncoder, outputCharPos) {
 };
 
 /** @constructor
+  * @extends {Node}
   * Represents an XML comment.
   * @param {string} txt Text inside the comment. */
 var CommentNode = function(txt) {
@@ -92,6 +97,7 @@ CommentNode.prototype.encode = function(xmlEncoder, outputCharPos) {
 };
 
 /** @constructor
+  * @extends {Node}
   * Represents text or whitespace in an XML document.
   * @param {string} txt. */
 var TextNode = function(txt) {
@@ -116,12 +122,14 @@ TextNode.prototype.encode = function(xmlEncoder, outputCharPos) {
 };
 
 /** @constructor
+  * @extends {Node}
   * Represents an XML tag captured in memory for processing.
   * @param {Object} node Sax node object. */
 var TagNode = function(node) {
 	/** @type {Object} Sax node object. */
 	this.node = node;
-	/** @type {Array.<Object>} Child tags, text/comment nodes or markers. */
+	/** @type {Array.<Node>} Contains mixture of:
+	  * FieldMarkerNode, CommentNode, TextNode and TagNode */
 	this.childList = [];
 	/** @type {string} Human-readable description. */
 	this.comment=null;
@@ -252,17 +260,19 @@ Rule.prototype.setComment=function(txt) {
 	this.comment=txt;
 };
 
-/** @return {string} */
+/** Format all names given to the rule for outputting parameter description.
+  * @return {string} */
 Rule.prototype.formatNamesForJson=function() {
 	return(this.nameList.join(';'));
 };
 
-/** @return {string} */
+/** Format comment found near the rule for outputting parameter description.
+  * @return {string} */
 Rule.prototype.formatCommentForJson=function() {
 	return(this.comment || '');
 };
 
-/** Produce rule description for JSON output.
+/** Produce rule description for CSV (probably JSON in the future) output.
   * @param {XmlEncoder} xmlEncoder
   * @param {number} outputCharPos */
 Rule.prototype.encode = function(xmlEncoder, outputCharPos) {
@@ -288,7 +298,9 @@ EntityEncoder.prototype.initEntityCodeTbl = function() {
 	}
 };
 
-/** Encode special characters as XML entities. */
+/** Encode special characters as XML entities.
+  * @param {string} txt
+  * @return {string} */
 EntityEncoder.prototype.encode = function(txt) {
 	var pos, len;
 	var chr, entityCode, out;
@@ -352,23 +364,22 @@ XmlEncoder.prototype.encodeClosingTag = function(tagName) {
 	return '</' + tagName + '>';
 };
 
+/** @param {Node} obj
+  * @param {number} outputCharPos */
 XmlEncoder.prototype.encodeCapturedNode = function(obj, outputCharPos) {
 	var node;
-	var childList;
 
 	if (obj instanceof TagNode) {
 		node = obj.node;
-		childList = obj.childList;
 
-		return this.encodeCapturedTag(node, childList, outputCharPos);
+		return this.encodeCapturedTag(node, obj.childList, outputCharPos);
 	} else {
 		return obj.encode(this, outputCharPos);
 	}
 };
 
-/** @param {Object} node Sax node object.
-  * @param {Array.<*>} childList Contains mixture of:
-  * FieldMarkerNode, CommentNode, TextNode and TagNode
+/** @param {TagNode} node
+  * @param {Array.<Node>} childList
   * @param {number} outputCharPos
   * @return {string} */
 XmlEncoder.prototype.encodeCapturedTag = function(node, childList, outputCharPos) {
@@ -388,10 +399,14 @@ XmlEncoder.prototype.encodeCapturedTag = function(node, childList, outputCharPos
 	return txt;
 };
 
+/** @param {string} txt
+  * @return {string} */
 XmlEncoder.prototype.encodeComment = function(txt) {
 	return '<!--' + txt + '-->';
 };
 
+/** @param {string} txt
+  * @return {string} */
 XmlEncoder.prototype.encodeText = function(txt) {
 	return this.entityEncoder.encode(txt);
 };
@@ -493,14 +508,20 @@ SldParser.prototype.captureText = function(txt) {
 	this.getCurrentTag().appendChild(new TextNode(txt));
 };
 
+/** @param {string} txt Text inside the comment. */
 SldParser.prototype.captureComment = function(txt) {
 	this.getCurrentTag().appendChild(new CommentNode(txt));
 };
 
+/** @param {Object} node Sax node object. */
 SldParser.prototype.handleXmlHeader = function(node) {
 	this.writeOut('<?' + node.name + ' ' + node.body + '?>');
 };
 
+/** Check if the node is an SLD rule, which needs to be read temporarily into
+  * a Javascript object for processing before encoding it back to XML output.
+  * @param {Object} node Sax node object.
+  * @return {boolean} */
 SldParser.prototype.isCaptureNeeded = function(node) {
 	if (node.name == 'Rule') {
 		return true;
@@ -509,6 +530,10 @@ SldParser.prototype.isCaptureNeeded = function(node) {
 	return false;
 };
 
+/** Check if the tag requires handling to output useful SLD structure around
+  * actual rules.
+  * @param {Object} node Sax node object.
+  * @return {boolean} */
 SldParser.prototype.isTagHandlerNeeded = function(node) {
 	if (node.name == 'FeatureTypeStyle') {
 		return true;
@@ -588,11 +613,14 @@ SldParser.prototype.handleEnd = function() {
 
 /** Called when a tag captured into a Javascript object has been read completely
   * and is about to be encoded back into XML. Override this method to process
-  * the decoded XML data. */
+  * the decoded XML data.
+  * @param {TagNode} node */
 SldParser.prototype.onCaptureDone = function(node) {};
 /** Override to do something after parsing is done. */
 SldParser.prototype.onEnd = function() {};
-SldParser.prototype.onTag = function() {};
+/** Override to do something about each tag when it begins.
+  * @param {Object} node Sax node object. */
+SldParser.prototype.onTag = function(node) {};
 
 /** Main function, reads input and writes output. */
 function parse() {
@@ -608,7 +636,8 @@ function parse() {
 
 	var parser = new SldParser(outStream);
 
-	/** Handle all processing of SLD rules. */
+	/** Handle all processing of SLD rules.
+	  * @param {TagNode} node */
 	parser.onCaptureDone = function(node) {
 		var rule;
 		var spec;
@@ -661,6 +690,9 @@ function parse() {
 			} else rule.addName('');
 		}
 
+		// Maybe in the future we need to process scale denominators:
+		// console.log(node.queryText(['MinScaleDenominator']).txt);
+
 		console.log('\n'+'Rule'+'\t'+rule.encode(this.xmlEncoder,this.outputCharPos));
 
 		for(var i=0;i<fieldSpecList.length;i++) {
@@ -674,6 +706,7 @@ function parse() {
 		}
 	};
 
+	/** @param {Object} node Sax node object. */
 	parser.onTag=function(node) {
 		console.log('FeatureType'+'\t'+featureTypeId++);
 	};
