@@ -1,32 +1,69 @@
-/* This tool parses an SLD file and replaces certain recognized fields (like
- * colors and linestyles) with placeholders. It groups them by rules and also
- * produces a field description file that references each placeholder.
- * The descriptions store the original removed value and the parent tags of
- * the field.
- * Sax parses XML and calls handler functions which usually output it as is
- * which makes most data stream through the parser.
- * SLD rules and any tags inside them are first read into a Javascript object.
- * When the rule's closing tag is found, the object is processed and encoded
- * back to XML. */
+/** @fileoverview
+  * This tool parses an SLD file and replaces certain recognized fields (like
+  * colors and linestyles) with placeholders. It groups them by rules and also
+  * produces a field description file that references each placeholder.
+  * The descriptions store the original removed value and the parent tags of
+  * the field. Use like this:
+  *
+  * node parse.js original.sld template.sld > fields.csv
+  *
+  * Sax parses XML and calls handler functions which usually output it as is
+  * which makes most data stream through the parser.
+  * SLD rules and any tags inside them are first read into a Javascript object.
+  * When the rule's closing tag is found, the object is processed and encoded
+  * back to XML.
+  *
+  * New modifiable SLD parameters can be added in the fieldSpecList variable. */
 
 'use strict';
 
 var fs = require('fs');
 var sax = require('sax');
 
+/** @type {string} Text replacing SLD template default parameter values
+  * in output. */
 var placeHolder='$';
 
-/** Return reference to function fn that when called, makes fn see scope
-  * as "this" variable. */
+/** List of fields (editable SLD parameters) and how to find them.
+  * Describes each field's parent tags up to its parent rule.
+  * A tag's required attributes are listed in an object after its name. */
+var fieldSpecList=[
+	{
+		path:['PolygonSymbolizer','Fill','GraphicFill','Graphic','Mark','WellKnownName']
+	},{
+		path:['PolygonSymbolizer','Fill','GraphicFill','Graphic','Size']
+	},{
+		path:['LineSymbolizer','Stroke','CssParameter',{'name':'stroke'}]
+	},{
+		path:['LineSymbolizer','Stroke','CssParameter',{'name':'stroke-width'}]
+	},{
+		path:['PolygonSymbolizer','Fill','GraphicFill','Graphic','Mark','Stroke','CssParameter',{'name':'stroke'}]
+	},{
+		path:['PolygonSymbolizer','Fill','GraphicFill','Graphic','Mark','Stroke','CssParameter',{'name':'stroke-width'}]
+	}
+];
+
+/** Return a new function that calls fn making it see the desired scope
+  * through its "this" variable.
+  * @param {Object} scope Variable fn should see as "this".
+  * @param {function()} fn Function to call. */
 function bindToScope(scope, fn) {
 	return function() {
 		fn.apply(scope, arguments);
 	};
 };
 
+/** @constructor */
+var Node = function() {};
+
 /** @constructor
+  * @extends {Node}
   * Marker that when exported as XML, outputs a field definition in JSON format
-  * to another file including the marker's character offset in XML output. */
+  * to another file including the marker's character offset in XML output.
+  * @param {number} id
+  * @param {string} typeName Serialized path from fieldSpecList.
+  * @param {string} defaultValue
+  * @param {Rule} rule */
 var FieldMarkerNode = function(id,typeName,defaultValue,rule) {
 	this.id = id;
 	this.typeName=typeName;
@@ -34,6 +71,10 @@ var FieldMarkerNode = function(id,typeName,defaultValue,rule) {
 	this.rule=rule;
 };
 
+/** @param {XmlEncoder} xmlEncoder
+  * @param {number} outputCharPos Number of characters in the template before
+  * this SLD parameter.
+  * @return {string} */
 FieldMarkerNode.prototype.encode = function(xmlEncoder, outputCharPos) {
 	console.log('Field'+'\t'+'\t'+this.id+'\t'+outputCharPos+'\t'+this.typeName+'\t'+this.defaultValue);
 
@@ -41,39 +82,54 @@ FieldMarkerNode.prototype.encode = function(xmlEncoder, outputCharPos) {
 };
 
 /** @constructor
-  * Represents an XML comment. */
+  * @extends {Node}
+  * Represents an XML comment.
+  * @param {string} txt Text inside the comment. */
 var CommentNode = function(txt) {
 	this.txt = txt;
 };
 
+/** @param {XmlEncoder} xmlEncoder
+  * @param {number} outputCharPos
+  * @return {string} */
 CommentNode.prototype.encode = function(xmlEncoder, outputCharPos) {
 	return xmlEncoder.encodeComment(this.txt);
 };
 
 /** @constructor
-  * Represents text or whitespace in an XML document. */
+  * @extends {Node}
+  * Represents text or whitespace in an XML document.
+  * @param {string} txt. */
 var TextNode = function(txt) {
 	this.txt = txt;
 };
 
+/** @return {string} */
 TextNode.prototype.getText = function() {
 	return this.txt;
 };
 
+/** @param {string} txt */
 TextNode.prototype.setText = function(txt) {
 	this.txt = txt;
 };
 
+/** @param {XmlEncoder} xmlEncoder
+  * @param {number} outputCharPos
+  * @return {string} */
 TextNode.prototype.encode = function(xmlEncoder, outputCharPos) {
 	return xmlEncoder.encodeText(this.txt);
 };
 
 /** @constructor
-  * Represents an XML tag captured in memory for processing. */
+  * @extends {Node}
+  * Represents an XML tag captured in memory for processing.
+  * @param {Object} node Sax node object. */
 var TagNode = function(node) {
-	/** Sax node object. */
+	/** @type {Object} Sax node object. */
 	this.node = node;
-	/** @type {Array.<Object>} Child tags, text/comment nodes or markers. */
+	/** @type {Array.<Node>} Contains mixture of:
+	  * FieldMarkerNode, CommentNode, TextNode and TagNode */
 	this.childList = [];
 	/** @type {string} Human-readable description. */
 	this.comment=null;
@@ -92,7 +148,9 @@ TagNode.prototype.insertBefore = function(child, obj) {
 };
 
 /** Check if tag's attributes matches attrTbl which is an object with
-  * required attributes as keys associated to their required values. */
+  * required attributes as keys associated to their required values.
+  * @param {string} tagName
+  * @param {Object.<string,string>} attrTbl */
 TagNode.prototype.matchRule = function(tagName,attrTbl) {
 	var attr;
 
@@ -190,23 +248,33 @@ var Rule = function(id) {
 	this.comment=null;
 };
 
+/** Add another name or description given to the rule.
+  * @param {string} name */
 Rule.prototype.addName=function(name) {
 	this.nameList.push(name);
 };
 
+/** Set comment found associated to the rule.
+  * @param {string} txt */
 Rule.prototype.setComment=function(txt) {
 	this.comment=txt;
 };
 
+/** Format all names given to the rule for outputting parameter description.
+  * @return {string} */
 Rule.prototype.formatNamesForJson=function() {
 	return(this.nameList.join(';'));
 };
 
+/** Format comment found near the rule for outputting parameter description.
+  * @return {string} */
 Rule.prototype.formatCommentForJson=function() {
 	return(this.comment || '');
 };
 
-/** Produce rule description for JSON output. */
+/** Produce rule description for CSV (probably JSON in the future) output.
+  * @param {XmlEncoder} xmlEncoder
+  * @param {number} outputCharPos */
 Rule.prototype.encode = function(xmlEncoder, outputCharPos) {
 	return(
 		this.id+'\t'+
@@ -223,14 +291,16 @@ var EntityEncoder = function() {
 	this.initEntityCodeTbl();
 };
 
+/** Create table for converting characters to sax entities. */
 EntityEncoder.prototype.initEntityCodeTbl = function() {
-	// Create table for converting characters to sax entities.
 	for (var code in sax.ENTITIES) {
 		this.entityCodeTbl[sax.ENTITIES[code]] = code;
 	}
 };
 
-/** Encode special characters as XML entities. */
+/** Encode special characters as XML entities.
+  * @param {string} txt
+  * @return {string} */
 EntityEncoder.prototype.encode = function(txt) {
 	var pos, len;
 	var chr, entityCode, out;
@@ -267,6 +337,8 @@ var XmlEncoder = function() {
 	this.entityEncoder = new EntityEncoder();
 }
 
+/** @param {Object} node Sax node object.
+  * @return {string} */
 XmlEncoder.prototype.encodeOpeningTag = function(node) {
 	var attr,value;
 	var txt;
@@ -286,24 +358,30 @@ XmlEncoder.prototype.encodeOpeningTag = function(node) {
 	return txt;
 };
 
+/** @param {string} tagName
+  * @return {string} */
 XmlEncoder.prototype.encodeClosingTag = function(tagName) {
 	return '</' + tagName + '>';
 };
 
+/** @param {Node} obj
+  * @param {number} outputCharPos */
 XmlEncoder.prototype.encodeCapturedNode = function(obj, outputCharPos) {
 	var node;
-	var childList;
 
 	if (obj instanceof TagNode) {
 		node = obj.node;
-		childList = obj.childList;
 
-		return this.encodeCapturedTag(node, childList, outputCharPos);
+		return this.encodeCapturedTag(node, obj.childList, outputCharPos);
 	} else {
 		return obj.encode(this, outputCharPos);
 	}
 };
 
+/** @param {TagNode} node
+  * @param {Array.<Node>} childList
+  * @param {number} outputCharPos
+  * @return {string} */
 XmlEncoder.prototype.encodeCapturedTag = function(node, childList, outputCharPos) {
 	var childNum, childCount;
 	var txt;
@@ -321,10 +399,14 @@ XmlEncoder.prototype.encodeCapturedTag = function(node, childList, outputCharPos
 	return txt;
 };
 
+/** @param {string} txt
+  * @return {string} */
 XmlEncoder.prototype.encodeComment = function(txt) {
 	return '<!--' + txt + '-->';
 };
 
+/** @param {string} txt
+  * @return {string} */
 XmlEncoder.prototype.encodeText = function(txt) {
 	return this.entityEncoder.encode(txt);
 };
@@ -426,14 +508,20 @@ SldParser.prototype.captureText = function(txt) {
 	this.getCurrentTag().appendChild(new TextNode(txt));
 };
 
+/** @param {string} txt Text inside the comment. */
 SldParser.prototype.captureComment = function(txt) {
 	this.getCurrentTag().appendChild(new CommentNode(txt));
 };
 
+/** @param {Object} node Sax node object. */
 SldParser.prototype.handleXmlHeader = function(node) {
 	this.writeOut('<?' + node.name + ' ' + node.body + '?>');
 };
 
+/** Check if the node is an SLD rule, which needs to be read temporarily into
+  * a Javascript object for processing before encoding it back to XML output.
+  * @param {Object} node Sax node object.
+  * @return {boolean} */
 SldParser.prototype.isCaptureNeeded = function(node) {
 	if (node.name == 'Rule') {
 		return true;
@@ -442,6 +530,10 @@ SldParser.prototype.isCaptureNeeded = function(node) {
 	return false;
 };
 
+/** Check if the tag requires handling to output useful SLD structure around
+  * actual rules.
+  * @param {Object} node Sax node object.
+  * @return {boolean} */
 SldParser.prototype.isTagHandlerNeeded = function(node) {
 	if (node.name == 'FeatureTypeStyle') {
 		return true;
@@ -451,7 +543,8 @@ SldParser.prototype.isTagHandlerNeeded = function(node) {
 };
 
 /** Called when sax has read an opening tag. Recognizes if it's an SLD rule
-  * and flags everything inside it to be temporarily stored into an object. */
+  * and flags everything inside it to be temporarily stored into an object.
+  * @param {Object} node Sax node object. */
 SldParser.prototype.handleOpeningTag = function(node) {
 	var obj;
 	var needsProcessing = false;
@@ -479,7 +572,8 @@ SldParser.prototype.handleOpeningTag = function(node) {
 };
 
 /** Called when sax has read a closing tag. Passed on as is or if the tag was
-  * captured into an object, processes it and encodes back to XML. */
+  * captured into an object, processes it and encodes back to XML.
+  * @param {string} tagName */
 SldParser.prototype.handleClosingTag = function(tagName) {
 	if (this.capturing) {
 		this.captureClosingTag();
@@ -491,7 +585,8 @@ SldParser.prototype.handleClosingTag = function(tagName) {
 	this.nestingDepth--;
 };
 
-/** Called when sax has read text or whitespace. */
+/** Called when sax has read text or whitespace.
+  * @param {string} txt */
 SldParser.prototype.handleTextNode = function(txt) {
 	if (this.capturing) {
 		this.captureText(txt);
@@ -500,7 +595,8 @@ SldParser.prototype.handleTextNode = function(txt) {
 	}
 };
 
-/** Called when sax has read a comment. */
+/** Called when sax has read a comment.
+  * @param {string} txt Text inside the comment. */
 SldParser.prototype.handleCommentNode = function(txt) {
 	if (this.capturing) {
 		this.captureComment(txt);
@@ -517,11 +613,14 @@ SldParser.prototype.handleEnd = function() {
 
 /** Called when a tag captured into a Javascript object has been read completely
   * and is about to be encoded back into XML. Override this method to process
-  * the decoded XML data. */
+  * the decoded XML data.
+  * @param {TagNode} node */
 SldParser.prototype.onCaptureDone = function(node) {};
 /** Override to do something after parsing is done. */
 SldParser.prototype.onEnd = function() {};
-SldParser.prototype.onTag = function() {};
+/** Override to do something about each tag when it begins.
+  * @param {Object} node Sax node object. */
+SldParser.prototype.onTag = function(node) {};
 
 /** Main function, reads input and writes output. */
 function parse() {
@@ -537,7 +636,8 @@ function parse() {
 
 	var parser = new SldParser(outStream);
 
-	/** Handle all processing of SLD rules. */
+	/** Handle all processing of SLD rules.
+	  * @param {TagNode} node */
 	parser.onCaptureDone = function(node) {
 		var rule;
 		var spec;
@@ -547,25 +647,6 @@ function parse() {
 
 		var namePathList=[
 			['Name'],['Title'],['Abstract']
-		];
-
-		/** List of fields (editable SLD parameters) and how to find them.
-		  * Describes each field's parent tags up to its parent rule.
-		  * A tag's required attributes are listed in an object after its name. */
-		var fieldSpecList=[
-			{
-				path:['PolygonSymbolizer','Fill','GraphicFill','Graphic','Mark','WellKnownName']
-			},{
-				path:['PolygonSymbolizer','Fill','GraphicFill','Graphic','Size']
-			},{
-				path:['LineSymbolizer','Stroke','CssParameter',{'name':'stroke'}]
-			},{
-				path:['LineSymbolizer','Stroke','CssParameter',{'name':'stroke-width'}]
-			},{
-				path:['PolygonSymbolizer','Fill','GraphicFill','Graphic','Mark','Stroke','CssParameter',{'name':'stroke'}]
-			},{
-				path:['PolygonSymbolizer','Fill','GraphicFill','Graphic','Mark','Stroke','CssParameter',{'name':'stroke-width'}]
-			}
 		];
 
 		/** Convert the list of a field's parent tags and their attributes into
@@ -609,6 +690,9 @@ function parse() {
 			} else rule.addName('');
 		}
 
+		// Maybe in the future we need to process scale denominators:
+		// console.log(node.queryText(['MinScaleDenominator']).txt);
+
 		console.log('\n'+'Rule'+'\t'+rule.encode(this.xmlEncoder,this.outputCharPos));
 
 		for(var i=0;i<fieldSpecList.length;i++) {
@@ -622,6 +706,7 @@ function parse() {
 		}
 	};
 
+	/** @param {Object} node Sax node object. */
 	parser.onTag=function(node) {
 		console.log('FeatureType'+'\t'+featureTypeId++);
 	};

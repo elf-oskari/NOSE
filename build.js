@@ -1,3 +1,12 @@
+/** @fileoverview
+  * This tool reads the output of parse.js and uses it to build an SLD file
+  * with parameters replaced by new values. Use like this:
+  *
+  * node build.js template.sld fields.csv > new.sld
+  *
+  * If fields.csv is unchanged, the file contents including comments and most
+  * whitespace should match the file originally passed to parse.js. */
+
 var fs=require('fs');
 
 var placeHolder='$';
