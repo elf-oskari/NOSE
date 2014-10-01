@@ -42,7 +42,7 @@ CREATE TABLE sld_template
   id bigserial NOT NULL,
   uuid character varying(64),
   name character varying(256) NOT NULL,
-  wms_url character varying(512) NOT NULL,
+  wms_url character varying(512),
   content text,
   created timestamp with time zone NOT NULL,
   updated timestamp with time zone,
