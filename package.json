@@ -5,6 +5,11 @@
   "dependencies": {
     "sax": "0.6.0",
     "es6-promise": "1.0.0",
-    "pg.js": "3.4.4"
+    "pg.js": "3.4.4",
+    "express": "4.9.5",
+    "lodash-node": "~2.4.1"
+  },
+  "engines": {
+    "node": ">=0.10.0"
   }
 }
