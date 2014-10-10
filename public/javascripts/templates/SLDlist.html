@@ -1,0 +1,33 @@
+
+<div class="view" id="sld-list">
+  <div class="panel panel-primary">
+    <div class="panel-heading">SLD list</div>
+    <div class="panel-body">
+      <p> Below is a list of your SLDs and templates based on those.<p>
+      <a href="/new" class="btn btn-primary">Upload SLD</a>
+    </div>
+    <table class="table table-striped table-condensed">
+      <% _.forEach(SLDtemplates, function(SLDtemplateModel) { %>
+        <thead>
+          <tr>
+            <th><%= SLDtemplateModel.get('name') %></th><th><a href="#/new" class="btn btn-primary btn-sm"><%= SLDlist.buttons.create %></a></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% _.forEach(SLDconfigs, function(SLDconfigModel) { %>
+            <tr>
+              <% if (SLDconfigModel.get('template_id') === SLDtemplateModel.get('id')) { %>
+                <td><%= SLDconfigModel.get('name') %></td>
+                <td>
+                  <a class="btn btn-warning btn-sm" href="/edit/<%= SLDconfigModel.get('id') %>"><%= SLDlist.buttons.edit %></a>
+                  <a class="btn btn-danger btn-sm" config-id="<%= SLDconfigModel.get('id') %>"><%= SLDlist.buttons.delete %></a>
+                  <a class="btn btn-success btn-sm" href="/edit/<%= SLDconfigModel.get('id') %>"><%= SLDlist.buttons.download %></a>
+                </td>
+              <% } %>
+            </tr>
+          <% }); %>
+        </tbody>
+      <% }); %>
+    </table>
+  </div>
+</div>
