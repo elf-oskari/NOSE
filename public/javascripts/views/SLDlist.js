@@ -1,9 +1,10 @@
 define([
 	'lodash',
 	'backbone',
+	'i18n!localization/nls/SLDlist',
 	'text!templates/SLDlist.html',
 	'models/sld_config'
-], function(_, Backbone, SLDListTemplate, SLDconfigModel) {
+], function(_, Backbone, locale, SLDListTemplate, SLDconfigModel) {
 	var SLDListView = Backbone.View.extend({
 		el: '.page',
 		template: _.template(SLDListTemplate),
@@ -18,7 +19,9 @@ define([
             console.log('AuthorView Initialized!', this.collection);
         },
         render: function() {
-            $(this.el).html(this.template({SLDtemplates: this.templates.models, SLDconfigs: this.configs.models}));
+        	var localization = locale;
+        	console.log(localization);
+            $(this.el).html(this.template({SLDtemplates: this.templates.models, SLDconfigs: this.configs.models, SLDlist: localization}));
             return this;
         },
         deleteConfig: function () {

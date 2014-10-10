@@ -10,7 +10,7 @@
       <% _.forEach(SLDtemplates, function(SLDtemplateModel) { %>
         <thead>
           <tr>
-            <th><%= SLDtemplateModel.get('name') %></th><th><a href="#/new" class="btn btn-primary btn-sm">Create new template</a></th>
+            <th><%= SLDtemplateModel.get('name') %></th><th><a href="#/new" class="btn btn-primary btn-sm"><%= SLDlist.buttons.create %></a></th>
           </tr>
         </thead>
         <tbody>
@@ -19,9 +19,9 @@
               <% if (SLDconfigModel.get('template_id') === SLDtemplateModel.get('id')) { %>
                 <td><%= SLDconfigModel.get('name') %></td>
                 <td>
-                  <a class="btn btn-warning btn-sm" href="/edit/<%= SLDconfigModel.get('id') %>">Edit</a>
-                  <a class="btn btn-danger btn-sm" config-id="<%= SLDconfigModel.get('id') %>">Delete</a>
-                  <a class="btn btn-success btn-sm" href="/edit/<%= SLDconfigModel.get('id') %>">Download</a>
+                  <a class="btn btn-warning btn-sm" href="/edit/<%= SLDconfigModel.get('id') %>"><%= SLDlist.buttons.edit %></a>
+                  <a class="btn btn-danger btn-sm" config-id="<%= SLDconfigModel.get('id') %>"><%= SLDlist.buttons.delete %></a>
+                  <a class="btn btn-success btn-sm" href="/edit/<%= SLDconfigModel.get('id') %>"><%= SLDlist.buttons.download %></a>
                 </td>
               <% } %>
             </tr>
