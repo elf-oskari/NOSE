@@ -43,6 +43,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // pass in all dependency references
 //var routes = require('./routes/api')(app, db, ObjectID, credentials);
+var routes = require('./routes/api')(app, path);
 
 // the startup sequence is async, therefore start the server only if everything else also works
 //function startServer() {
