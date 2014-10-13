@@ -20,6 +20,7 @@ var fs=require('fs');
 var pg=require('pg.js');
 var Promise = require('es6-promise').Promise;
 var filename = '';
+var tname = '';
 
 /** @constructor
   * Deferred encapsulates a promise that gets fulfilled by outside code. */
@@ -172,15 +173,16 @@ SldInserter.prototype.readFile=function(path, name) {
   * @param {string} name name of original sld file
   * @param {string} templatePath Path of file to read.
   * @return {Promise} */
-SldInserter.prototype.insertTemplate=function(templatePath, name) {
+SldInserter.prototype.insertTemplate=function(templatePath, name, tname) {
 	var self=this;
     self.filename = name;
+    self.tname = tname;
 
 	return(this.readFile(templatePath,'SLD template').then(function(sldTemplate) {
 		return(self.db.querySingle(
-			'INSERT INTO sld_template (content,name)'+
-			' VALUES ($1,$2)'+
-			' RETURNING id',[sldTemplate, self.filename]
+			'INSERT INTO sld_template (content,name,sld_filename)'+
+			' VALUES ($1,$2,$3)'+
+			' RETURNING id',[sldTemplate, self.tname, self.filename]
 		));
 	}));
 };
@@ -335,13 +337,13 @@ SldInserter.prototype.insertConfig=function(params,templateId) {
  * @param name  original sld file name
  * @param cb {function} status cb
  * */
-exports.store = function(params, sld_template, name, cb) {
+exports.store = function(params, sld_template, name, tname, cb) {
 	var inserter=new SldInserter();
 
 	var connected=inserter.connect('db.json');
 
 	var templateInserted=connected.then(function() {
-		return(inserter.insertTemplate(sld_template,name));
+		return(inserter.insertTemplate(sld_template,name, tname));
 	});
 
 	var configInserted=templateInserted.then(function(templateRow) {

@@ -651,7 +651,7 @@ SldParser.prototype.onEnd = function() {};
 SldParser.prototype.onTag = function(node) {};
 
 /** Parse function,  input sld file stream and writes output as sld_template */
-exports.parse = function (inFileName, fname, cb) {
+exports.parse = function (inFileName, fname, tname, cb) {
 	var featureTypeId=0;
 	var ruleId=0;
 	var fieldId=0;
@@ -741,7 +741,7 @@ exports.parse = function (inFileName, fname, cb) {
 
 	parser.onEnd=function(cd) {
 		console.log(' ');
-        cb(params,fname, err);
+        cb(params, fname, tname, err);
 	};
 
 	parser.parse(inStream);

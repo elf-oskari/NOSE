@@ -12,21 +12,22 @@ module.exports = function (app, path, parse, store) {
         form.parse(req, function (err, fields, files) {
             // `file` is the name of the <input> field of type `file`
             var old_path = files.sldfile.path,
-                fname = files.sldfile.name;
+                fname = files.sldfile.name,
+                tname = fields['tname'] || '';
 
             console.log("fields", fields);
             console.log("file name", fname);
 
             // sld parse and store to db
-            parse(old_path, fname,
-                function (params, fname, err) {
+            parse(old_path, fname, tname,
+                function (params, fname, tname, err) {
                     console.log("params", params);
 
                     if (err) {
                         res.status(500);
-                        res.json({'sld parse': 'failed for ' + fname});
+                        res.json({'sld parse': 'failed for sld file ' + fname});
                     } else {
-                        store(params, 'sld_test_template.sld', fname,
+                        store(params, 'sld_test_template.sld', fname, tname,
                             function (err) {
                                 if (err) {
                                     res.status(500);
