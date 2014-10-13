@@ -1,15 +1,18 @@
 define([
 	'lodash',
 	'backbone',
+	'jquery',
+	'bootstrap',
 	'i18n!localization/nls/SLDlist',
 	'text!templates/SLDlist.html',
 	'models/sld_config'
-], function(_, Backbone, locale, SLDListTemplate, SLDconfigModel) {
+], function(_, Backbone, $, Bootstrap, locale, SLDListTemplate, SLDconfigModel) {
 	var SLDListView = Backbone.View.extend({
 		el: '.page',
 		template: _.template(SLDListTemplate),
 		events: {
-	        'click .delete': 'deleteConfig'
+	        'click .delete': 'deleteConfig',
+	        'click .upload': 'showUpload'
       	},
 		initialize: function(params) {
             _.bindAll(this, 'render');
@@ -20,7 +23,6 @@ define([
         },
         render: function() {
         	var localization = locale;
-        	console.log(localization);
             $(this.el).html(this.template({SLDtemplates: this.templates.models, SLDconfigs: this.configs.models, SLDlist: localization}));
             return this;
         },
