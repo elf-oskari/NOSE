@@ -3,7 +3,6 @@ module.exports = function (app, path, parse, store) {
         formidable = require('formidable'),
         parse = parse,
         store = store,
-        file_name = '',
         errorMessage = "We are working on the problem, please try again later. Thanks for understanding!";
 
 
@@ -13,24 +12,21 @@ module.exports = function (app, path, parse, store) {
         form.parse(req, function (err, fields, files) {
             // `file` is the name of the <input> field of type `file`
             var old_path = files.sldfile.path,
-                file_size = files.sldfile.size,
-                file_ext = files.sldfile.name.split('.').pop(),
-                index = old_path.lastIndexOf(path.sep) + 1;
+                fname = files.sldfile.name;
 
-            file_name = files.sldfile.name;
             console.log("fields", fields);
-            console.log("file name", file_name);
+            console.log("file name", fname);
 
-            // sld parser and store cb is coming here
-            var params = parse(old_path,
-                function (params, err) {
+            // sld parse and store to db
+            parse(old_path, fname,
+                function (params, fname, err) {
                     console.log("params", params);
 
                     if (err) {
                         res.status(500);
-                        res.json({'sld parse': 'failed for '+file_name});
+                        res.json({'sld parse': 'failed for ' + fname});
                     } else {
-                        store(params, 'sld_test_template.sld', file_name,
+                        store(params, 'sld_test_template.sld', fname,
                             function (err) {
                                 if (err) {
                                     res.status(500);

@@ -50,7 +50,17 @@ var fieldSpecList=[
 		path:['PolygonSymbolizer','Fill','GraphicFill','Graphic','Mark','Stroke','CssParameter',{'name':'stroke'}]
 	},{
 		path:['PolygonSymbolizer','Fill','GraphicFill','Graphic','Mark','Stroke','CssParameter',{'name':'stroke-width'}]
-	}
+	},{
+        path:['PointSymbolizer','Graphic','Mark','Fill','CssParameter',{'name':'fill'}]
+    },
+    {
+        path:['PointSymbolizer','Graphic','Mark','WellKnownName']
+    },
+    {
+        path:['PointSymbolizer','Size','Literal']
+    },{
+        path:['PointSymbolizer','Graphic','Mark','Stroke']
+    }
 ];
 
 
@@ -146,6 +156,8 @@ var TagNode = function(node) {
 	this.childList = [];
 	/** @type {string} Human-readable description. */
 	this.comment=null;
+    // local name without prefix
+    this.localName = node.name.split(':')[node.name.split(':').length-1];
 };
 
 TagNode.prototype.appendChild = function(obj) {
@@ -167,7 +179,7 @@ TagNode.prototype.insertBefore = function(child, obj) {
 TagNode.prototype.matchRule = function(tagName,attrTbl) {
 	var attr;
 
-	if(this.node.name!=tagName) return(false);
+	if( this.node.localName!=tagName) return(false);
 
 	if(attrTbl) {
 		for(attr in attrTbl) {
@@ -356,7 +368,7 @@ XmlEncoder.prototype.encodeOpeningTag = function(node) {
 	var attr,value;
 	var txt;
 
-	txt = '<' + node.name;
+	txt = '<' +  node.localName;
 
 	for (attr in node.attributes) {
 		if (!node.attributes.hasOwnProperty(attr)) continue;
@@ -407,7 +419,7 @@ XmlEncoder.prototype.encodeCapturedTag = function(node, childList, outputCharPos
 		txt += this.encodeCapturedNode(childList[childNum], outputCharPos + txt.length);
 	}
 
-	txt += this.encodeClosingTag(node.name);
+	txt += this.encodeClosingTag( node.localName);
 
 	return txt;
 };
@@ -528,7 +540,7 @@ SldParser.prototype.captureComment = function(txt) {
 
 /** @param {Object} node Sax node object. */
 SldParser.prototype.handleXmlHeader = function(node) {
-	this.writeOut('<?' + node.name + ' ' + node.body + '?>');
+	this.writeOut('<?' + node.localName + ' ' + node.body + '?>');
 };
 
 /** Check if the node is an SLD rule, which needs to be read temporarily into
@@ -536,7 +548,7 @@ SldParser.prototype.handleXmlHeader = function(node) {
   * @param {Object} node Sax node object.
   * @return {boolean} */
 SldParser.prototype.isCaptureNeeded = function(node) {
-	if (node.name == 'Rule') {
+	if ( node.localName == 'Rule') {
 		return true;
 	}
 
@@ -548,7 +560,7 @@ SldParser.prototype.isCaptureNeeded = function(node) {
   * @param {Object} node Sax node object.
   * @return {boolean} */
 SldParser.prototype.isTagHandlerNeeded = function(node) {
-	if (node.name == 'FeatureTypeStyle') {
+	if ( node.localName == 'FeatureTypeStyle') {
 		return true;
 	}
 
@@ -561,6 +573,9 @@ SldParser.prototype.isTagHandlerNeeded = function(node) {
 SldParser.prototype.handleOpeningTag = function(node) {
 	var obj;
 	var needsProcessing = false;
+
+    // local name without prefix
+    node.localName = node.name.split(':')[node.name.split(':').length-1];
 
 	if(this.isTagHandlerNeeded(node)) {
 		this.onTag(node);
@@ -636,7 +651,7 @@ SldParser.prototype.onEnd = function() {};
 SldParser.prototype.onTag = function(node) {};
 
 /** Parse function,  input sld file stream and writes output as sld_template */
-exports.parse = function (inFileName, cb) {
+exports.parse = function (inFileName, fname, cb) {
 	var featureTypeId=0;
 	var ruleId=0;
 	var fieldId=0;
@@ -726,7 +741,7 @@ exports.parse = function (inFileName, cb) {
 
 	parser.onEnd=function(cd) {
 		console.log(' ');
-        cb(params, err);
+        cb(params,fname, err);
 	};
 
 	parser.parse(inStream);
