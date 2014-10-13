@@ -3,7 +3,8 @@ requirejs.config({
 		backbone: 'lib/backbone',
 		jquery: 'lib/jquery-1.10.2.min',
 		lodash: 'lib/lodash',
-		i18n: 'lib/i18n'
+		i18n: 'lib/i18n',
+		bootstrap: 'lib/bootstrap'
 	},
 	map: {
 		"*" : {
@@ -17,9 +18,10 @@ require([
 	'jquery',
 	'lodash',
 	'router',
+	'bootstrap',
 	'collections/SLDtemplates',
 	'collections/SLDconfigs'
-], function(Backbone, $, _, Router, SLDTemplatesCollection, SLDConfigsCollection) {
+], function(Backbone, $, _, Router, Bootstrap, SLDTemplatesCollection, SLDConfigsCollection) {
     var initialLocation = window.location.href.substring(0, window.location.href.indexOf('index'));
 	console.log(initialLocation, Backbone, $, _, Router, SLDTemplatesCollection);
 	window._ = _;
