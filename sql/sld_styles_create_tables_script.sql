@@ -28,8 +28,6 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION procedure_sld_template_update()
-  OWNER TO liferay;
 
 
 
@@ -42,6 +40,7 @@ CREATE TABLE sld_template
   id bigserial NOT NULL,
   uuid character varying(64),
   name character varying(256) NOT NULL,
+  sld_filename character varying(128),
   wms_url character varying(512),
   content text,
   created timestamp with time zone NOT NULL,
@@ -51,9 +50,7 @@ CREATE TABLE sld_template
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE sld_template
-  OWNER TO liferay;
-GRANT ALL ON TABLE sld_template TO liferay;
+
 
 
 -- Trigger: trigger_sld_template on sld_template
@@ -88,8 +85,6 @@ END;
 $BODY$
   LANGUAGE plpgsql VOLATILE
   COST 100;
-ALTER FUNCTION procedure_sld_config_update()
-  OWNER TO liferay;
 
 
 
@@ -114,9 +109,7 @@ CREATE TABLE sld_config
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE sld_config
-  OWNER TO liferay;
-GRANT ALL ON TABLE sld_config TO liferay;
+
 
 
 -- Trigger: trigger_sld_config on sld_config
@@ -146,9 +139,7 @@ CREATE TABLE sld_type
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE sld_type
-  OWNER TO liferay;
-GRANT ALL ON TABLE sld_type TO liferay;
+
 
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ sld_featuretype
 
@@ -172,9 +163,6 @@ CREATE TABLE sld_featuretype
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE sld_featuretype
-  OWNER TO liferay;
-GRANT ALL ON TABLE sld_featuretype TO liferay;
 
 
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ sld_rule
@@ -199,9 +187,6 @@ CREATE TABLE sld_rule
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE sld_rule
-  OWNER TO liferay;
-GRANT ALL ON TABLE sld_rule TO liferay;
 
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ sld_param
 
@@ -228,9 +213,6 @@ CREATE TABLE sld_param
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE sld_param
-  OWNER TO liferay;
-GRANT ALL ON TABLE sld_param TO liferay;
 
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ sld_value
 
@@ -256,7 +238,3 @@ CREATE TABLE sld_value
 WITH (
   OIDS=FALSE
 );
-ALTER TABLE sld_value
-  OWNER TO liferay;
-GRANT ALL ON TABLE sld_value TO liferay;
-
