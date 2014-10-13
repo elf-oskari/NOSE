@@ -6,6 +6,7 @@ var express = require('express'),
     app = express();
 var http = require('http');
 var path = require('path');
+
 //var mongo = require('mongodb');
 //var fs = require('fs');
 
@@ -43,7 +44,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // pass in all dependency references
 //var routes = require('./routes/api')(app, db, ObjectID, credentials);
-var routes = require('./routes/api')(app, path);
+var parse =  require('./sources/parse');
+var store =  require('./sources/store');
+var routes = require('./routes/api')(app, path, parse.parse, store.store);
+
 
 // the startup sequence is async, therefore start the server only if everything else also works
 //function startServer() {

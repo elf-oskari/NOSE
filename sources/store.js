@@ -19,6 +19,7 @@
 var fs=require('fs');
 var pg=require('pg.js');
 var Promise = require('es6-promise').Promise;
+var filename = '';
 
 /** @constructor
   * Deferred encapsulates a promise that gets fulfilled by outside code. */
@@ -155,10 +156,10 @@ SldInserter.prototype.finish=function() {
   * @param {string} path File to read.
   * @param {string} name Description of the file for error messages.
   * @return {Promise} */
-SldInserter.prototype.readFile=function(path,name) {
+SldInserter.prototype.readFile=function(path, name) {
 	var defer=new Deferred();
 
-	fs.readFile(path,{encoding:'utf-8'},function(err,data) {
+	fs.readFile(path,{encoding:'utf-8'},function(err, data) {
 		if(err) defer.reject('Unable to read '+name+' from '+path+': '+err);
 		defer.resolve(data);
 	})
@@ -168,16 +169,18 @@ SldInserter.prototype.readFile=function(path,name) {
 
 /** Read entire text contents of an SLD template and insert them into a single
   * database row.
+  * @param {string} name name of original sld file
   * @param {string} templatePath Path of file to read.
   * @return {Promise} */
-SldInserter.prototype.insertTemplate=function(templatePath) {
+SldInserter.prototype.insertTemplate=function(templatePath, name) {
 	var self=this;
+    self.filename = name;
 
 	return(this.readFile(templatePath,'SLD template').then(function(sldTemplate) {
 		return(self.db.querySingle(
 			'INSERT INTO sld_template (content,name)'+
 			' VALUES ($1,$2)'+
-			' RETURNING id',[sldTemplate,'foobar']
+			' RETURNING id',[sldTemplate, self.filename]
 		));
 	}));
 };
@@ -268,7 +271,7 @@ SldInserter.prototype.parseConfig=function(sldConfig,templateId) {
 	var fieldList;
 	var featureTypeInserted,ruleInserted,fieldInserted;
 
-	lineList=sldConfig.split(/\r?\n/);
+	lineList=sldConfig;  //.split(/\r?\n/);
 	lineCount=lineList.length;
 
 	for(lineNum=0;lineNum<lineCount;lineNum++) {
@@ -312,30 +315,37 @@ SldInserter.prototype.parseConfig=function(sldConfig,templateId) {
 };
 
 /** Read SLD parameters and store them associated with templateId in the database.
-  * @param {string} configPath Path of file with parameter descriptions.
+  * @param {string []} params  parameter descriptions.
   * @param {number} templateId Refers to a template in the database.
   * @return {Promise} Resolved when everything has been successfully inserted. */
-SldInserter.prototype.insertConfig=function(configPath,templateId) {
+SldInserter.prototype.insertConfig=function(params,templateId) {
 	var self=this;
-	var inputReady=this.readFile(configPath,'SLD config');
 
-	return(inputReady.then(function(sldConfig) {
-		return(self.parseConfig(sldConfig,templateId));
-	}));
+   // var inputReady=this.setParams(params);
+
+ //   return(inputReady.then(function(sldConfig) {
+        return(self.parseConfig(params,templateId));
+  //  }));
+
 };
 
-/** Main function, reads input and writes output. */
-function run() {
+/** Main function, read template and store data to sld_styles db
+ * @param params : [] output of sld parse function
+ * @param sld_template: file name of template file
+ * @param name  original sld file name
+ * @param cb {function} status cb
+ * */
+exports.store = function(params, sld_template, name, cb) {
 	var inserter=new SldInserter();
 
 	var connected=inserter.connect('db.json');
 
 	var templateInserted=connected.then(function() {
-		return(inserter.insertTemplate(process.argv[2]));
+		return(inserter.insertTemplate(sld_template,name));
 	});
 
 	var configInserted=templateInserted.then(function(templateRow) {
-		return(inserter.insertConfig(process.argv[3],templateRow.id));
+		return(inserter.insertConfig(params,templateRow.id));
 	});
 
 	var ready=configInserted;
@@ -350,8 +360,7 @@ function run() {
 		return(inserter.finish());
 	}).then(function() {
 		console.log('Success!');
+        cb(false);
 	});
 }
 
-// This is where the program actually begins.
-run();
