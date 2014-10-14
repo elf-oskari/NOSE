@@ -14,7 +14,8 @@ define(['lodash','backbone'], function(_, Backbone) {
 			console.log('Router editSLD', id);
 			var self = this;
 			var view;
-			var model = this.WebApp.collections.SLDs.getById(id);
+			var model = this.WebApp.collections.SLDConfigsCollection.getById(id);
+			console.log(model);
 			if (!this.WebApp.views.SLDeditor) {
 				require(['views/SLDeditor'], function(SLDEditorView) {
 					view = new SLDEditorView({'model': model});
