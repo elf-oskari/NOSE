@@ -14,25 +14,15 @@
   * back to XML.
   *
   * New modifiable SLD parameters can be added in the fieldSpecList variable. */
+
 'use strict';
 
-    
 var fs = require('fs');
 var sax = require('sax');
 
 /** @type {string} Text replacing SLD template default parameter values
   * in output. */
 var placeHolder='$';
-
-/**
- * true if parse fails
- */
-var err = false;
-
-/**
- * Parameters for db store
- */
-var params = [];
 
 /** List of fields (editable SLD parameters) and how to find them.
   * Describes each field's parent tags up to its parent rule.
@@ -50,20 +40,8 @@ var fieldSpecList=[
 		path:['PolygonSymbolizer','Fill','GraphicFill','Graphic','Mark','Stroke','CssParameter',{'name':'stroke'}]
 	},{
 		path:['PolygonSymbolizer','Fill','GraphicFill','Graphic','Mark','Stroke','CssParameter',{'name':'stroke-width'}]
-	},{
-        path:['PointSymbolizer','Graphic','Mark','Fill','CssParameter',{'name':'fill'}]
-    },
-    {
-        path:['PointSymbolizer','Graphic','Mark','WellKnownName']
-    },
-    {
-        path:['PointSymbolizer','Size','Literal']
-    },{
-        path:['PointSymbolizer','Graphic','Mark','Stroke']
-    }
+	}
 ];
-
-
 
 /** Return a new function that calls fn making it see the desired scope
   * through its "this" variable.
@@ -98,8 +76,7 @@ var FieldMarkerNode = function(id,typeName,defaultValue,rule) {
   * this SLD parameter.
   * @return {string} */
 FieldMarkerNode.prototype.encode = function(xmlEncoder, outputCharPos) {
-	//console.log('Field'+'\t'+'\t'+this.id+'\t'+outputCharPos+'\t'+this.typeName+'\t'+this.defaultValue);
-    params.push('Field'+'\t'+'\t'+this.id+'\t'+outputCharPos+'\t'+this.typeName+'\t'+this.defaultValue);
+	console.log('Field'+'\t'+'\t'+this.id+'\t'+outputCharPos+'\t'+this.typeName+'\t'+this.defaultValue);
 
 	return('');
 };
@@ -156,8 +133,6 @@ var TagNode = function(node) {
 	this.childList = [];
 	/** @type {string} Human-readable description. */
 	this.comment=null;
-    // local name without prefix
-    this.localName = node.name.split(':')[node.name.split(':').length-1];
 };
 
 TagNode.prototype.appendChild = function(obj) {
@@ -179,7 +154,7 @@ TagNode.prototype.insertBefore = function(child, obj) {
 TagNode.prototype.matchRule = function(tagName,attrTbl) {
 	var attr;
 
-	if( this.node.localName!=tagName) return(false);
+	if(this.node.name!=tagName) return(false);
 
 	if(attrTbl) {
 		for(attr in attrTbl) {
@@ -368,7 +343,7 @@ XmlEncoder.prototype.encodeOpeningTag = function(node) {
 	var attr,value;
 	var txt;
 
-	txt = '<' +  node.localName;
+	txt = '<' + node.name;
 
 	for (attr in node.attributes) {
 		if (!node.attributes.hasOwnProperty(attr)) continue;
@@ -419,7 +394,7 @@ XmlEncoder.prototype.encodeCapturedTag = function(node, childList, outputCharPos
 		txt += this.encodeCapturedNode(childList[childNum], outputCharPos + txt.length);
 	}
 
-	txt += this.encodeClosingTag( node.localName);
+	txt += this.encodeClosingTag(node.name);
 
 	return txt;
 };
@@ -540,7 +515,7 @@ SldParser.prototype.captureComment = function(txt) {
 
 /** @param {Object} node Sax node object. */
 SldParser.prototype.handleXmlHeader = function(node) {
-	this.writeOut('<?' + node.localName + ' ' + node.body + '?>');
+	this.writeOut('<?' + node.name + ' ' + node.body + '?>');
 };
 
 /** Check if the node is an SLD rule, which needs to be read temporarily into
@@ -548,7 +523,7 @@ SldParser.prototype.handleXmlHeader = function(node) {
   * @param {Object} node Sax node object.
   * @return {boolean} */
 SldParser.prototype.isCaptureNeeded = function(node) {
-	if ( node.localName == 'Rule') {
+	if (node.name == 'Rule') {
 		return true;
 	}
 
@@ -560,7 +535,7 @@ SldParser.prototype.isCaptureNeeded = function(node) {
   * @param {Object} node Sax node object.
   * @return {boolean} */
 SldParser.prototype.isTagHandlerNeeded = function(node) {
-	if ( node.localName == 'FeatureTypeStyle') {
+	if (node.name == 'FeatureTypeStyle') {
 		return true;
 	}
 
@@ -573,9 +548,6 @@ SldParser.prototype.isTagHandlerNeeded = function(node) {
 SldParser.prototype.handleOpeningTag = function(node) {
 	var obj;
 	var needsProcessing = false;
-
-    // local name without prefix
-    node.localName = node.name.split(':')[node.name.split(':').length-1];
 
 	if(this.isTagHandlerNeeded(node)) {
 		this.onTag(node);
@@ -650,21 +622,23 @@ SldParser.prototype.onEnd = function() {};
   * @param {Object} node Sax node object. */
 SldParser.prototype.onTag = function(node) {};
 
-/** Parse function,  input sld file stream and writes output as sld_template */
-exports.parse = function (inFileName, fname, tname, cb) {
+/** Main function, reads input and writes output. */
+function parse() {
 	var featureTypeId=0;
 	var ruleId=0;
 	var fieldId=0;
 
-	var outFileName = 'sld_test_template.sld';
-    var inStream = fs.createReadStream(inFileName);
+	var inFileName = process.argv[2];
+	var outFileName = process.argv[3];
+
+	var inStream = fs.createReadStream(inFileName);
 	var outStream = fs.createWriteStream(outFileName);
 
 	var parser = new SldParser(outStream);
 
 	/** Handle all processing of SLD rules.
 	  * @param {TagNode} node */
-	parser.onCaptureDone = function(node, cb) {
+	parser.onCaptureDone = function(node) {
 		var rule;
 		var spec;
 		var field;
@@ -719,8 +693,7 @@ exports.parse = function (inFileName, fname, tname, cb) {
 		// Maybe in the future we need to process scale denominators:
 		// console.log(node.queryText(['MinScaleDenominator']).txt);
 
-		//console.log('\n'+'Rule'+'\t'+rule.encode(this.xmlEncoder,this.outputCharPos));
-        params.push('Rule'+'\t'+rule.encode(this.xmlEncoder,this.outputCharPos));
+		console.log('\n'+'Rule'+'\t'+rule.encode(this.xmlEncoder,this.outputCharPos));
 
 		for(var i=0;i<fieldSpecList.length;i++) {
 			spec=fieldSpecList[i];
@@ -735,15 +708,15 @@ exports.parse = function (inFileName, fname, tname, cb) {
 
 	/** @param {Object} node Sax node object. */
 	parser.onTag=function(node) {
-		//console.log('FeatureType'+'\t'+featureTypeId++);
-        params.push('FeatureType'+'\t'+featureTypeId++);
+		console.log('FeatureType'+'\t'+featureTypeId++);
 	};
 
-	parser.onEnd=function(cd) {
-		console.log(' ');
-        cb(params, fname, tname, err);
+	parser.onEnd=function() {
+		console.log('');
 	};
 
 	parser.parse(inStream);
 }
 
+// This is where the program actually begins.
+parse();

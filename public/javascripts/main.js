@@ -6,6 +6,11 @@ requirejs.config({
 		i18n: 'lib/i18n',
 		bootstrap: 'lib/bootstrap'
 	},
+	shim: {
+		'bootstrap': {
+			deps: ['jquery']
+		}
+	},
 	map: {
 		"*" : {
 			underscore: 'lodash'
