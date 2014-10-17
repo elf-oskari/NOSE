@@ -1,0 +1,39 @@
+<!-- List template -->
+<div class="view" id="sld-tree-view">
+  <div class="panel panel-primary">
+    <div class="panel-heading">SLD Featuretypes</div>
+      <div class="panel-body" style="height:800px">
+        <% _.forEach(SLDfeaturetypes, function(SLDfeatureType, index) { %>
+        <div class="panel panel-danger">
+          <div class="panel-heading">
+            <h4 class="panel-title" data-toggle="collapse" data-target="#featuretype<%=index%>"><%= SLDfeatureType.name %></h4>
+          </div>
+          <div id="featuretype<%=index%>" class="panel-collapse collapse">
+            <div class="panel-body">
+              <% _.forEach(SLDrules, function(SLDrule, index) { 
+                if (SLDrule.featuretype_id === SLDfeatureType.id) { %>
+              <div class="panel panel-info">
+                <div class="panel-heading">
+                  <h4 class="panel-title" data-toggle="collapse" data-target="#rule<%=index%>"><%= SLDrule.title %></h4>
+                </div>
+                <div id="rule<%=index%>" class="panel-collapse collapse">
+                  <div class="panel-body">
+                      <% _.forEach(SLDparams, function(SLDparam, index) { 
+                        if (SLDparam.rule_id === SLDrule.id) { %>
+                        <button id="btn-templateid-<%=SLDfeatureType.template_id%>" value="<%=SLDfeatureType.template_id%>" type="button" class="btn btn-primary btn-block sld_param"><%= SLDparam.name %></button>
+                        <% } %>
+                      <% }); %>
+                  </div>
+                </div>
+              </div>
+              <% } %>
+              <% }); %>
+            </div>
+          </div>
+        </div>
+        <% }); %>
+      </div>
+    </div>
+  </div>
+</div>
+
