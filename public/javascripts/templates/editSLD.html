@@ -1,8 +1,9 @@
-<% console.log(SLDvalues); %>
 
-  <div class="view" id="edit-sld">
-    <form class="edit-sld-form">
-      <legend>Edit SLD</legend>
+<div class="view" id="edit-sld">
+  <div class="panel panel-primary">
+    <div class="panel-heading">SLD Editor</div>
+    <div class="panel-body" style="height:800px">
+      <form class="edit-sld-form">
         <label>Name</label>
         <input name="Name" type="text" value="<%= SLDmodel.get('name') %>">
         <br>
@@ -16,5 +17,7 @@
         <input type="hidden" name="id" value="<%= SLDmodel.get('id') %>" />
        <button data-user-id="<%= SLDmodel.get('id') %>" class="btn btn-danger delete">Delete</button>
        <% }; %>
-    </form>
+      </form>
+    </div>
   </div>
+</div>

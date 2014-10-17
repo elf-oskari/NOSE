@@ -13,23 +13,22 @@ define(['lodash','backbone'], function(_, Backbone) {
 		editSLD: function(id) {
 			console.log('Router editSLD', id);
 			var self = this;
-			var view;
-			var model = this.WebApp.collections.SLDConfigsCollection.getById(id);
-			console.log(model);
-			if (!this.WebApp.views.SLDeditor) {
-				require(['views/SLDeditor'], function(SLDEditorView) {
-					view = new SLDEditorView({'model': model});
-					view.on('remove', function(item) {
+			var editorPageView;
+			var SLDconfigmodel = this.WebApp.collections.SLDConfigsCollection.getById(id);
+			if (!this.WebApp.views.SLDEditorPage) {
+				require(['views/SLDEditorPage'], function(SLDEditorPageView) {
+					var editorPageView = new SLDEditorPageView({'SLDconfigmodel': SLDconfigmodel});
+					editorPageView.on('remove', function(item) {
 						console.log('remove event triggered with view', item);
 						self.navigate('index', {trigger:true});
 					});
-					view.render();
-					window.WebApp.views.SLDeditor = view;
+					editorPageView.render();
+					window.WebApp.views.SLDEditorPage = editorPageView;
 				});
 			} else {
-				view = window.WebApp.views.SLDeditor;
-				view.model = model;
-				view.render();
+				editorPageView = window.WebApp.views.SLDEditorPage;
+				editorPageView.model = SLDconfigmodel;
+				editorPageView.render();
 			}
 		},
 		listSLD: function(url) {

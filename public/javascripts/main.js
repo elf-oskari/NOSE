@@ -46,7 +46,7 @@ require([
 					"id":"245",
 					"template_id":"265",
 					"order":"1",
-					"name":"",
+					"name":"Earth",
 					"title":"",
 					"feturetype_name":""
 				},		
@@ -54,7 +54,7 @@ require([
 					"id":"345",
 					"template_id":"265",
 					"order":"2",
-					"name":"",
+					"name":"Water",
 					"title":"",
 					"feturetype_name":""
 				}
@@ -64,14 +64,14 @@ require([
 					"id":"132",
 					"featuretype_id":"245",
 					"name":"",
-					"title":"",
+					"title":"Roads",
 					"abstract":""
 				},
 				{
 					"id":"632",
-					"featuretype_id":"245",
+					"featuretype_id":"345",
 					"name":"",
-					"title":"",
+					"title":"Rivers",
 					"abstract":""
 				}
 			],
