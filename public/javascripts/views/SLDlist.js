@@ -8,7 +8,7 @@ define([
     'bootstrap'
 ], function(_, Backbone, $, locale, SLDListTemplate, SLDconfigModel) {
 	var SLDListView = Backbone.View.extend({
-		el: '.page',
+		el: '.container-main',
 		template: _.template(SLDListTemplate),
 		events: {
 	        'click .delete': 'deleteConfig',
