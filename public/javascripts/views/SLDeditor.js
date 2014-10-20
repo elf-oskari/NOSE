@@ -3,18 +3,17 @@ define([
 	'backbone',
 	'jquery',
 	'bootstrap',
-	'i18n!localization/nls/editSLD',
-	'text!templates/editSLD.html',
-	'models/sld_config'
-], function(_, Backbone, $, Bootstrap, locale, editSLDTemplate, SLDconfigModel) {
+	'i18n!localization/nls/SLDeditor',
+	'text!templates/SLDeditor.html'
+], function(_, Backbone, $, Bootstrap, locale, editSLDTemplate) {
 	var SLDEditorView = Backbone.View.extend({
-    el : '.page',
 		template: _.template(editSLDTemplate),
 		events: {
 	        'click .delete': 'deleteConfig',
 	        'click .upload': 'showUpload'
     },
 		initialize: function(params) {
+      this.el = '.page';
       this.SLDconfigmodel = params.SLDconfigmodel;
       _.bindAll(this, 'render');
       console.log(this, arguments);

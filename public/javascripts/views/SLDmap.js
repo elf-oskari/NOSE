@@ -2,17 +2,16 @@ define([
   'lodash',
   'backbone',
   'jquery',
-  'i18n!localization/nls/SLDlist',
-  'text!templates/SLDlist.html',
-  'models/sld_config',
-  'bootstrap'
-], function(_, Backbone, $, locale, SLDListTemplate, SLDconfigModel) {
+  'i18n!localization/nls/SLDlist'
+], function(_, Backbone, $, locale) {
   var SLDMapView = Backbone.View.extend({
-    el: '.map',
+    initialize: function() {
+      this.el ='map';
+      _.bindAll(this, 'render');
+    },
     render: function() {
       // create a map in the "map" div, set the view to a given place and zoom
-      var container = $(this.el);
-      var map = L.map(container[0]).setView([51.505, -0.09], 13);
+      var map = L.map(this.el).setView([51.505, -0.09], 13);
 
       // add an OpenStreetMap tile layer
       L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {

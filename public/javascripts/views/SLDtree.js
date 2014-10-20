@@ -7,30 +7,52 @@ define([
   'bootstrap'
 ], function(_, Backbone, $, locale, SLDTreeTemplate) {
   var SLDTreeView = Backbone.View.extend({
-    el: '.tree',
     template: _.template(SLDTreeTemplate),
     events: {
       'click .btn.sld_param': 'updateSLDeditor'
     },
     initialize: function(params) {
-      SLDconfigmodel = params.SLDconfigmodel;
-      template_id = SLDconfigmodel.get('template_id');
-      SLDtemplatemodel = window.WebApp.collections.SLDTemplatesCollection.get(template_id);
-      featuretypes = SLDtemplatemodel.get('sld_featuretypes');
-      SLDrules = SLDtemplatemodel.get('sld_rules');
-      SLDparams = SLDtemplatemodel.get('sld_params');
+      this.el = '.tree';
+      this.SLDconfigmodel = params.SLDconfigmodel;
+      this.SLDtemplatemodel = params.SLDtemplatemodel;
+      var SLDfeaturetypes = this.SLDtemplatemodel.get('sld_featuretypes');
+      var SLDrules = this.SLDtemplatemodel.get('sld_rules');
+      var SLDparams = this.SLDtemplatemodel.get('sld_params');
+      this.SLDfeaturetypeTree = this.constructFeaturetypeTree(SLDfeaturetypes, SLDrules, SLDparams);
       _.bindAll(this, 'render');
       console.log(this, arguments);
       console.log('AuthorView Initialized!', this.collection);
     },
 
+    constructFeaturetypeTree: function(SLDfeaturetypes, SLDrules, SLDparams) {
+      var featuretypes = [];
+      _.forEach(SLDfeaturetypes, function(SLDfeatureType, index) {
+        featuretypes.push(SLDfeatureType);
+        var rules = [];
+        _.forEach(SLDrules, function(SLDrule, index) { 
+          if (SLDrule.featuretype_id === SLDfeatureType.id) {
+            rules.push(SLDrule);
+            var symbolizer_groups = [];
+            _.forEach(SLDparams, function(SLDparam, index) { 
+              if (SLDparam.rule_id === SLDrule.id) {
+                if (!_.contains(symbolizer_groups, SLDparam.symbolizer_group)) {
+                  symbolizer_groups.push(SLDparam.symbolizer_group);
+                }
+              }
+            });
+            SLDrule.symbolizer_groups = symbolizer_groups;
+          }
+        });
+        SLDfeatureType.rules = rules;
+      });
+      return featuretypes;
+    },
     render: function() {
-      console.log('collection', window.WebApp.collections.SLDTemplatesCollection);
-      $(this.el).html(this.template({SLDfeaturetypes: featuretypes, SLDrules: SLDrules, SLDparams: SLDparams, locale: locale, SLDvalues: SLDconfigmodel.get('sld_values')}));
+      $(this.el).html(this.template({SLDfeaturetypeTree: this.SLDfeaturetypeTree, locale: locale}));
       return this;
     },
 
-    updateSLDeditor: function(params) {
+    updateSLDeditor: function(params) { 
       console.log(params);
       debugger;
     }

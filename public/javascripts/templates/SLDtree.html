@@ -3,30 +3,26 @@
   <div class="panel panel-primary">
     <div class="panel-heading">SLD Featuretypes</div>
       <div class="panel-body" style="height:800px">
-        <% _.forEach(SLDfeaturetypes, function(SLDfeatureType, index) { %>
+        <% _.forEach(SLDfeaturetypeTree, function(SLDfeatureType) { %>
         <div class="panel panel-danger">
           <div class="panel-heading">
-            <h4 class="panel-title" data-toggle="collapse" data-target="#featuretype<%=index%>"><%= SLDfeatureType.name %></h4>
+            <h4 class="panel-title" data-toggle="collapse" data-target="#featuretype-id-<%=SLDfeatureType.id%>"><%= SLDfeatureType.name %></h4>
           </div>
-          <div id="featuretype<%=index%>" class="panel-collapse collapse">
+          <div id="featuretype-id-<%=SLDfeatureType.id%>" class="panel-collapse collapse">
             <div class="panel-body">
-              <% _.forEach(SLDrules, function(SLDrule, index) { 
-                if (SLDrule.featuretype_id === SLDfeatureType.id) { %>
+              <% _.forEach(SLDfeatureType.rules, function(SLDrule) { %>
               <div class="panel panel-info">
                 <div class="panel-heading">
-                  <h4 class="panel-title" data-toggle="collapse" data-target="#rule<%=index%>"><%= SLDrule.title %></h4>
+                  <h4 class="panel-title" data-toggle="collapse" data-target="#rule-id-<%=SLDrule.id%>"><%= SLDrule.title %></h4>
                 </div>
-                <div id="rule<%=index%>" class="panel-collapse collapse">
+                <div id="rule-id-<%=SLDrule.id%>" class="panel-collapse collapse">
                   <div class="panel-body">
-                      <% _.forEach(SLDparams, function(SLDparam, index) { 
-                        if (SLDparam.rule_id === SLDrule.id) { %>
-                        <button id="btn-templateid-<%=SLDfeatureType.template_id%>" value="<%=SLDfeatureType.template_id%>" type="button" class="btn btn-primary btn-block sld_param"><%= SLDparam.name %></button>
-                        <% } %>
+                      <% _.forEach(SLDrule.symbolizer_groups, function(symbolizer_group) { %>
+                        <button id="btn-templateid-<%=SLDfeatureType.template_id%>" value="<%=SLDfeatureType.template_id%>" type="button" class="btn btn-primary btn-block sld_param"><%=symbolizer_group %></button>
                       <% }); %>
                   </div>
                 </div>
               </div>
-              <% } %>
               <% }); %>
             </div>
           </div>
