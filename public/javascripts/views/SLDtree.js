@@ -4,8 +4,10 @@ define([
   'jquery',
   'i18n!localization/nls/SLDlist',
   'text!templates/SLDtree.html',
+  'models/sld_config',
+  'models/sld_template',
   'bootstrap'
-], function(_, Backbone, $, locale, SLDTreeTemplate) {
+], function(_, Backbone, $, locale, SLDTreeTemplate, SLDtemplateModel, SLDconfigModel) {
   var SLDTreeView = Backbone.View.extend({
     template: _.template(SLDTreeTemplate),
     events: {
@@ -13,18 +15,24 @@ define([
     },
     initialize: function(params) {
       this.el = '.tree';
-      this.SLDconfigmodel = params.SLDconfigmodel;
-      this.SLDtemplatemodel = params.SLDtemplatemodel;
-      var SLDfeaturetypes = this.SLDtemplatemodel.get('sld_featuretypes');
-      var SLDrules = this.SLDtemplatemodel.get('sld_rules');
-      var SLDparams = this.SLDtemplatemodel.get('sld_params');
-      this.SLDfeaturetypeTree = this.constructFeaturetypeTree(SLDfeaturetypes, SLDrules, SLDparams);
+      this.SLDtemplatemodel = new SLDtemplateModel(params.SLDtemplatemodel.toJSON());
+      this.SLDconfigmodel = new SLDconfigModel(params.SLDconfigmodel.toJSON());
+      this.SLDfeaturetypeTree = this.constructFeaturetypeTree(this.SLDtemplatemodel);
+
       _.bindAll(this, 'render');
-      console.log(this, arguments);
-      console.log('AuthorView Initialized!', this.collection);
     },
 
-    constructFeaturetypeTree: function(SLDfeaturetypes, SLDrules, SLDparams) {
+    setModels: function(models) {
+        this.SLDtemplatemodel.set(models.SLDtemplatemodel.toJSON());
+        this.SLDconfigmodel.set(models.SLDconfigmodel.toJSON());
+        this.SLDfeaturetypeTree = this.constructFeaturetypeTree(this.SLDtemplatemodel);
+        return this;
+    },
+
+    constructFeaturetypeTree: function(SLDtemplatemodel) {
+      var SLDfeaturetypes = SLDtemplatemodel.get('sld_featuretypes');
+      var SLDrules = SLDtemplatemodel.get('sld_rules');
+      var SLDparams = SLDtemplatemodel.get('sld_params');
       var featuretypes = [];
       _.forEach(SLDfeaturetypes, function(SLDfeatureType, index) {
         featuretypes.push(SLDfeatureType);

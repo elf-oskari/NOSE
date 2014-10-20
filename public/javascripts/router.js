@@ -19,13 +19,16 @@ define(['lodash','backbone'], function(_, Backbone) {
 			if (!self.WebApp.views.SLDEditorPage) {
 				require(['views/SLDEditorPage'], function(SLDEditorPageView) {
 					editorPageView = new SLDEditorPageView({'SLDconfigmodel': SLDconfigmodel, 'SLDtemplatemodel': SLDtemplatemodel});
-					editorPageView.render();
+					editorPageView
+						.setModels({'SLDconfigmodel': SLDconfigmodel, 'SLDtemplatemodel': SLDtemplatemodel})
+						.render();
 					self.WebApp.views.SLDEditorPage = editorPageView;
 				});
 			} else {
 				editorPageView = self.WebApp.views.SLDEditorPage;
-				editorPageView.setModels({'SLDconfigmodel': SLDconfigmodel, 'SLDtemplatemodel': SLDtemplatemodel});
-				editorPageView.render();
+				editorPageView
+					.setModels({'SLDconfigmodel': SLDconfigmodel, 'SLDtemplatemodel': SLDtemplatemodel})
+					.render();
 			}
 		},
 		listSLD: function(url) {

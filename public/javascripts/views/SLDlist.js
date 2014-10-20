@@ -19,8 +19,6 @@ define([
             _.bindAll(this, 'render');
             this.configs = params.configs;
             this.templates = params.templates;
-            console.log(this, arguments);
-            console.log('AuthorView Initialized!', this.collection);
         },
         render: function() {
         	var localization = locale;

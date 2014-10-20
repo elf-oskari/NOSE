@@ -16,8 +16,6 @@ define([
       this.el = '.page';
       this.SLDconfigmodel = params.SLDconfigmodel;
       _.bindAll(this, 'render');
-      console.log(this, arguments);
-      console.log('AuthorView Initialized!', this.collection);
     },
     render: function() {
       var localization = locale;
