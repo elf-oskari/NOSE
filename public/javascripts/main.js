@@ -3,6 +3,7 @@ requirejs.config({
 		backbone: 'lib/backbone',
 		jquery: 'lib/jquery-1.10.2.min',
 		lodash: 'lib/lodash',
+		'leaflet': 'lib/leaflet-0.7.3-src',
 		i18n: 'lib/i18n',
 		bootstrap: 'lib/bootstrap'
 	},
