@@ -1,10 +1,11 @@
 define(['lodash','backbone'], function(_, Backbone) {
 	var AppRouter = Backbone.Router.extend({
 		routes: {
-			'' : 'listSLD',
+			'application.html' : 'listSLD',
 			'/' : 'listSLD',
 			'edit/:id' : 'editSLD',
-			'new' : 'editSLD'
+			'new' : 'editSLD',
+			'*default': 'listSLD'
 		},
 
 		initialize: function(WebApp) {

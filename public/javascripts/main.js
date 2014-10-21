@@ -1,4 +1,5 @@
 requirejs.config({
+	baseUrl: "/javascripts/",
 	paths: {
 		backbone: 'lib/backbone',
 		jquery: 'lib/jquery-1.10.2.min',
@@ -456,7 +457,9 @@ require([
 	// for easy debugging, do not use this variable directly
 	// TODO: remove
 	window.debugWebApp = WebApp;
-	if (Backbone.history !== null) {
-		Backbone.history.start();
-	}
+
+	// TODO: enable pushState when backend is able to serve correct pages
+	// E.g /edit/:id would return application.html content and WebApp.Router would navigate correctly
+	//Backbone.history.start({pushState: true});
+	Backbone.history.start();
 });

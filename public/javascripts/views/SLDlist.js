@@ -11,9 +11,11 @@ define([
 		el: '.container-main',
 		template: _.template(SLDListTemplate),
 		events: {
-	        'click .delete': 'deleteConfig',
+	        'click .btn.delete-config': 'deleteConfig',
 	        'click .btn.upload': 'upload',
-            'click .btn.delete-template': 'deleteTemplate'
+            'click .btn.delete-template': 'deleteTemplate',
+            'click .btn.edit': 'editConfig',
+            'click .btn.download': 'downloadConfig'
       	},
 		initialize: function(params) {
             _.bindAll(this, 'render');
@@ -21,13 +23,14 @@ define([
             this.templates = params.templates;
         },
         render: function() {
-            console.log('here', this);
         	var localization = locale;
             this.$el.html(this.template({SLDtemplates: this.templates.models, SLDconfigs: this.configs.models, SLDlist: localization}));
             return this;
         },
         deleteConfig: function () {
-            alert('Deleting is not possible');
+            event.preventDefault();
+            $('#deleteConfigModal').modal('hide');
+            alert('Deleting config is not possible');
         	//console.log(this.configs.models);
         	//this.configs.models.destroy({
           		//success: function () {
@@ -37,10 +40,21 @@ define([
         	//});
         //return false;
       	},
+        editConfig: function (event) {
+            event.preventDefault();
+            Backbone.history.navigate('/edit/' + $(event.currentTarget).data('config-id'), true);
+        },
+        downloadConfig: function (event) {
+            event.preventDefault();
+            // TODO: use url from collection instead.
+            var apiUrl = "/api/v1/configs/";
+            window.open(apiUrl + $(event.currentTarget).blur().data('config-id') + "/download");
+            alert('Downloading config is not possible');
+        },
         deleteTemplate: function () {
+            event.preventDefault();
             $('#deleteTemplateModal').modal('hide');
-            alert('Deleting is not possible');
-
+            alert('Deleting template is not possible');
         },
         upload: function(event) {
             event.preventDefault();

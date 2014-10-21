@@ -12,8 +12,8 @@
           <tr>
             <th><%= SLDtemplateModel.get('name') %></th>
             <th>
-              <a href="#/new" class="btn btn-primary btn-sm"><%= SLDlist.buttons.create %></a>
-              <a class="btn btn-danger btn-sm" template-id="<%= SLDtemplateModel.get('id') %>" data-toggle="modal" data-target="#deleteTemplateModal"><%= SLDlist.buttons.delete %></a>
+              <button type="button" class="btn btn-primary btn-sm new"><%= SLDlist.buttons.create %></button>
+              <button type="button" class="btn btn-danger btn-sm delete" data-template-id="<%= SLDtemplateModel.get('id') %>" data-toggle="modal" data-target="#deleteTemplateModal"><%= SLDlist.buttons.delete %></button>
             </th>
           </tr>
         </thead>
@@ -23,9 +23,9 @@
               <% if (SLDconfigModel.get('template_id') === SLDtemplateModel.get('id')) { %>
                 <td><%= SLDconfigModel.get('name') %></td>
                 <td>
-                  <a class="btn btn-warning btn-sm" href="#/edit/<%= SLDconfigModel.get('id') %>"><%= SLDlist.buttons.edit %></a>
-                  <a class="btn btn-danger btn-sm" config-id="<%= SLDconfigModel.get('id') %>"><%= SLDlist.buttons.delete %></a>
-                  <a class="btn btn-success btn-sm" href="/edit/<%= SLDconfigModel.get('id') %>"><%= SLDlist.buttons.download %></a>
+                  <button type="button" class="btn btn-warning btn-sm edit" data-config-id="<%= SLDconfigModel.get('id') %>"><%= SLDlist.buttons.edit %></button>
+                  <button type="button" class="btn btn-danger btn-sm delete" data-config-id="<%= SLDconfigModel.get('id') %>" data-toggle="modal" data-target="#deleteConfigModal"><%= SLDlist.buttons.delete %></button>
+                  <button type="button" class="btn btn-success btn-sm download" data-config-id="<%= SLDconfigModel.get('id') %>"><%= SLDlist.buttons.download %></button>
                 </td>
               <% } %>
             </tr>
@@ -72,6 +72,24 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-danger delete-template"><%= SLDlist.deleteTemplate.delete %></button>
+          <button type="button" class="btn btn-primary" data-dismiss="modal"><%= SLDlist.buttons.cancel %></button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal window -->
+  <div class="modal" id="deleteConfigModal" tabindex="-1" role="dialog" aria-labelledby="ModalTitle" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+          <h4 class="modal-title" id="ModalTitle"><%= SLDlist.deleteConfig.title %></h4>
+        </div>
+        <div class="modal-body">
+          <p><%= SLDlist.deleteConfig.body %></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger delete-config"><%= SLDlist.deleteConfig.delete %></button>
           <button type="button" class="btn btn-primary" data-dismiss="modal"><%= SLDlist.buttons.cancel %></button>
         </div>
       </div>

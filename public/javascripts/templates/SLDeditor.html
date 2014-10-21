@@ -15,7 +15,7 @@
         <button type="submit" class="btn"><%= SLDmodel ? 'Update' : 'Create' %></button>
         <% if(SLDmodel) { %>
         <input type="hidden" name="id" value="<%= SLDmodel.get('id') %>" />
-       <button data-user-id="<%= SLDmodel.get('id') %>" class="btn btn-danger delete">Delete</button>
+       <button type="button" data-user-id="<%= SLDmodel.get('id') %>" class="btn btn-danger delete">Delete</button>
        <% }; %>
       </form>
     </div>

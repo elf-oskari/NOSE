@@ -16,6 +16,9 @@ define([
     var SLDEditorPageView = Backbone.View.extend({
         el: '.container-main',
         template: _.template(editorTemplate),
+        events: {
+            'click .btn.back': 'back'
+        },
         initialize: function(params) {
             this.dispatcher = params.dispatcher;
             this.SLDtemplatemodel = new SLDtemplateModel(params.SLDtemplatemodel.toJSON());
@@ -27,6 +30,10 @@ define([
             this.treeView = new SLDTreeView({'SLDconfigmodel': this.SLDconfigmodel, 'SLDtemplatemodel': this.SLDtemplatemodel, 'dispatcher': this.dispatcher});
             this.mapView = new SLDMapView({'dispatcher': this.dispatcher});
             _.bindAll(this, 'render');
+        },
+        back: function (event) {
+            event.preventDefault();
+            Backbone.history.navigate('/', true);
         },
         setModels: function(models) {
             this.SLDtemplatemodel.set(models.SLDtemplatemodel.toJSON());
