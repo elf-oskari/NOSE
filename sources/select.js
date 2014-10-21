@@ -72,13 +72,13 @@ PgDatabase.prototype.exec=function() {
 }
 
 /** Send query to database and read a single result row. */
-PgDatabase.prototype.querySingle=function() {
+PgDatabase.prototype.queryResult=function() {
 	var query=this.client.query.apply(this.client,arguments);
 	var defer=new Deferred();
-	var result;
+	var result = [];
 
 	query.on('row',function(row) {
-		result=row;
+		result.push(row);
 	});
 
 	query.on('error',function(err) {
@@ -130,6 +130,25 @@ SldSelecter.prototype.connect=function(dbPath) {
 	return(defer.promise.then(this.db.connect(this.dbConf)).then(this.db.begin()));
 };
 
+/** Select templates with all data
+ * @param {string/number} id  template id
+ *                        if  < 1  --> select all templates
+ * @return {Promise} */
+SldSelecter.prototype.selectTemplate=function(id) {
+    var self=this,
+        sql = 'SELECT id,uuid,name,created,updated,wms_url, sld_filename FROM SLD_TEMPLATE';
+    if (id > 0) sql = sql + ' WHERE ID='+id;
+        return(self.db.queryResult( sql));
+};
+
+/** Select featuretypes of one template
+ * @param {string/number} id  template id
+ * @return {Promise} */
+SldSelecter.prototype.selectFeaturetypes=function(id) {
+    var self=this;
+    return(self.db.queryResult('SELECT * FROM SLD_FEATURETYPE WHERE TEMPLATE_ID='+id));
+};
+
 /** Roll back current transaction and close connection. */
 SldSelecter.prototype.abort=function() {
 	return(this.db.rollback().then(bindToScope(this.db,this.db.close)));
@@ -148,40 +167,98 @@ SldSelecter.prototype.executeSql=function(query, cb) {
     this.db.client.query(query, cb);
 };
 
+function subSelect(client, sql) {
+    client.query(sql, function(error, result) {
+    return result.rows;
+    });
+
+};
+
 /** Top function, to execute sql statement
  * @param {String} sql_template id
  * */
 exports.select = function(id, cb) {
-    var statement = 'SELECT * FROM SLD_TEMPLATE WHERE ID='+id;
+    var statement = 'SELECT id,uuid,name,created,updated,wms_url, sld_filename FROM SLD_TEMPLATE WHERE ID='+id;
 	var selecter=new SldSelecter(),
-        cb = cb;;
+        cb = cb,
+        cnt = 0;
+        sldresult = [];
+        result = [];
 
 	var connected=selecter.connect('db.json');
     var cb2 = function(error, result) {
-        if (error) cb(error, result);
+        if (error)
+        {
+            cb(error, result);
+            return;
+        }
 
 
         // Node Postgres parses results as JSON, but the JSON
         // we returned in `data` is just text.
         // So we need to parse the data object for all rows(n)
-        /*    result.rows.map(function (row) {
-         try {
-         row.data = JSON.parse(row.data);
-         } catch (e) {
-         row.data = null;
-         }
+         result.rows.map(function (row) {
+         // subselects
+             row.sld_featuretypes = subSelect(selecter.db.client, 'SELECT * FROM SLD_FEATURETYPE WHERE TEMPLATE_ID='+id);
+             //row.sld_rules = subSelect('SELECT ID, FEATURETYPE_ID, NAME, TITLE, ABSTRACT FROM SLD_RULE_VIEW WHERE SLD_ID='+id);
+             //row.sld_params = subSelect('SELECT ID, RULE_ID, TEMPLATE_OFFSET, DEFAULT_VALUE, TYPE_ID, SYMBOLIZER_GROUP, NAME, SYMBOLIZER FROM SLD_PARAMS_VIEW WHERE SLD_ID='+id);
 
          return row;
-         }); */
+         });
 
         cb(error, result.rows);
     };
 
-	connected.then(function() {
+/*	connected.then(function() {
 		selecter.executeSql(statement,cb2);
 
-	});
+	});   */
+
+    var templateSelected=connected.then(function() {
+        return(selecter.selectTemplate(id));
+    });
+
+    var ready = templateSelected.then(function (templateResult) {
+       //Loop templates
+            var ind = 0;
+            var maxind = templateResult.lenght;
+            var allSelected = null;
 
 
+
+        templateResult.forEach(function(row){
+            result.push(row);
+            allSelected = subSelect(ind,row.id);
+            ind++;
+        });
+
+
+        return allSelected;
+    });
+
+    function subSelect(ind, id) {
+        var featuretypeSelected = selecter.selectFeaturetypes(id);
+        var allSelected = featuretypeSelected.then(function (featureResult) {
+            result[ind].sld_featuretypes = featureResult;
+
+        });
+
+        return allSelected;
+
+    };
+
+
+    ready.catch(function(err) {
+        inserter.abort();
+        console.error(err);
+        return;
+    });
+
+    ready.then(function() {
+        return(selecter.finish());
+    }).then(function() {
+        console.log('Success!');
+        cb(false,result);
+    });
 }
 
