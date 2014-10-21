@@ -7,7 +7,7 @@ define([
   'models/sld_config',
   'models/sld_template',
   'bootstrap'
-], function(_, Backbone, $, locale, SLDTreeTemplate, SLDtemplateModel, SLDconfigModel) {
+], function(_, Backbone, $, locale, SLDTreeTemplate, SLDconfigModel, SLDtemplateModel) {
   var SLDTreeView = Backbone.View.extend({
     className: 'tree',
     template: _.template(SLDTreeTemplate),
@@ -62,9 +62,9 @@ define([
       return this;
     },
 
-    updateSLDeditor: function(params) { 
-      console.log(params);
-      debugger;
+    updateSLDeditor: function(event) {
+      var symbolizer_group = event.target.value;
+      this.dispatcher.trigger("selectSymbolizer", this.SLDtemplatemodel.getParamsBySymbolizergroup(symbolizer_group));
     }
   });
   return SLDTreeView;

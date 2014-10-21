@@ -12,7 +12,7 @@ define([
     'views/SLDtree',
     'views/SLDeditor',
     'views/SLDmap'
-], function(_, Backbone, $, Bootstrap, locale, editorTemplate, SLDtemplateModel, SLDconfigModel, SLDTreeView, SLDEditorView, SLDMapView) {
+], function(_, Backbone, $, Bootstrap, locale, editorTemplate, SLDconfigModel, SLDtemplateModel, SLDTreeView, SLDEditorView, SLDMapView) {
     var SLDEditorPageView = Backbone.View.extend({
         el: '.container-main',
         template: _.template(editorTemplate),

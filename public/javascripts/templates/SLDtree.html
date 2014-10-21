@@ -18,7 +18,7 @@
                 <div id="rule-id-<%=SLDrule.id%>" class="panel-collapse collapse">
                   <div class="panel-body">
                       <% _.forEach(SLDrule.symbolizer_groups, function(symbolizer_group) { %>
-                        <button id="btn-templateid-<%=SLDfeatureType.template_id%>" value="<%=SLDfeatureType.template_id%>" type="button" class="btn btn-primary btn-block sld_param"><%=symbolizer_group %></button>
+                        <button value="<%=symbolizer_group %>" type="button" class="btn btn-primary btn-block sld_param"><%=symbolizer_group %></button>
                       <% }); %>
                   </div>
                 </div>

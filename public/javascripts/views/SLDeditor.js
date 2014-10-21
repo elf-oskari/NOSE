@@ -15,6 +15,7 @@ define([
     },
 		initialize: function(params) {
       this.dispatcher = params.dispatcher;
+      this.listenTo(this.dispatcher, "selectSymbolizer", this.updateEditParams);
       this.SLDconfigmodel = params.SLDconfigmodel;
       _.bindAll(this, 'render');
     },
@@ -22,6 +23,10 @@ define([
       var localization = locale;
       this.$el.html(this.template({SLDmodel: this.SLDconfigmodel, editSLD: localization, SLDvalues: this.SLDconfigmodel.get('sld_values')}));
       return this;
+    },
+    updateEditParams: function(params) {
+      console.log(params);
+      debugger;
     },
     deleteConfig: function () {
       console.log(this.configs.models);
