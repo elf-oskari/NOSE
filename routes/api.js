@@ -14,6 +14,7 @@ module.exports = function (app, path, parse, store, select) {
             // `file` is the name of the <input> field of type `file`
             var old_path = files.sldfile.path,
                 fname = files.sldfile.name,
+                template_id = 0;
                 tname = fields['tname'] || '';
 
             console.log("fields", fields);
@@ -29,13 +30,18 @@ module.exports = function (app, path, parse, store, select) {
                         res.json({'sld parse': 'failed for sld file ' + fname});
                     } else {
                         store(params, fname, tname, tfile,
-                            function (err) {
-                                if (err) {
+                            function (err, template_id) {
+                                if (err || template_id === 0) {
                                     res.status(500);
                                     res.json({'sld store': 'failed'});
                                 } else {
-                                    res.status(200);
-                                    res.json({'sld store': 'success'});
+                                    select(template_id,
+                                        function(error, result) {
+                                            if (error) return res.send(500);
+                                            res.status(200);
+                                            res.json(result);
+                                        }
+                                    );
                                 }
 
                             }
@@ -53,20 +59,6 @@ module.exports = function (app, path, parse, store, select) {
         select(req.params.id,
             function(error, result) {
                 if (error) return res.send(500);
-
-
-                // Node Postgres parses results as JSON, but the JSON
-                // we returned in `data` is just text.
-                // So we need to parse the data object for all rows(n)
-                /*    result.rows.map(function (row) {
-                 try {
-                 row.data = JSON.parse(row.data);
-                 } catch (e) {
-                 row.data = null;
-                 }
-
-                 return row;
-                 }); */
 
                 res.json(result);
             }

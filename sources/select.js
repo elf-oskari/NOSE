@@ -248,7 +248,7 @@ exports.select = function(id, cb) {
     ready.then(function() {
         return(selecter.finish());
     }).then(function() {
-        console.log('Success!');
+        console.log('Select success!');
         cb(false,result);
     });
 }

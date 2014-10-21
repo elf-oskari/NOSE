@@ -21,6 +21,7 @@ var pg=require('pg.js');
 var Promise = require('es6-promise').Promise;
 var filename = '';
 var tname = '';
+var template_id = 0;
 
 /** @constructor
   * Deferred encapsulates a promise that gets fulfilled by outside code. */
@@ -348,6 +349,7 @@ exports.store = function(params, name, tname, tfile, cb) {
 	});
 
 	var configInserted=templateInserted.then(function(templateRow) {
+        template_id = templateRow.id;
 		return(inserter.insertConfig(params,templateRow.id));
 	});
 
@@ -355,15 +357,15 @@ exports.store = function(params, name, tname, tfile, cb) {
 
 	ready.catch(function(err) {
 		inserter.abort();
-		console.error(err);
+        cb(err, 0);
 		return;
 	});
 
 	ready.then(function() {
 		return(inserter.finish());
 	}).then(function() {
-		console.log('Success!');
-        cb(false);
+		console.log('Store success!');
+        cb(false, template_id);
 	});
 }
 
