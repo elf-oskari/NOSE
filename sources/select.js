@@ -148,7 +148,21 @@ SldSelecter.prototype.selectFeaturetypes=function(id) {
     var self=this;
     return(self.db.queryResult('SELECT * FROM SLD_FEATURETYPE WHERE TEMPLATE_ID='+id));
 };
+/** Select rules of one template
+ * @param {string/number} id  template id
+ * @return {Promise} */
+SldSelecter.prototype.selectRules=function(id) {
+    var self=this;
+    return(self.db.queryResult('SELECT * FROM SLD_RULE_VIEW WHERE TEMPLATE_ID='+id));
+};
 
+/** Select params of one template
+ * @param {string/number} id  template id
+ * @return {Promise} */
+SldSelecter.prototype.selectParams=function(id) {
+    var self=this;
+    return(self.db.queryResult('SELECT * FROM SLD_PARAMS_VIEW WHERE TEMPLATE_ID='+id));
+};
 /** Roll back current transaction and close connection. */
 SldSelecter.prototype.abort=function() {
 	return(this.db.rollback().then(bindToScope(this.db,this.db.close)));
@@ -160,20 +174,6 @@ SldSelecter.prototype.finish=function() {
 };
 
 
-
-/** @param {String} sql select
-  * @return {Promise} */
-SldSelecter.prototype.executeSql=function(query, cb) {
-    this.db.client.query(query, cb);
-};
-
-function subSelect(client, sql) {
-    client.query(sql, function(error, result) {
-    return result.rows;
-    });
-
-};
-
 /** Top function, to execute sql statement
  * @param {String} sql_template id
  * */
@@ -181,33 +181,10 @@ exports.select = function(id, cb) {
     var statement = 'SELECT id,uuid,name,created,updated,wms_url, sld_filename FROM SLD_TEMPLATE WHERE ID='+id;
 	var selecter=new SldSelecter(),
         cb = cb,
-        cnt = 0;
-        sldresult = [];
         result = [];
 
 	var connected=selecter.connect('db.json');
-    var cb2 = function(error, result) {
-        if (error)
-        {
-            cb(error, result);
-            return;
-        }
 
-
-        // Node Postgres parses results as JSON, but the JSON
-        // we returned in `data` is just text.
-        // So we need to parse the data object for all rows(n)
-         result.rows.map(function (row) {
-         // subselects
-             row.sld_featuretypes = subSelect(selecter.db.client, 'SELECT * FROM SLD_FEATURETYPE WHERE TEMPLATE_ID='+id);
-             //row.sld_rules = subSelect('SELECT ID, FEATURETYPE_ID, NAME, TITLE, ABSTRACT FROM SLD_RULE_VIEW WHERE SLD_ID='+id);
-             //row.sld_params = subSelect('SELECT ID, RULE_ID, TEMPLATE_OFFSET, DEFAULT_VALUE, TYPE_ID, SYMBOLIZER_GROUP, NAME, SYMBOLIZER FROM SLD_PARAMS_VIEW WHERE SLD_ID='+id);
-
-         return row;
-         });
-
-        cb(error, result.rows);
-    };
 
 /*	connected.then(function() {
 		selecter.executeSql(statement,cb2);
@@ -222,31 +199,45 @@ exports.select = function(id, cb) {
        //Loop templates
             var ind = 0;
             var maxind = templateResult.lenght;
-            var allSelected = null;
-
-
-
+            var feaSelected = null;
+            var ruleSelected = null;
+            var paramSelected = null;
         templateResult.forEach(function(row){
             result.push(row);
-            allSelected = subSelect(ind,row.id);
+            feaSelected = subSelectFeatures(ind, row.id);
+            ruleSelected = subSelectRules(ind, row.id);
+            paramSelected = subSelectParams(ind, row.id);
             ind++;
         });
-
-
-        return allSelected;
+        return paramSelected;
     });
 
-    function subSelect(ind, id) {
+    function subSelectFeatures(ind, id) {
         var featuretypeSelected = selecter.selectFeaturetypes(id);
         var allSelected = featuretypeSelected.then(function (featureResult) {
             result[ind].sld_featuretypes = featureResult;
 
         });
-
         return allSelected;
-
     };
 
+    function subSelectRules(ind, id) {
+        var rulesSelected = selecter.selectRules(id);
+        var allSelected = rulesSelected.then(function (featureResult) {
+            result[ind].sld_rules = featureResult;
+
+        });
+        return allSelected;
+    };
+
+    function subSelectParams(ind, id) {
+        var paramsSelected = selecter.selectParams(id);
+        var allSelected = paramsSelected.then(function (featureResult) {
+            result[ind].sld_params = featureResult;
+
+        });
+        return allSelected;
+    };
 
     ready.catch(function(err) {
         inserter.abort();
