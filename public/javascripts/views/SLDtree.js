@@ -15,6 +15,7 @@ define([
     },
     initialize: function(params) {
       this.el = '.tree';
+      this.dispatcher = params.dispatcher;
       this.SLDtemplatemodel = new SLDtemplateModel(params.SLDtemplatemodel.toJSON());
       this.SLDconfigmodel = new SLDconfigModel(params.SLDconfigmodel.toJSON());
       this.SLDfeaturetypeTree = this.constructFeaturetypeTree(this.SLDtemplatemodel);

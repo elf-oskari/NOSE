@@ -18,7 +18,7 @@ define(['lodash','backbone'], function(_, Backbone) {
 			var SLDtemplatemodel = self.WebApp.collections.SLDTemplatesCollection.getById(SLDconfigmodel.get('template_id'));
 			if (!self.WebApp.views.SLDEditorPage) {
 				require(['views/SLDEditorPage'], function(SLDEditorPageView) {
-					editorPageView = new SLDEditorPageView({'SLDconfigmodel': SLDconfigmodel, 'SLDtemplatemodel': SLDtemplatemodel});
+					editorPageView = new SLDEditorPageView({'SLDconfigmodel': SLDconfigmodel, 'SLDtemplatemodel': SLDtemplatemodel, 'dispatcher': self.WebApp.dispatcher});
 					editorPageView
 						.setModels({'SLDconfigmodel': SLDconfigmodel, 'SLDtemplatemodel': SLDtemplatemodel})
 						.render();
@@ -27,7 +27,7 @@ define(['lodash','backbone'], function(_, Backbone) {
 			} else {
 				editorPageView = self.WebApp.views.SLDEditorPage;
 				editorPageView
-					.setModels({'SLDconfigmodel': SLDconfigmodel, 'SLDtemplatemodel': SLDtemplatemodel})
+					.setModels({'SLDconfigmodel': SLDconfigmodel, 'SLDtemplatemodel': SLDtemplatemodel, 'dispatcher': self.WebApp.dispatcher})
 					.render();
 			}
 		},
@@ -38,7 +38,7 @@ define(['lodash','backbone'], function(_, Backbone) {
 			var configs = this.WebApp.collections.SLDConfigsCollection;
 			if (!self.WebApp.views.SLDlist) {
 				require(['views/SLDlist'], function(SLDListView) {
-					view = new SLDListView({'configs': configs, 'templates': templates});
+					view = new SLDListView({'configs': configs, 'templates': templates, 'dispatcher': self.WebApp.dispatcher});
 					view.render();
 					self.WebApp.views.SLDlist = view;
 				});

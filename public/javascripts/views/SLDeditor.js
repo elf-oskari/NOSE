@@ -14,6 +14,7 @@ define([
     },
 		initialize: function(params) {
       this.el = '.page';
+      this.dispatcher = params.dispatcher;
       this.SLDconfigmodel = params.SLDconfigmodel;
       _.bindAll(this, 'render');
     },

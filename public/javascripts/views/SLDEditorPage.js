@@ -17,14 +17,15 @@ define([
         el: $('div.container-main'),
         template: _.template(editorTemplate),
         initialize: function(params) {
+            this.dispatcher = params.dispatcher;
             this.SLDtemplatemodel = new SLDtemplateModel(params.SLDtemplatemodel.toJSON());
             this.SLDconfigmodel = new SLDconfigModel(params.SLDconfigmodel.toJSON());
 
             this.SLDconfigmodel.on("change", function(model, name) {console.log("config model", model, name);});
             
-            this.editorView = new SLDEditorView({'SLDconfigmodel': this.SLDconfigmodel});
-            this.treeView = new SLDTreeView({'SLDconfigmodel': this.SLDconfigmodel, 'SLDtemplatemodel': this.SLDtemplatemodel});
-            this.mapView = new SLDMapView();
+            this.editorView = new SLDEditorView({'SLDconfigmodel': this.SLDconfigmodel, 'vent': this.vent});
+            this.treeView = new SLDTreeView({'SLDconfigmodel': this.SLDconfigmodel, 'SLDtemplatemodel': this.SLDtemplatemodel, 'vent': this.vent});
+            this.mapView = new SLDMapView({'vent': this.vent});
             _.bindAll(this, 'render');
         },
         setModels: function(models) {

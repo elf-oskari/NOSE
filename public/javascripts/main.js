@@ -448,9 +448,8 @@ require([
 	];
 	WebApp.collections.SLDConfigsCollection = new SLDConfigsCollection(configs);
 
-	// Creating eventbus for enabling communication between components	
-	WebApp.EventBus = {};
-	_.extend(WebApp.EventBus, Backbone.Events);
+	// Creating  event dispatcher that can coordinate events among different areas of application	
+	WebApp.dispatcher = _.clone(Backbone.Events);
 	
 	WebApp.Router = new Router(WebApp);
 	// for easy debugging, do not use this variable directly
