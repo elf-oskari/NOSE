@@ -51,12 +51,12 @@ var PgDatabase=function() {
 	this.client=null;
 };
 
-/** @param {Object} conf Contains attributes:
+/** @param {Object} client:
   * host, port, database, user and password. */
-PgDatabase.prototype.connect=function(conf) {
+PgDatabase.prototype.connect=function(client) {
 	var defer=new Deferred();
 
-	this.client=new pg.Client(conf);
+	this.client=client;
 	this.client.connect(function(err) {
 		if(err) return(defer.reject('Unable to connect to database: '+err));
 		defer.resolve();
@@ -127,21 +127,13 @@ var SldInserter=function() {
 	this.dbConf=null;
 }
 
-/** @param {string} dbPath Name of JSON file with database address and credentials. */
-SldInserter.prototype.connect=function(dbPath) {
+/** @param {object} pg client */
+SldInserter.prototype.connect=function(client) {
 	var defer=new Deferred();
 
 	this.db=new PgDatabase();
 
-	try {
-		var dbJson=fs.readFileSync(dbPath,'utf-8');
-		this.dbConf=JSON.parse(dbJson);
-		defer.resolve();
-	} catch(e) {
-		defer.reject('Unable to read database configuration: '+e);
-	}
-
-	return(defer.promise.then(this.db.connect(this.dbConf)).then(this.db.begin()));
+	return(this.db.connect(client)).then(this.db.begin());
 };
 
 /** Roll back current transaction and close connection. */
@@ -339,10 +331,10 @@ SldInserter.prototype.insertConfig=function(params,templateId) {
  * @param name  original sld file name
  * @param cb {function} status cb
  * */
-exports.store = function(params, name, tname, tfile, cb) {
+exports.store = function(params, client, name, tname, tfile, cb) {
 	var inserter=new SldInserter();
 
-	var connected=inserter.connect('db.json');
+	var connected=inserter.connect(client);
 
 	var templateInserted=connected.then(function() {
 		return(inserter.insertTemplate(tfile.path, name, tname));

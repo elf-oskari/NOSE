@@ -1,9 +1,10 @@
-module.exports = function (app, path, parse, store, select) {
+module.exports = function (app, path, client, parse, store, select) {
     var fs = require('fs'),
         formidable = require('formidable'),
         parse = parse,
         store = store,
         select = select,
+        client = client,
         errorMessage = "We are working on the problem, please try again later. Thanks for understanding!";
 
 
@@ -29,7 +30,7 @@ module.exports = function (app, path, parse, store, select) {
                         res.status(500);
                         res.json({'sld parse': 'failed for sld file ' + fname});
                     } else {
-                        store(params, fname, tname, tfile,
+                        store(params, client, fname, tname, tfile,
                             function (err, template_id) {
                                 if (err || template_id === 0) {
                                     res.status(500);

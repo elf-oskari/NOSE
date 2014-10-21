@@ -6,12 +6,15 @@ var express = require('express'),
     app = express();
 var http = require('http');
 var path = require('path');
+var fs = require('fs');
+var pg = require('pg.js');
 
 //var mongo = require('mongodb');
 //var fs = require('fs');
 
 var environment = process.env.NODE_ENV || 'development';
 var publicDir = path.join(__dirname, 'public');
+var client = null;
 // all environments
 app.set('port', process.env.PORT || 3300);
 
@@ -31,16 +34,24 @@ app.use(express.static(path.join(__dirname, 'public')));
 //}
 
 
-// DB
-//var db = new mongo.Db('sld', new mongo.Server('localhost', 27017, {auto_reconnect: true}));
-//var ObjectID = mongo.BSONPure.ObjectID;
+// DB client
+try {
+       var data = fs.readFileSync('db.json','utf-8');
+       client = new pg.Client(JSON.parse(data));
+      /* client.connect(function(err) {
+        if (err) {
+          console.error('Could not connect to postgres', err);
+        } });  */
+} catch(e) {
+    console.error('Unable to read database configuration: '+e);
+}
 
 // pass in all dependency references
 //var routes = require('./routes/api')(app, db, ObjectID, credentials);
 var parse =  require('./sources/parse');
 var store =  require('./sources/store');
 var select =  require('./sources/select');
-var routes = require('./routes/api')(app, path, parse.parse, store.store, select.select);
+var routes = require('./routes/api')(app, path, client, parse.parse, store.store, select.select);
 
 
 // the startup sequence is async, therefore start the server only if everything else also works
