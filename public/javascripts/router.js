@@ -2,6 +2,7 @@ define(['lodash','backbone'], function(_, Backbone) {
 	var AppRouter = Backbone.Router.extend({
 		routes: {
 			'' : 'listSLD',
+			'/' : 'listSLD',
 			'edit/:id' : 'editSLD',
 			'new' : 'editSLD'
 		},
@@ -11,39 +12,38 @@ define(['lodash','backbone'], function(_, Backbone) {
 			this.WebApp = WebApp;
 		},
 		editSLD: function(id) {
-			console.log('Router editSLD', id);
 			var self = this;
-			var view;
-			var model = this.WebApp.collections.SLDs.getById(id);
-			if (!this.WebApp.views.SLDeditor) {
-				require(['views/SLDeditor'], function(SLDEditorView) {
-					view = new SLDEditorView({'model': model});
-					view.on('remove', function(item) {
-						console.log('remove event triggered with view', item);
-						self.navigate('index', {trigger:true});
-					});
-					view.render();
-					window.WebApp.views.SLDeditor = view;
+			var editorPageView;
+			var SLDconfigmodel = self.WebApp.collections.SLDConfigsCollection.getById(id);
+			var SLDtemplatemodel = self.WebApp.collections.SLDTemplatesCollection.getById(SLDconfigmodel.get('template_id'));
+			if (!self.WebApp.views.SLDEditorPage) {
+				require(['views/SLDEditorPage'], function(SLDEditorPageView) {
+					editorPageView = new SLDEditorPageView({'SLDconfigmodel': SLDconfigmodel, 'SLDtemplatemodel': SLDtemplatemodel, 'dispatcher': self.WebApp.dispatcher});
+					editorPageView
+						.setModels({'SLDconfigmodel': SLDconfigmodel, 'SLDtemplatemodel': SLDtemplatemodel})
+						.render();
+					self.WebApp.views.SLDEditorPage = editorPageView;
 				});
 			} else {
-				view = window.WebApp.views.SLDeditor;
-				view.model = model;
-				view.render();
+				editorPageView = self.WebApp.views.SLDEditorPage;
+				editorPageView
+					.setModels({'SLDconfigmodel': SLDconfigmodel, 'SLDtemplatemodel': SLDtemplatemodel})
+					.render();
 			}
 		},
 		listSLD: function(url) {
-			console.log('Router default', url);
+			var self = this;
 			var view;
 			var templates = this.WebApp.collections.SLDTemplatesCollection;
 			var configs = this.WebApp.collections.SLDConfigsCollection;
-			if (!this.WebApp.views.SLDlist) {
+			if (!self.WebApp.views.SLDlist) {
 				require(['views/SLDlist'], function(SLDListView) {
-					view = new SLDListView({'configs': configs, 'templates': templates});
+					view = new SLDListView({'configs': configs, 'templates': templates, 'dispatcher': self.WebApp.dispatcher});
 					view.render();
-					window.WebApp.views.SLDlist = view;
+					self.WebApp.views.SLDlist = view;
 				});
 			} else {
-				view = window.WebApp.views.SLDlist;
+				view = self.WebApp.views.SLDlist;
 				view.render();
 			}
 		}

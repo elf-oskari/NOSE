@@ -17,6 +17,11 @@ define({
 			"title": "Upload new SLD template",
 			"fileInput": "Choose the SLD you want to upload",
 			"fileName": "Name"
+		},
+		"deleteTemplate" : {
+			"title": "Are you sure you want to delete this template?",
+			"body": "Deleting this template will also delete all the configs of this template.",
+			"delete": "Delete template"
 		}
 	}
 });

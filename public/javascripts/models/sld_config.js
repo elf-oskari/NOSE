@@ -9,7 +9,7 @@ define(['lodash','backbone'], function(_, Backbone) {
 			created: null,
 			updated: null
 		},
-		urlRoot: "/api/v1/authors",
+		urlRoot: "/api/v1/configs",
 		initialize: function() {
 			this.on('change', function(e){
 				console.log('Change triggered', e);

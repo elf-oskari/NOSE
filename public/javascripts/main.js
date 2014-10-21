@@ -3,8 +3,14 @@ requirejs.config({
 		backbone: 'lib/backbone',
 		jquery: 'lib/jquery-1.10.2.min',
 		lodash: 'lib/lodash',
+		'leaflet': 'lib/leaflet-0.7.3-src',
 		i18n: 'lib/i18n',
 		bootstrap: 'lib/bootstrap'
+	},
+	shim: {
+		'bootstrap': {
+			deps: ['jquery']
+		}
 	},
 	map: {
 		"*" : {
@@ -22,11 +28,7 @@ require([
 	'collections/SLDtemplates',
 	'collections/SLDconfigs'
 ], function(Backbone, $, _, Router, Bootstrap, SLDTemplatesCollection, SLDConfigsCollection) {
-    var initialLocation = window.location.href.substring(0, window.location.href.indexOf('index'));
-	console.log(initialLocation, Backbone, $, _, Router, SLDTemplatesCollection);
-	window._ = _;
-	window.Backbone = Backbone;
-	window.WebApp = {'views': {}, 'collections': {}};
+	var WebApp = {'views': {}, 'collections': {}};
 	var slds = [
 		{
 			"id":"265",
@@ -41,7 +43,7 @@ require([
 					"id":"245",
 					"template_id":"265",
 					"order":"1",
-					"name":"",
+					"name":"Earth",
 					"title":"",
 					"feturetype_name":""
 				},		
@@ -49,7 +51,7 @@ require([
 					"id":"345",
 					"template_id":"265",
 					"order":"2",
-					"name":"",
+					"name":"Water",
 					"title":"",
 					"feturetype_name":""
 				}
@@ -59,14 +61,14 @@ require([
 					"id":"132",
 					"featuretype_id":"245",
 					"name":"",
-					"title":"",
+					"title":"Roads",
 					"abstract":""
 				},
 				{
 					"id":"632",
-					"featuretype_id":"245",
+					"featuretype_id":"345",
 					"name":"",
-					"title":"",
+					"title":"Rivers",
 					"abstract":""
 				}
 			],
@@ -77,17 +79,39 @@ require([
 					"template_offset":"5323",
 					"default_value":"#893281",
 					"type_id":"324",
-					"name":"line_width",
-					"symbolizer":"LineSymbolizer/Stroke/CssParameter(stroke)"
+					"name":"line_fill",
+					"symbolizer":"LineSymbolizer/Stroke/CssParameter(stroke)",
+					"symbolizer_group": "LineSymbolizer1"
 				},
 				{
 					"id":"1288",
 					"rule_id":"132",
 					"template_offset":"5323",
-					"default_value":"#893281",
+					"default_value":"2",
 					"type_id":"324",
 					"name":"line_width",
-					"symbolizer":"LineSymbolizer/Stroke/CssParameter(stroke)"
+					"symbolizer":"LineSymbolizer/Stroke/CssParameter(stroke-width)",
+					"symbolizer_group": "LineSymbolizer1"
+				},
+				{
+					"id":"1841",
+					"rule_id":"132",
+					"template_offset":"5323",
+					"default_value":"#893281",
+					"type_id":"324",
+					"name":"line_fill",
+					"symbolizer":"LineSymbolizer/Stroke/CssParameter(stroke)",
+					"symbolizer_group": "LineSymbolizer2"
+				},
+				{
+					"id":"1288",
+					"rule_id":"132",
+					"template_offset":"5323",
+					"default_value":"3",
+					"type_id":"324",
+					"name":"line_width",
+					"symbolizer":"LineSymbolizer/Stroke/CssParameter(stroke-width)",
+					"symbolizer_group": "LineSymbolizer2"
 				},
 				{
 					"id":"1432",
@@ -96,7 +120,8 @@ require([
 					"default_value":"#893281",
 					"type_id":"324",
 					"name":"line_width",
-					"symbolizer":"LineSymbolizer/Stroke/CssParameter(stroke)"
+					"symbolizer":"LineSymbolizer/Stroke/CssParameter(stroke)",
+					"symbolizer_group": "LineSymbolizer1"
 					},
 				{
 					"id":"1433",
@@ -105,7 +130,8 @@ require([
 					"default_value":"#893281",
 					"type_id":"324",
 					"name":"line_width",
-					"symbolizer":"LineSymbolizer/Stroke/CssParameter(stroke)"
+					"symbolizer":"LineSymbolizer/Stroke/CssParameter(stroke)",
+					"symbolizer_group": "LineSymbolizer1"
 				}
 			]
 		},
@@ -151,7 +177,8 @@ require([
 					"default_value":"#233281",
 					"type_id":"324",
 					"name":"line_width",
-					"symbolizer":"LineSymbolizer/Stroke/CssParameter(stroke)"
+					"symbolizer":"LineSymbolizer/Stroke/CssParameter(stroke)",
+					"symbolizer_group": "LineSymbolizer1"
 				},
 				{
 					"id":"1212",
@@ -160,7 +187,8 @@ require([
 					"default_value":"#122341",
 					"type_id":"324",
 					"name":"line_width",
-					"symbolizer":"LineSymbolizer/Stroke/CssParameter(stroke)"
+					"symbolizer":"LineSymbolizer/Stroke/CssParameter(stroke)",
+					"symbolizer_group": "LineSymbolizer1"
 				},
 				{
 					"id":"1433",
@@ -169,12 +197,13 @@ require([
 					"default_value":"#213281",
 					"type_id":"324",
 					"name":"line_width",
-					"symbolizer":"LineSymbolizer/Stroke/CssParameter(stroke)"
+					"symbolizer":"LineSymbolizer/Stroke/CssParameter(stroke)",
+					"symbolizer_group": "LineSymbolizer1"
 				}
 			]
 		}
 	];
-	window.WebApp.collections.SLDTemplatesCollection = new SLDTemplatesCollection(slds);
+	WebApp.collections.SLDTemplatesCollection = new SLDTemplatesCollection(slds);
 	var configs = [
 		{
 			"id":"435",
@@ -418,9 +447,15 @@ require([
 			]
 		}
 	];
-	window.WebApp.collections.SLDConfigsCollection = new SLDConfigsCollection(configs);		
-	console.log('Creating Router', window.WebApp);
-	window.WebApp.Router = new Router(window.WebApp);
+	WebApp.collections.SLDConfigsCollection = new SLDConfigsCollection(configs);
+
+	// Creating  event dispatcher that can coordinate events among different areas of application	
+	WebApp.dispatcher = _.clone(Backbone.Events);
+	
+	WebApp.Router = new Router(WebApp);
+	// for easy debugging, do not use this variable directly
+	// TODO: remove
+	window.debugWebApp = WebApp;
 	if (Backbone.history !== null) {
 		Backbone.history.start();
 	}
