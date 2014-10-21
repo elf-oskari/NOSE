@@ -14,6 +14,7 @@ define([
 	        'click .upload': 'showUpload'
     },
 		initialize: function(params) {
+      this.dispatcher = params.dispatcher;
       this.SLDconfigmodel = params.SLDconfigmodel;
       _.bindAll(this, 'render');
     },

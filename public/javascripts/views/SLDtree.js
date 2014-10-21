@@ -15,6 +15,7 @@ define([
       'click .btn.sld_param': 'updateSLDeditor'
     },
     initialize: function(params) {
+      this.dispatcher = params.dispatcher;
       this.SLDtemplatemodel = new SLDtemplateModel(params.SLDtemplatemodel.toJSON());
       this.SLDconfigmodel = new SLDconfigModel(params.SLDconfigmodel.toJSON());
       this.SLDfeaturetypeTree = this.constructFeaturetypeTree(this.SLDtemplatemodel);
@@ -56,6 +57,7 @@ define([
       return featuretypes;
     },
     render: function() {
+      console.log(this.dispatcher);
       this.$el.html(this.template({SLDfeaturetypeTree: this.SLDfeaturetypeTree, locale: locale}));
       return this;
     },
