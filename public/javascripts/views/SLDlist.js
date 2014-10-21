@@ -21,8 +21,9 @@ define([
             this.templates = params.templates;
         },
         render: function() {
+            console.log('here', this);
         	var localization = locale;
-            $(this.el).html(this.template({SLDtemplates: this.templates.models, SLDconfigs: this.configs.models, SLDlist: localization}));
+            this.$el.html(this.template({SLDtemplates: this.templates.models, SLDconfigs: this.configs.models, SLDlist: localization}));
             return this;
         },
         deleteConfig: function () {

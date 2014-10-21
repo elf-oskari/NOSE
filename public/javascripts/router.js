@@ -27,7 +27,7 @@ define(['lodash','backbone'], function(_, Backbone) {
 			} else {
 				editorPageView = self.WebApp.views.SLDEditorPage;
 				editorPageView
-					.setModels({'SLDconfigmodel': SLDconfigmodel, 'SLDtemplatemodel': SLDtemplatemodel, 'dispatcher': self.WebApp.dispatcher})
+					.setModels({'SLDconfigmodel': SLDconfigmodel, 'SLDtemplatemodel': SLDtemplatemodel})
 					.render();
 			}
 		},

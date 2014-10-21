@@ -14,7 +14,7 @@ define([
     'views/SLDmap'
 ], function(_, Backbone, $, Bootstrap, locale, editorTemplate, SLDtemplateModel, SLDconfigModel, SLDTreeView, SLDEditorView, SLDMapView) {
     var SLDEditorPageView = Backbone.View.extend({
-        el: $('div.container-main'),
+        el: '.container-main',
         template: _.template(editorTemplate),
         initialize: function(params) {
             this.dispatcher = params.dispatcher;
@@ -23,9 +23,9 @@ define([
 
             this.SLDconfigmodel.on("change", function(model, name) {console.log("config model", model, name);});
             
-            this.editorView = new SLDEditorView({'SLDconfigmodel': this.SLDconfigmodel, 'vent': this.vent});
-            this.treeView = new SLDTreeView({'SLDconfigmodel': this.SLDconfigmodel, 'SLDtemplatemodel': this.SLDtemplatemodel, 'vent': this.vent});
-            this.mapView = new SLDMapView({'vent': this.vent});
+            this.editorView = new SLDEditorView({'SLDconfigmodel': this.SLDconfigmodel, 'dispatcher': this.dispatcher});
+            this.treeView = new SLDTreeView({'SLDconfigmodel': this.SLDconfigmodel, 'SLDtemplatemodel': this.SLDtemplatemodel, 'dispatcher': this.dispatcher});
+            this.mapView = new SLDMapView({'dispatcher': this.dispatcher});
             _.bindAll(this, 'render');
         },
         setModels: function(models) {
@@ -34,11 +34,22 @@ define([
             return this;
         },
         render: function() {
-            $(this.el).html(this.template());
-            this.treeView.render(this.template);
-            this.editorView.render();
-            this.mapView.render(this.template);
+            console.log(this.dispatcher);
+            this.$el.html(this.template());
+            this.assign(this.treeView, '.tree');
+            this.assign(this.editorView, '.page');
+            this.assign(this.mapView, '.map');
             return this;
+        },
+        /*
+        * assign is basically just setElement, which calls delegateEvents for you.
+        * But with a nicer API and an automatic call to render.
+        * Based on http://ianstormtaylor.com/rendering-views-in-backbonejs-isnt-always-simple/
+        */
+        assign: function(view, selector) {
+            view
+                .setElement(this.$(selector))
+                .render();
         }
     });
     return SLDEditorPageView;

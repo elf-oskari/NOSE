@@ -5,8 +5,8 @@ define([
   'i18n!localization/nls/SLDlist'
 ], function(_, Backbone, $, locale) {
   var SLDMapView = Backbone.View.extend({
+    className: 'map',
     initialize: function() {
-      this.el ='map';
       _.bindAll(this, 'render');
     },
     render: function() {
