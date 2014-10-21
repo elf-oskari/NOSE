@@ -7,19 +7,19 @@ define([
 	'text!templates/SLDeditor.html'
 ], function(_, Backbone, $, Bootstrap, locale, editSLDTemplate) {
 	var SLDEditorView = Backbone.View.extend({
+    className: 'page',
 		template: _.template(editSLDTemplate),
 		events: {
 	        'click .delete': 'deleteConfig',
 	        'click .upload': 'showUpload'
     },
 		initialize: function(params) {
-      this.el = '.page';
       this.SLDconfigmodel = params.SLDconfigmodel;
       _.bindAll(this, 'render');
     },
     render: function() {
       var localization = locale;
-      $(this.el).html(this.template({SLDmodel: this.SLDconfigmodel, editSLD: localization, SLDvalues: this.SLDconfigmodel.get('sld_values')}));
+      this.$el.html(this.template({SLDmodel: this.SLDconfigmodel, editSLD: localization, SLDvalues: this.SLDconfigmodel.get('sld_values')}));
       return this;
     },
     deleteConfig: function () {

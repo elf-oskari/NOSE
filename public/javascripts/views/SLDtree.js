@@ -9,12 +9,12 @@ define([
   'bootstrap'
 ], function(_, Backbone, $, locale, SLDTreeTemplate, SLDtemplateModel, SLDconfigModel) {
   var SLDTreeView = Backbone.View.extend({
+    className: 'tree',
     template: _.template(SLDTreeTemplate),
     events: {
       'click .btn.sld_param': 'updateSLDeditor'
     },
     initialize: function(params) {
-      this.el = '.tree';
       this.SLDtemplatemodel = new SLDtemplateModel(params.SLDtemplatemodel.toJSON());
       this.SLDconfigmodel = new SLDconfigModel(params.SLDconfigmodel.toJSON());
       this.SLDfeaturetypeTree = this.constructFeaturetypeTree(this.SLDtemplatemodel);
@@ -56,7 +56,7 @@ define([
       return featuretypes;
     },
     render: function() {
-      $(this.el).html(this.template({SLDfeaturetypeTree: this.SLDfeaturetypeTree, locale: locale}));
+      this.$el.html(this.template({SLDfeaturetypeTree: this.SLDfeaturetypeTree, locale: locale}));
       return this;
     },
 

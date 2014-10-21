@@ -14,7 +14,7 @@ define([
     'views/SLDmap'
 ], function(_, Backbone, $, Bootstrap, locale, editorTemplate, SLDtemplateModel, SLDconfigModel, SLDTreeView, SLDEditorView, SLDMapView) {
     var SLDEditorPageView = Backbone.View.extend({
-        el: $('div.container-main'),
+        el: '.container-main',
         template: _.template(editorTemplate),
         initialize: function(params) {
             this.SLDtemplatemodel = new SLDtemplateModel(params.SLDtemplatemodel.toJSON());
@@ -33,11 +33,21 @@ define([
             return this;
         },
         render: function() {
-            $(this.el).html(this.template());
-            this.treeView.render(this.template);
-            this.editorView.render();
-            this.mapView.render(this.template);
+            this.$el.html(this.template());
+            this.assign(this.treeView, '.tree');
+            this.assign(this.editorView, '.page');
+            this.assign(this.mapView, '.map');
             return this;
+        },
+        /*
+        * assign is basically just setElement, which calls delegateEvents for you.
+        * But with a nicer API and an automatic call to render.
+        * Based on http://ianstormtaylor.com/rendering-views-in-backbonejs-isnt-always-simple/
+        */
+        assign: function(view, selector) {
+            view
+                .setElement(this.$(selector))
+                .render();
         }
     });
     return SLDEditorPageView;
