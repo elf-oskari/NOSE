@@ -30,13 +30,6 @@ app.use(express.static(path.join(__dirname, 'public')));
   //app.use(express.errorHandler());
 //}
 
-//try {
-    //var credentials = fs.readFileSync('.credentials', 'utf8');
-//} catch (error) {
-    //console.log("Verify the .credentials file exists, check README.md for details and fix:");
-    //console.dir(error);
-    //return;
-//}
 
 // DB
 //var db = new mongo.Db('sld', new mongo.Server('localhost', 27017, {auto_reconnect: true}));
@@ -46,7 +39,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 //var routes = require('./routes/api')(app, db, ObjectID, credentials);
 var parse =  require('./sources/parse');
 var store =  require('./sources/store');
-var routes = require('./routes/api')(app, path, parse.parse, store.store);
+var select =  require('./sources/select');
+var routes = require('./routes/api')(app, path, parse.parse, store.store, select.select);
 
 
 // the startup sequence is async, therefore start the server only if everything else also works

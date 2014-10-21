@@ -155,6 +155,7 @@ CREATE TABLE sld_featuretype
   name character varying(256) NOT NULL,
   title character varying(256) NOT NULL,
   featuretype_name character varying(256) NOT NULL,
+  feature_order integer,
   CONSTRAINT sld_featuretype_pkey PRIMARY KEY (id),
   CONSTRAINT template_id_fkey FOREIGN KEY (template_id)
       REFERENCES sld_template (id) MATCH SIMPLE
@@ -202,6 +203,7 @@ CREATE TABLE sld_param
   template_offset  int,
   type_id  bigint,
   default_value character varying(512) NOT NULL,
+  symbolizer_group character varying(32),
   CONSTRAINT sld_param_pkey PRIMARY KEY (id),
   CONSTRAINT rule_id_fkey FOREIGN KEY (rule_id)
       REFERENCES sld_rule (id) MATCH SIMPLE

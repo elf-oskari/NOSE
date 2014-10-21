@@ -19,6 +19,7 @@
     
 var fs = require('fs');
 var sax = require('sax');
+var tmp = require('temporary');
 
 /** @type {string} Text replacing SLD template default parameter values
   * in output. */
@@ -34,32 +35,35 @@ var err = false;
  */
 var params = [];
 
+/** List of symbolizers to be supported inside rule
+ . */
+var symbolizerSpecList=['PolygonSymbolizer', 'LineSymbolizer', 'PointSymbolizer', 'TextSymbolizer'];
+
+
 /** List of fields (editable SLD parameters) and how to find them.
   * Describes each field's parent tags up to its parent rule.
   * A tag's required attributes are listed in an object after its name. */
 var fieldSpecList=[
 	{
-		path:['PolygonSymbolizer','Fill','GraphicFill','Graphic','Mark','WellKnownName']
+		path:['Fill','GraphicFill','Graphic','Mark','WellKnownName']
 	},{
-		path:['PolygonSymbolizer','Fill','GraphicFill','Graphic','Size']
+		path:['Fill','GraphicFill','Graphic','Size']
 	},{
-		path:['LineSymbolizer','Stroke','CssParameter',{'name':'stroke'}]
+		path:['Stroke','CssParameter',{'name':'stroke'}]
 	},{
-		path:['LineSymbolizer','Stroke','CssParameter',{'name':'stroke-width'}]
+		path:['Stroke','CssParameter',{'name':'stroke-width'}]
 	},{
-		path:['PolygonSymbolizer','Fill','GraphicFill','Graphic','Mark','Stroke','CssParameter',{'name':'stroke'}]
+		path:['Fill','GraphicFill','Graphic','Mark','Stroke','CssParameter',{'name':'stroke'}]
 	},{
-		path:['PolygonSymbolizer','Fill','GraphicFill','Graphic','Mark','Stroke','CssParameter',{'name':'stroke-width'}]
+		path:['Fill','GraphicFill','Graphic','Mark','Stroke','CssParameter',{'name':'stroke-width'}]
 	},{
-        path:['PointSymbolizer','Graphic','Mark','Fill','CssParameter',{'name':'fill'}]
-    },
-    {
-        path:['PointSymbolizer','Graphic','Mark','WellKnownName']
-    },
-    {
-        path:['PointSymbolizer','Size','Literal']
+        path:['Graphic','Mark','Fill','CssParameter',{'name':'fill'}]
     },{
-        path:['PointSymbolizer','Graphic','Mark','Stroke']
+        path:['Graphic','Mark','WellKnownName']
+    },{
+        path:['Size','Literal']
+    },{
+        path:['Graphic','Mark','Stroke']
     }
 ];
 
@@ -85,12 +89,14 @@ var Node = function() {};
   * @param {number} id
   * @param {string} typeName Serialized path from fieldSpecList.
   * @param {string} defaultValue
-  * @param {Rule} rule */
-var FieldMarkerNode = function(id,typeName,defaultValue,rule) {
+  * @param {Rule} rule
+  * @param {number} symbolizer_group */
+var FieldMarkerNode = function(id,typeName,defaultValue,rule,symbolizer_group) {
 	this.id = id;
 	this.typeName=typeName;
 	this.defaultValue=defaultValue;
 	this.rule=rule;
+    this.symbolizer_group = symbolizer_group;
 };
 
 /** @param {XmlEncoder} xmlEncoder
@@ -99,7 +105,7 @@ var FieldMarkerNode = function(id,typeName,defaultValue,rule) {
   * @return {string} */
 FieldMarkerNode.prototype.encode = function(xmlEncoder, outputCharPos) {
 	//console.log('Field'+'\t'+'\t'+this.id+'\t'+outputCharPos+'\t'+this.typeName+'\t'+this.defaultValue);
-    params.push('Field'+'\t'+'\t'+this.id+'\t'+outputCharPos+'\t'+this.typeName+'\t'+this.defaultValue);
+    params.push('Field'+'\t'+'\t'+this.id+'\t'+outputCharPos+'\t'+this.typeName+'\t'+this.defaultValue+'\t'+this.symbolizer_group);
 
 	return('');
 };
@@ -656,9 +662,17 @@ exports.parse = function (inFileName, fname, tname, cb) {
 	var ruleId=0;
 	var fieldId=0;
 
-	var outFileName = 'sld_test_template.sld';
+    // Select paramlist for parser
+
+	//var outFileName = 'sld_test_template.sld';
+    var file = new tmp.File();
+
     var inStream = fs.createReadStream(inFileName);
-	var outStream = fs.createWriteStream(outFileName);
+	var outStream = fs.createWriteStream(file.path);
+
+    outStream.on('finish', function(){
+        cb(params, fname, tname, file, err);
+    });
 
 	var parser = new SldParser(outStream);
 
@@ -722,15 +736,32 @@ exports.parse = function (inFileName, fname, tname, cb) {
 		//console.log('\n'+'Rule'+'\t'+rule.encode(this.xmlEncoder,this.outputCharPos));
         params.push('Rule'+'\t'+rule.encode(this.xmlEncoder,this.outputCharPos));
 
-		for(var i=0;i<fieldSpecList.length;i++) {
-			spec=fieldSpecList[i];
-			field=node.queryText(spec.path);
-			if(!field) continue;
+        // Parse symbolizers
+        var child = node.childList;
+        var cnt=1;
+        for (var i = 0; i < child.length; i++) {
+            for (var k = 0; k < symbolizerSpecList.length; k++) {
+                // supported symbolizer ?
+                if(child[i].localName === symbolizerSpecList[k])
+                {
+                    var subnode = child[i];
 
-			marker=new FieldMarkerNode(fieldId++,serializeSpec(spec),field.getText(),rule);
-			field.parent.insertBefore(field,marker);
-			field.setText(placeHolder);
-		}
+                    var symbolizer_group = symbolizerSpecList[k]+"_"+cnt++;
+                    for(var m=0;m<fieldSpecList.length;m++) {
+                        spec=fieldSpecList[m];
+                        field=subnode.queryText(spec.path);
+                        if(!field) continue;
+
+                        marker=new FieldMarkerNode(fieldId++,serializeSpec(spec),field.getText(),rule, symbolizer_group);
+                        field.parent.insertBefore(field,marker);
+                        field.setText(placeHolder);
+                    }
+
+                }
+            }
+
+        }
+
 	};
 
 	/** @param {Object} node Sax node object. */
@@ -739,10 +770,10 @@ exports.parse = function (inFileName, fname, tname, cb) {
         params.push('FeatureType'+'\t'+featureTypeId++);
 	};
 
-	parser.onEnd=function(cd) {
+	parser.onEnd=function() {
 		console.log(' ');
-        cb(params, fname, tname, err);
-	};
+        this.outStream.end();
+    };
 
 	parser.parse(inStream);
 }

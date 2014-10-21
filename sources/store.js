@@ -189,11 +189,12 @@ SldInserter.prototype.insertTemplate=function(templatePath, name, tname) {
 
 /** @param {number} templateId Refers to a template in the database.
   * @return {Promise} */
-SldInserter.prototype.insertFeatureType=function(templateId) {
+SldInserter.prototype.insertFeatureType=function(templateId,fieldList) {
+    var order = fieldList[1];
 	return(this.db.querySingle(
-		'INSERT INTO sld_featuretype (template_id,name,title,featuretype_name)'+
-		' VALUES ($1,$2,$3,$4)'+
-		' RETURNING id',[templateId,'','','']
+		'INSERT INTO sld_featuretype (template_id,name,title,featuretype_name, feature_order)'+
+		' VALUES ($1,$2,$3,$4, $5)'+
+		' RETURNING id',[templateId,'','','', order]
 	));
 };
 
@@ -232,9 +233,9 @@ SldInserter.prototype.insertParam=function(ruleInserted,fieldList) {
 
 		typeFound.then(function(typeRow) {
 			self.db.querySingle(
-				'INSERT INTO sld_param (rule_id,template_offset,type_id,default_value)'+
-				' VALUES ($1,$2,$3,$4)'+
-				' RETURNING id',[ruleId.id,fieldList[3],typeRow.id,fieldList[5]]
+				'INSERT INTO sld_param (rule_id,template_offset,type_id,default_value, symbolizer_group)'+
+				' VALUES ($1,$2,$3,$4,$5)'+
+				' RETURNING id',[ruleId.id,fieldList[3],typeRow.id,fieldList[5],fieldList[6]]
 			).then(function() {
 				defer.resolve();
 			});
@@ -248,9 +249,9 @@ SldInserter.prototype.insertParam=function(ruleInserted,fieldList) {
 			));
 		}).then(function(typeRow) {
 			self.db.querySingle(
-				'INSERT INTO sld_param (rule_id,template_offset,type_id,default_value)'+
-				' VALUES ($1,$2,$3,$4)'+
-				' RETURNING id',[ruleId.id,fieldList[3],typeRow.id,fieldList[5]]
+				'INSERT INTO sld_param (rule_id,template_offset,type_id,default_value, symbolizer_group)'+
+				' VALUES ($1,$2,$3,$4,$5)'+
+				' RETURNING id',[ruleId.id,fieldList[3],typeRow.id,fieldList[5], fieldList[6]]
 			).then(function() {
 				defer.resolve();
 			});
@@ -284,7 +285,7 @@ SldInserter.prototype.parseConfig=function(sldConfig,templateId) {
 		type=fieldList[0];
 
 		if(type=='FeatureType') {
-			featureTypeInserted=this.insertFeatureType(templateId);
+			featureTypeInserted=this.insertFeatureType(templateId, fieldList);
 			featureTypeInserted.catch(function(err) {
 				defer.reject('Error inserting feature type: '+err);
 			});
@@ -337,13 +338,13 @@ SldInserter.prototype.insertConfig=function(params,templateId) {
  * @param name  original sld file name
  * @param cb {function} status cb
  * */
-exports.store = function(params, sld_template, name, tname, cb) {
+exports.store = function(params, name, tname, tfile, cb) {
 	var inserter=new SldInserter();
 
 	var connected=inserter.connect('db.json');
 
 	var templateInserted=connected.then(function() {
-		return(inserter.insertTemplate(sld_template,name, tname));
+		return(inserter.insertTemplate(tfile.path, name, tname));
 	});
 
 	var configInserted=templateInserted.then(function(templateRow) {
