@@ -25,7 +25,8 @@ define([
         },
         render: function() {
         	var localization = locale;
-            this.$el.html(this.template({SLDtemplates: this.templates.models, SLDconfigs: this.configs.models, SLDlist: localization}));
+            var templateConfigTree = this.templates.getTemplateConfigTree(this.configs.getConfigTree());
+            this.$el.html(this.template({_: _, SLDtemplates: templateConfigTree, SLDlist_i18n: localization}));
             return this;
         },
         deleteConfig: function () {

@@ -1,4 +1,5 @@
-module.exports = function (app, path, client, parse, store, select) {
+module.exports = function (app, path, parse, store, select, delete_template) {
+
     var fs = require('fs'),
         formidable = require('formidable'),
         parse = parse,
@@ -67,4 +68,27 @@ module.exports = function (app, path, client, parse, store, select) {
 
 
     });
+
+
+    app.delete('/api/v1/:id/sld_upload_testit', function(req, res) {
+        console.log('DELETE /api/v1/' + req.params.id +  '/sld_upload_testit');
+        console.log(' #########  JOU  ###########'); 
+
+        delete_template(req.params.id,
+            function (err) {
+                if (err) {
+                    console.log("API ERROR!!!");
+                    res.status(500);
+                    res.json({'sld store': 'failed'});
+                } else {
+                    console.log("API SUCCESS!!!");
+                    res.status(200);
+                    res.json({'sld store': 'success'});
+                }
+
+            }            
+        );
+
+    });
+
 }

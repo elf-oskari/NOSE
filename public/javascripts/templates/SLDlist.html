@@ -1,33 +1,31 @@
 <!-- List template -->
 <div class="view" id="sld-list">
   <div class="panel panel-primary">
-    <div class="panel-heading"><%= SLDlist.texts.title %></div>
+    <div class="panel-heading"><%= SLDlist_i18n.texts.title %></div>
     <div class="panel-body">
-      <p> <%= SLDlist.texts.body %><p>
-      <a class="btn btn-primary" data-toggle="modal" data-target="#uploadModal"><%= SLDlist.texts.upload %></a>
+      <p> <%= SLDlist_i18n.texts.body %><p>
+      <a class="btn btn-primary" data-toggle="modal" data-target="#uploadModal"><%= SLDlist_i18n.texts.upload %></a>
     </div>
     <table class="table table-striped table-condensed">
       <% _.forEach(SLDtemplates, function(SLDtemplateModel) { %>
         <thead>
           <tr>
-            <th><%= SLDtemplateModel.get('name') %></th>
+            <th><%= SLDtemplateModel.name %></th>
             <th>
-              <button type="button" class="btn btn-primary btn-sm new"><%= SLDlist.buttons.create %></button>
-              <button type="button" class="btn btn-danger btn-sm delete" data-template-id="<%= SLDtemplateModel.get('id') %>" data-toggle="modal" data-target="#deleteTemplateModal"><%= SLDlist.buttons.delete %></button>
+              <button type="button" class="btn btn-primary btn-sm new"><%= SLDlist_i18n.buttons.create %></button>
+              <button type="button" class="btn btn-danger btn-sm delete" data-template-id="<%= SLDtemplateModel.id %>" data-toggle="modal" data-target="#deleteTemplateModal"><%= SLDlist_i18n.buttons.delete %></button>
             </th>
           </tr>
         </thead>
         <tbody>
-          <% _.forEach(SLDconfigs, function(SLDconfigModel) { %>
+          <% _.forEach(SLDtemplateModel.configs, function(SLDconfigModel) { %>
             <tr>
-              <% if (SLDconfigModel.get('template_id') === SLDtemplateModel.get('id')) { %>
-                <td><%= SLDconfigModel.get('name') %></td>
-                <td>
-                  <button type="button" class="btn btn-warning btn-sm edit" data-config-id="<%= SLDconfigModel.get('id') %>"><%= SLDlist.buttons.edit %></button>
-                  <button type="button" class="btn btn-danger btn-sm delete" data-config-id="<%= SLDconfigModel.get('id') %>" data-toggle="modal" data-target="#deleteConfigModal"><%= SLDlist.buttons.delete %></button>
-                  <button type="button" class="btn btn-success btn-sm download" data-config-id="<%= SLDconfigModel.get('id') %>"><%= SLDlist.buttons.download %></button>
-                </td>
-              <% } %>
+              <td><%= SLDconfigModel.name %></td>
+              <td>
+                <button type="button" class="btn btn-warning btn-sm edit" data-config-id="<%= SLDconfigModel.id %>"><%= SLDlist_i18n.buttons.edit %></button>
+                <button type="button" class="btn btn-danger btn-sm delete" data-config-id="<%= SLDconfigModel.id %>" data-toggle="modal" data-target="#deleteConfigModal"><%= SLDlist_i18n.buttons.delete %></button>
+                <button type="button" class="btn btn-success btn-sm download" data-config-id="<%= SLDconfigModel.id %>"><%= SLDlist_i18n.buttons.download %></button>
+              </td>
             </tr>
           <% }); %>
         </tbody>
@@ -40,19 +38,19 @@
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-          <h4 class="modal-title" id="ModalTitle"><%= SLDlist.upload.title %></h4>
+          <h4 class="modal-title" id="ModalTitle"><%= SLDlist_i18n.upload.title %></h4>
         </div>
         <div class="modal-body">
           <form id="fileinfo" action="/api/v1/sld_upload" role="form" enctype="multipart/form-data" method="post">
             <div class="form-group">
-              <label for="userFileInput"><%= SLDlist.upload.fileInput %></label>
+              <label for="userFileInput"><%= SLDlist_i18n.upload.fileInput %></label>
               <input type="file" id="userFileInput" class="form-control" name="sldfile" required />
             </div>
             <div class="form-group">
-              <label for="fileName"><%= SLDlist.upload.fileName %></label>
+              <label for="fileName"><%= SLDlist_i18n.upload.fileName %></label>
               <input type="text" id="fileName" class="form-control" name="tname" required />
               <hr>
-              <button type="submit" class="btn btn-primary upload"><%= SLDlist.buttons.upload %></button>
+              <button type="submit" class="btn btn-primary upload"><%= SLDlist_i18n.buttons.upload %></button>
             </div>
          </form>
         </div>
@@ -65,14 +63,14 @@
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-          <h4 class="modal-title" id="ModalTitle"><%= SLDlist.deleteTemplate.title %></h4>
+          <h4 class="modal-title" id="ModalTitle"><%= SLDlist_i18n.deleteTemplate.title %></h4>
         </div>
         <div class="modal-body">
-          <p><%= SLDlist.deleteTemplate.body %></p>
+          <p><%= SLDlist_i18n.deleteTemplate.body %></p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-danger delete-template"><%= SLDlist.deleteTemplate.delete %></button>
-          <button type="button" class="btn btn-primary" data-dismiss="modal"><%= SLDlist.buttons.cancel %></button>
+          <button type="button" class="btn btn-danger delete-template"><%= SLDlist_i18n.deleteTemplate.delete %></button>
+          <button type="button" class="btn btn-primary" data-dismiss="modal"><%= SLDlist_i18n.buttons.cancel %></button>
         </div>
       </div>
     </div>
@@ -83,14 +81,14 @@
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-          <h4 class="modal-title" id="ModalTitle"><%= SLDlist.deleteConfig.title %></h4>
+          <h4 class="modal-title" id="ModalTitle"><%= SLDlist_i18n.deleteConfig.title %></h4>
         </div>
         <div class="modal-body">
-          <p><%= SLDlist.deleteConfig.body %></p>
+          <p><%= SLDlist_i18n.deleteConfig.body %></p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-danger delete-config"><%= SLDlist.deleteConfig.delete %></button>
-          <button type="button" class="btn btn-primary" data-dismiss="modal"><%= SLDlist.buttons.cancel %></button>
+          <button type="button" class="btn btn-danger delete-config"><%= SLDlist_i18n.deleteConfig.delete %></button>
+          <button type="button" class="btn btn-primary" data-dismiss="modal"><%= SLDlist_i18n.buttons.cancel %></button>
         </div>
       </div>
     </div>

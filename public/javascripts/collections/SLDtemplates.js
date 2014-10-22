@@ -16,6 +16,13 @@ define([
 				return item.get('id') === id;
 			});
 		},
+		getTemplateConfigTree: function(configs) {
+			return this.models.map(function (item) {
+				var template = item.pick('id', 'name');
+				template.configs = _.where(configs, {template_id: template.id});
+				return template;
+			});
+		},
 		comparator: function(item) {
 			return item.get('id');
 		}

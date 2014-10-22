@@ -12,8 +12,11 @@ define([
 			}
 		},
 		getById: function(id) {
-			return this.find(function(item) {
-				return item.get('id') === id;
+			return this.get(id);
+		},
+		getConfigTree: function() {
+			return this.models.map(function (item) {
+				return item.pick('id', 'name', 'template_id');
 			});
 		},
 		comparator: function(item) {
