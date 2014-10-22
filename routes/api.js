@@ -1,4 +1,4 @@
-module.exports = function (app, path, parse, store, select, delete_template) {
+module.exports = function (app, path, client, parse, store, select, delete_template) {
 
     var fs = require('fs'),
         formidable = require('formidable'),
