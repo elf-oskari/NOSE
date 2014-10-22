@@ -11,10 +11,11 @@ define([
 		el: '.container-main',
 		template: _.template(SLDListTemplate),
 		events: {
-	        'click .btn.delete-config': 'deleteConfig',
 	        'click .btn.upload': 'upload',
             'click .btn.delete-template': 'deleteTemplate',
+            'click .btn.new': 'newConfig',
             'click .btn.edit': 'editConfig',
+            'click .btn.delete-config': 'deleteConfig',
             'click .btn.download': 'downloadConfig'
 
       	},
@@ -42,6 +43,19 @@ define([
         	//});
         //return false;
       	},
+        newConfig: function (event) {
+            event.preventDefault();
+            var template_id = $(event.currentTarget).data('template-id');
+            var template = this.templates.get(template_id);
+            var new_config_sld_values = template.getDefaultConfigSLDValues();
+            var new_config = {
+                "id": "new",
+                "template_id": template_id,
+                "sld_values": new_config_sld_values
+            };
+            this.configs.create(new_config);
+            Backbone.history.navigate('/edit/new', true);
+        },
         editConfig: function (event) {
             event.preventDefault();
             Backbone.history.navigate('/edit/' + $(event.currentTarget).data('config-id'), true);

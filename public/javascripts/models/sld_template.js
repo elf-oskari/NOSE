@@ -24,6 +24,14 @@ define(['lodash','backbone'], function(_, Backbone) {
 				return "Name cannot be null or empty.";
 			}
 		},
+		getDefaultConfigSLDValues: function() {
+			var SLDparams = this.get('sld_params');
+			return SLDparams.map(function (item) {
+				var param = _.pick(item, 'id', 'default_value');
+				// rename id to param_id before returning
+				return {param_id: param.id, data: param.default_value};
+			});
+		},
 
 		/**
 	     * @method getFeaturetypeTree

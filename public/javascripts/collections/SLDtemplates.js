@@ -12,9 +12,7 @@ define([
 			}
 		},
 		getById: function(id) {
-			return this.find(function(item) {
-				return item.get('id') === id;
-			});
+			return this.get(id);
 		},
 		getTemplateConfigTree: function(configs) {
 			return this.models.map(function (item) {

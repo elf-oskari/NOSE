@@ -12,7 +12,7 @@
           <tr>
             <th><%= SLDtemplateModel.name %></th>
             <th>
-              <button type="button" class="btn btn-primary btn-sm new"><%= SLDlist_i18n.buttons.create %></button>
+              <button type="button" class="btn btn-primary btn-sm new" data-template-id="<%= SLDtemplateModel.id %>"><%= SLDlist_i18n.buttons.create %></button>
               <button type="button" class="btn btn-danger btn-sm delete" data-template-id="<%= SLDtemplateModel.id %>" data-toggle="modal" data-target="#deleteTemplateModal"><%= SLDlist_i18n.buttons.delete %></button>
             </th>
           </tr>
