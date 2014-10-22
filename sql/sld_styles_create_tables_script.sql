@@ -1,3 +1,5 @@
+-- Create scripts for sld_styles Postgres db
+
 CREATE DATABASE sld_styles
   WITH OWNER = postgres
        ENCODING = 'UTF8'
@@ -159,7 +161,7 @@ CREATE TABLE sld_featuretype
   CONSTRAINT sld_featuretype_pkey PRIMARY KEY (id),
   CONSTRAINT template_id_fkey FOREIGN KEY (template_id)
       REFERENCES sld_template (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION
+      ON UPDATE NO ACTION ON DELETE CASCADE
 )
 WITH (
   OIDS=FALSE
@@ -183,7 +185,7 @@ CREATE TABLE sld_rule
   CONSTRAINT sld_rule_pkey PRIMARY KEY (id),
   CONSTRAINT featuretype_id_fkey FOREIGN KEY (featuretype_id)
       REFERENCES sld_featuretype (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION
+      ON UPDATE NO ACTION ON DELETE CASCADE
 )
 WITH (
   OIDS=FALSE
@@ -210,7 +212,7 @@ CREATE TABLE sld_param
       ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT type_id_fkey FOREIGN KEY (type_id)
       REFERENCES sld_type (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION
+      ON UPDATE NO ACTION ON DELETE CASCADE
 )
 WITH (
   OIDS=FALSE
@@ -240,3 +242,33 @@ CREATE TABLE sld_value
 WITH (
   OIDS=FALSE
 );
+
+CREATE VIEW sld_params_view AS
+ SELECT d.id,
+    a.id AS template_id,
+    d.rule_id,
+    d.template_offset,
+    d.default_value,
+    d.symbolizer_group,
+    e.name,
+    e.symbolizer
+   FROM sld_template a,
+    sld_featuretype b,
+    sld_rule c,
+    sld_param d,
+    sld_type e
+  WHERE a.id = b.template_id AND b.id = c.featuretype_id AND c.id = d.rule_id AND d.type_id = e.id;
+
+ CREATE OR REPLACE VIEW sld_rule_view AS
+ SELECT c.id,
+    a.id AS template_id,
+    c.featuretype_id,
+    c.name,
+    c.title,
+    c.abstract
+   FROM sld_template a,
+    sld_featuretype b,
+    sld_rule c,
+    sld_param d,
+    sld_type e
+  WHERE a.id = b.template_id AND b.id = c.featuretype_id AND c.id = d.rule_id AND d.type_id = e.id;
