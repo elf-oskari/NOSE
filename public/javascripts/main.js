@@ -1,5 +1,4 @@
 requirejs.config({
-	baseUrl: "/javascripts/",
 	paths: {
 		backbone: 'lib/backbone',
 		jquery: 'lib/jquery-1.10.2.min',
@@ -219,109 +218,109 @@ require([
 				{
 					"id":"243242",
 					"config_id":"435",
-					"param_id":"",
+					"param_id":"1273",
 					"data":"#c832d8"
 				},
 				{
 					"id":"243242",
 					"config_id":"435",
-					"param_id":"",
+					"param_id":"1288",
+					"data":"2"
+				},
+				{
+					"id":"243242",
+					"config_id":"435",
+					"param_id":"??",
 					"data":"#c832d8"
 				},
 				{
 					"id":"243242",
 					"config_id":"435",
-					"param_id":"",
+					"param_id":"??",
 					"data":"#c832d8"
 				},
 				{
 					"id":"243242",
 					"config_id":"435",
-					"param_id":"",
+					"param_id":"??",
 					"data":"#c832d8"
 				},
 				{
 					"id":"243242",
 					"config_id":"435",
-					"param_id":"",
+					"param_id":"??",
 					"data":"#c832d8"
 				},
 				{
 					"id":"243242",
 					"config_id":"435",
-					"param_id":"",
+					"param_id":"??",
 					"data":"#c832d8"
 				},
 				{
 					"id":"243242",
 					"config_id":"435",
-					"param_id":"",
+					"param_id":"??",
 					"data":"#c832d8"
 				},
 				{
 					"id":"243242",
 					"config_id":"435",
-					"param_id":"",
+					"param_id":"??",
 					"data":"#c832d8"
 				},
 				{
 					"id":"243242",
 					"config_id":"435",
-					"param_id":"",
+					"param_id":"??",
 					"data":"#c832d8"
 				},
 				{
 					"id":"243242",
 					"config_id":"435",
-					"param_id":"",
+					"param_id":"??",
 					"data":"#c832d8"
 				},
 				{
 					"id":"243242",
 					"config_id":"435",
-					"param_id":"",
+					"param_id":"??",
 					"data":"#c832d8"
 				},
 				{
 					"id":"243242",
 					"config_id":"435",
-					"param_id":"",
+					"param_id":"??",
 					"data":"#c832d8"
 				},
 				{
 					"id":"243242",
 					"config_id":"435",
-					"param_id":"",
+					"param_id":"??",
 					"data":"#c832d8"
 				},
 				{
 					"id":"243242",
 					"config_id":"435",
-					"param_id":"",
+					"param_id":"??",
 					"data":"#c832d8"
 				},
 				{
 					"id":"243242",
 					"config_id":"435",
-					"param_id":"",
+					"param_id":"??",
 					"data":"#c832d8"
 				},
 				{
 					"id":"243242",
 					"config_id":"435",
-					"param_id":"",
+					"param_id":"??",
 					"data":"#c832d8"
 				},
 				{
 					"id":"243242",
 					"config_id":"435",
-					"param_id":"",
-					"data":"#c832d8"
-				},
-				{
-					"id":"243242",
-					"config_id":"435",
-					"param_id":"",
+					"param_id":"??",
 					"data":"#c832d8"
 				},
 
@@ -457,9 +456,7 @@ require([
 	// for easy debugging, do not use this variable directly
 	// TODO: remove
 	window.debugWebApp = WebApp;
-
-	// TODO: enable pushState when backend is able to serve correct pages
-	// E.g /edit/:id would return application.html content and WebApp.Router would navigate correctly
-	//Backbone.history.start({pushState: true});
-	Backbone.history.start();
+	if (Backbone.history !== null) {
+		Backbone.history.start();
+	}
 });
