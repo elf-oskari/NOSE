@@ -28,7 +28,7 @@ define(['lodash','backbone'], function(_, Backbone) {
 		/**
 	     * @method getFeaturetypeTree
 	     * Constructs the featuretypetree of sld configuration 
-	     * Tree structure from up to bottom: featuretypes > rules > symbolizergroups
+	     * Tree structure from up to bottom
 	     * @return {Array} list of featuretype objects
 	     */
 		getFeaturetypeTree: function() {
