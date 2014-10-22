@@ -39,8 +39,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 //var routes = require('./routes/api')(app, db, ObjectID, credentials);
 var parse =  require('./sources/parse');
 var store =  require('./sources/store');
+var delete_template =  require('./sources/delete_template');
 var select =  require('./sources/select');
-var routes = require('./routes/api')(app, path, parse.parse, store.store, select.select);
+var routes = require('./routes/api')(app, path, parse.parse, store.store, select.select, delete_template.delete_template);
 
 
 // the startup sequence is async, therefore start the server only if everything else also works
