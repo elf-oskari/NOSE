@@ -13,6 +13,8 @@ define([
     render: function() {
       // create a map in the "map" div, set the view to a given place and zoom
       if (!this.map) {
+        // OSM uses the Web Mercator projection (EPSG:3857) for more details see:
+        // http://openlayers.org/ol3-workshop/layers/cached.html
         this.map = new ol.Map({
           target: this.el,
           layers: [
@@ -23,7 +25,6 @@ define([
             zoom: 13
           })
         });
-        window.debugMap = this.map;
       } else {
         // map node has been detached.
         // Note! event handling might not function properly, but since we currently do not have any map specific
