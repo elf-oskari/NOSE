@@ -7,10 +7,14 @@
         <label>Name</label>
         <input name="Name" type="text" value="<%= SLDmodel.get('name') %>">
         <br>
-        <% _.forEach(SLDvalues, function(SLDvalue) { %>
-          <label>Data</label>
-          <input name="Data" type="text" value="<%= SLDvalue.data %>">
-          <br>
+        <% if (!paramlist) { %>
+          <p>Joku kiva käyttöohje</p>
+        <% } %>
+        <% _.forEach(paramlist, function(sld_value) { %>
+          <div class="form-group">
+            <label>Data</label>
+            <input name="Data" type="text" value="<%= sld_value.data %>">
+          </div>
         <% }); %>
         <button type="submit" class="btn"><%= SLDmodel ? 'Update' : 'Create' %></button>
         <% if(SLDmodel) { %>

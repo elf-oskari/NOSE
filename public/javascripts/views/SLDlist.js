@@ -4,7 +4,7 @@ define([
 	'jquery',
 	'i18n!localization/nls/SLDlist',
 	'text!templates/SLDlist.html',
-	'models/sld_config',
+    'models/sld_config',
     'bootstrap'
 ], function(_, Backbone, $, locale, SLDListTemplate, SLDconfigModel) {
 	var SLDListView = Backbone.View.extend({
@@ -16,6 +16,7 @@ define([
             'click .btn.delete-template': 'deleteTemplate',
             'click .btn.edit': 'editConfig',
             'click .btn.download': 'downloadConfig'
+
       	},
 		initialize: function(params) {
             _.bindAll(this, 'render');

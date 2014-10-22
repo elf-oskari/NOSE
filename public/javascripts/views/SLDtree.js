@@ -18,44 +18,17 @@ define([
       this.dispatcher = params.dispatcher;
       this.SLDtemplatemodel = new SLDtemplateModel(params.SLDtemplatemodel.toJSON());
       this.SLDconfigmodel = new SLDconfigModel(params.SLDconfigmodel.toJSON());
-      this.SLDfeaturetypeTree = this.constructFeaturetypeTree(this.SLDtemplatemodel);
-
+      this.SLDfeaturetypeTree = this.SLDtemplatemodel.getFeaturetypeTree();
       _.bindAll(this, 'render');
     },
 
     setModels: function(models) {
         this.SLDtemplatemodel.set(models.SLDtemplatemodel.toJSON());
         this.SLDconfigmodel.set(models.SLDconfigmodel.toJSON());
-        this.SLDfeaturetypeTree = this.constructFeaturetypeTree(this.SLDtemplatemodel);
+        this.SLDfeaturetypeTree = this.SLDtemplatemodel.getFeaturetypeTree();
         return this;
     },
 
-    constructFeaturetypeTree: function(SLDtemplatemodel) {
-      var SLDfeaturetypes = SLDtemplatemodel.get('sld_featuretypes');
-      var SLDrules = SLDtemplatemodel.get('sld_rules');
-      var SLDparams = SLDtemplatemodel.get('sld_params');
-      var featuretypes = [];
-      _.forEach(SLDfeaturetypes, function(SLDfeatureType, index) {
-        featuretypes.push(SLDfeatureType);
-        var rules = [];
-        _.forEach(SLDrules, function(SLDrule, index) { 
-          if (SLDrule.featuretype_id === SLDfeatureType.id) {
-            rules.push(SLDrule);
-            var symbolizer_groups = [];
-            _.forEach(SLDparams, function(SLDparam, index) { 
-              if (SLDparam.rule_id === SLDrule.id) {
-                if (!_.contains(symbolizer_groups, SLDparam.symbolizer_group)) {
-                  symbolizer_groups.push(SLDparam.symbolizer_group);
-                }
-              }
-            });
-            SLDrule.symbolizer_groups = symbolizer_groups;
-          }
-        });
-        SLDfeatureType.rules = rules;
-      });
-      return featuretypes;
-    },
     render: function() {
       console.log(this.dispatcher);
       this.$el.html(this.template({SLDfeaturetypeTree: this.SLDfeaturetypeTree, locale: locale}));
@@ -63,8 +36,10 @@ define([
     },
 
     updateSLDeditor: function(event) {
-      var symbolizer_group = event.target.value;
-      this.dispatcher.trigger("selectSymbolizer", this.SLDtemplatemodel.getParamsBySymbolizergroup(symbolizer_group));
+      var symbolizer_group = $(event.currentTarget).data('symbolizergroup');
+      // JQuery probably parses numers as strings to numbers and therefore the ruleid must be formatted to string
+      var rule_id = "" + $(event.currentTarget).data('ruleid');
+      this.dispatcher.trigger("selectSymbolizer", this.SLDtemplatemodel.getParamsBySymbolizergroup(symbolizer_group, rule_id));
     }
   });
   return SLDTreeView;
