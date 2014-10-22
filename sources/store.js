@@ -57,17 +57,17 @@ PgDatabase.prototype.connect=function(client) {
 	var defer=new Deferred();
 
 	this.client=client;
-	this.client.connect(function(err) {
+/*	this.client.connect(function(err) {
 		if(err) return(defer.reject('Unable to connect to database: '+err));
 		defer.resolve();
-	});
-
+	}); */
+    defer.resolve();
 	return(defer.promise);
 }
 
-PgDatabase.prototype.close=function(conf) {
+/* PgDatabase.prototype.close=function(conf) {
 	return(Promise.resolve(this.client.end()));
-}
+}  */
 
 /** Execute query without reading any results. */
 PgDatabase.prototype.exec=function() {
@@ -138,12 +138,12 @@ SldInserter.prototype.connect=function(client) {
 
 /** Roll back current transaction and close connection. */
 SldInserter.prototype.abort=function() {
-	return(this.db.rollback().then(bindToScope(this.db,this.db.close)));
+	return(this.db.rollback()); //.then(bindToScope(this.db,this.db.close)));
 };
 
 /** Commit current transaction and close connection. */
 SldInserter.prototype.finish=function() {
-	return(this.db.commit().then(bindToScope(this.db,this.db.close)));
+	return(this.db.commit()); //.then(bindToScope(this.db,this.db.close)));
 };
 
 /** Read a file and retuŕn its contents in a promise.

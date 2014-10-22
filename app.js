@@ -38,10 +38,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 try {
        var data = fs.readFileSync('db.json','utf-8');
        client = new pg.Client(JSON.parse(data));
-      /* client.connect(function(err) {
+       client.connect(function(err) {
         if (err) {
           console.error('Could not connect to postgres', err);
-        } });  */
+        } });
 } catch(e) {
     console.error('Unable to read database configuration: '+e);
 }
