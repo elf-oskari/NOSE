@@ -4,13 +4,16 @@ requirejs.config({
 		backbone: 'lib/backbone',
 		jquery: 'lib/jquery-1.10.2.min',
 		lodash: 'lib/lodash',
-		'leaflet': 'lib/leaflet-0.7.3-src',
+		ol3: 'lib/ol3-v3.0.0-debug',
 		i18n: 'lib/i18n',
 		bootstrap: 'lib/bootstrap'
 	},
 	shim: {
 		'bootstrap': {
 			deps: ['jquery']
+		},
+		'ol3': {
+			exports: 'ol'
 		}
 	},
 	map: {
