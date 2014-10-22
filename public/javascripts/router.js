@@ -1,10 +1,12 @@
 define(['lodash','backbone'], function(_, Backbone) {
 	var AppRouter = Backbone.Router.extend({
 		routes: {
-			'' : 'listSLD',
+			'application.html' : 'listSLD',
 			'/' : 'listSLD',
 			'edit/:id' : 'editSLD',
-			'new' : 'editSLD'
+			'new' : 'editSLD',
+			'*default': 'listSLD'
+
 		},
 
 		initialize: function(WebApp) {
@@ -34,11 +36,11 @@ define(['lodash','backbone'], function(_, Backbone) {
 		listSLD: function(url) {
 			var self = this;
 			var view;
-			var templates = this.WebApp.collections.SLDTemplatesCollection;
-			var configs = this.WebApp.collections.SLDConfigsCollection;
+			var SLDtemplatemodels = self.WebApp.collections.SLDTemplatesCollection.models;
+			var SLDconfigmodels = self.WebApp.collections.SLDConfigsCollection.models;
 			if (!self.WebApp.views.SLDlist) {
 				require(['views/SLDlist'], function(SLDListView) {
-					view = new SLDListView({'configs': configs, 'templates': templates, 'dispatcher': self.WebApp.dispatcher});
+					view = new SLDListView({'SLDconfigmodels': SLDconfigmodels, 'SLDtemplatemodels': SLDtemplatemodels, 'dispatcher': self.WebApp.dispatcher});
 					view.render();
 					self.WebApp.views.SLDlist = view;
 				});
