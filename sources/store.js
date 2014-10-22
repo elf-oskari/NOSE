@@ -21,6 +21,7 @@ var pg=require('pg.js');
 var Promise = require('es6-promise').Promise;
 var filename = '';
 var tname = '';
+var template_id = 0;
 
 /** @constructor
   * Deferred encapsulates a promise that gets fulfilled by outside code. */
@@ -50,23 +51,23 @@ var PgDatabase=function() {
 	this.client=null;
 };
 
-/** @param {Object} conf Contains attributes:
+/** @param {Object} client:
   * host, port, database, user and password. */
-PgDatabase.prototype.connect=function(conf) {
+PgDatabase.prototype.connect=function(client) {
 	var defer=new Deferred();
 
-	this.client=new pg.Client(conf);
-	this.client.connect(function(err) {
+	this.client=client;
+/*	this.client.connect(function(err) {
 		if(err) return(defer.reject('Unable to connect to database: '+err));
 		defer.resolve();
-	});
-
+	}); */
+    defer.resolve();
 	return(defer.promise);
 }
 
-PgDatabase.prototype.close=function(conf) {
+/* PgDatabase.prototype.close=function(conf) {
 	return(Promise.resolve(this.client.end()));
-}
+}  */
 
 /** Execute query without reading any results. */
 PgDatabase.prototype.exec=function() {
@@ -126,31 +127,23 @@ var SldInserter=function() {
 	this.dbConf=null;
 }
 
-/** @param {string} dbPath Name of JSON file with database address and credentials. */
-SldInserter.prototype.connect=function(dbPath) {
+/** @param {object} pg client */
+SldInserter.prototype.connect=function(client) {
 	var defer=new Deferred();
 
 	this.db=new PgDatabase();
 
-	try {
-		var dbJson=fs.readFileSync(dbPath,'utf-8');
-		this.dbConf=JSON.parse(dbJson);
-		defer.resolve();
-	} catch(e) {
-		defer.reject('Unable to read database configuration: '+e);
-	}
-
-	return(defer.promise.then(this.db.connect(this.dbConf)).then(this.db.begin()));
+	return(this.db.connect(client)).then(this.db.begin());
 };
 
 /** Roll back current transaction and close connection. */
 SldInserter.prototype.abort=function() {
-	return(this.db.rollback().then(bindToScope(this.db,this.db.close)));
+	return(this.db.rollback()); //.then(bindToScope(this.db,this.db.close)));
 };
 
 /** Commit current transaction and close connection. */
 SldInserter.prototype.finish=function() {
-	return(this.db.commit().then(bindToScope(this.db,this.db.close)));
+	return(this.db.commit()); //.then(bindToScope(this.db,this.db.close)));
 };
 
 /** Read a file and retuŕn its contents in a promise.
@@ -338,16 +331,17 @@ SldInserter.prototype.insertConfig=function(params,templateId) {
  * @param name  original sld file name
  * @param cb {function} status cb
  * */
-exports.store = function(params, name, tname, tfile, cb) {
+exports.store = function(params, client, name, tname, tfile, cb) {
 	var inserter=new SldInserter();
 
-	var connected=inserter.connect('db.json');
+	var connected=inserter.connect(client);
 
 	var templateInserted=connected.then(function() {
 		return(inserter.insertTemplate(tfile.path, name, tname));
 	});
 
 	var configInserted=templateInserted.then(function(templateRow) {
+        template_id = templateRow.id;
 		return(inserter.insertConfig(params,templateRow.id));
 	});
 
@@ -355,15 +349,15 @@ exports.store = function(params, name, tname, tfile, cb) {
 
 	ready.catch(function(err) {
 		inserter.abort();
-		console.error(err);
+        cb(err, 0);
 		return;
 	});
 
 	ready.then(function() {
 		return(inserter.finish());
 	}).then(function() {
-		console.log('Success!');
-        cb(false);
+		console.log('Store success!');
+        cb(false, template_id);
 	});
 }
 
