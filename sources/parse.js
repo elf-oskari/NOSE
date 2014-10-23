@@ -90,13 +90,12 @@ var Node = function() {};
   * @param {string} typeName Serialized path from fieldSpecList.
   * @param {string} defaultValue
   * @param {Rule} rule
-  * @param {number} symbolizer_group */
-var FieldMarkerNode = function(id,typeName,defaultValue,rule,symbolizer_group) {
+   */
+var FieldMarkerNode = function(id,typeName,defaultValue,rule) {
 	this.id = id;
 	this.typeName=typeName;
 	this.defaultValue=defaultValue;
 	this.rule=rule;
-    this.symbolizer_group = symbolizer_group;
 };
 
 /** @param {XmlEncoder} xmlEncoder
@@ -105,7 +104,7 @@ var FieldMarkerNode = function(id,typeName,defaultValue,rule,symbolizer_group) {
   * @return {string} */
 FieldMarkerNode.prototype.encode = function(xmlEncoder, outputCharPos) {
 	//console.log('Field'+'\t'+'\t'+this.id+'\t'+outputCharPos+'\t'+this.typeName+'\t'+this.defaultValue);
-    params.push('Field'+'\t'+'\t'+this.id+'\t'+outputCharPos+'\t'+this.typeName+'\t'+this.defaultValue+'\t'+this.symbolizer_group);
+    params.push('Field'+'\t'+'\t'+this.id+'\t'+outputCharPos+'\t'+this.typeName+'\t'+this.defaultValue);
 
 	return('');
 };
@@ -744,15 +743,15 @@ exports.parse = function (inFileName, fname, tname, cb) {
                 // supported symbolizer ?
                 if(child[i].localName === symbolizerSpecList[k])
                 {
+                    params.push('Symbolizer'+'\t'+symbolizerSpecList[k]+'\t'+cnt++);
                     var subnode = child[i];
 
-                    var symbolizer_group = symbolizerSpecList[k]+"_"+cnt++;
                     for(var m=0;m<fieldSpecList.length;m++) {
                         spec=fieldSpecList[m];
                         field=subnode.queryText(spec.path);
                         if(!field) continue;
 
-                        marker=new FieldMarkerNode(fieldId++,serializeSpec(spec),field.getText(),rule, symbolizer_group);
+                        marker=new FieldMarkerNode(fieldId++,serializeSpec(spec),field.getText(),rule);
                         field.parent.insertBefore(field,marker);
                         field.setText(placeHolder);
                     }
