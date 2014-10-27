@@ -12,7 +12,7 @@ define([
     className: 'tree',
     template: _.template(SLDTreeTemplate),
     events: {
-      'click .btn.sld_param': 'updateSLDeditor'
+      'click .btn.sld_symbolizer': 'updateSLDeditor'
     },
     initialize: function(params) {
       this.dispatcher = params.dispatcher;
@@ -31,15 +31,16 @@ define([
 
     render: function() {
       console.log(this.dispatcher);
+      console.log('got tree', this.SLDfeaturetypeTree);
       this.$el.html(this.template({SLDfeaturetypeTree: this.SLDfeaturetypeTree, locale: locale}));
       return this;
     },
 
     updateSLDeditor: function(event) {
-      var symbolizer_group = $(event.currentTarget).data('symbolizergroup');
+      var symbolizer_id = $(event.currentTarget).data('symbolizerid');
+      console.log('continue here');
       // JQuery probably parses numers as strings to numbers and therefore the ruleid must be formatted to string
-      var rule_id = "" + $(event.currentTarget).data('ruleid');
-      this.dispatcher.trigger("selectSymbolizer", this.SLDtemplatemodel.getParamsBySymbolizergroup(symbolizer_group, rule_id));
+      this.dispatcher.trigger("selectSymbolizer", this.SLDtemplatemodel.getParamsBySymbolizerId(symbolizer_id));
     }
   });
   return SLDTreeView;

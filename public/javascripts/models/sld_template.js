@@ -42,39 +42,32 @@ define(['lodash','backbone'], function(_, Backbone) {
 		getFeaturetypeTree: function() {
 			var SLDfeaturetypes = this.get('sld_featuretypes');
 			var SLDrules = this.get('sld_rules');
+			var SLDsymbolizers = this.get('sld_symbolizers');
 			var SLDparams = this.get('sld_params');
-			var featuretypes = [];
-			_.forEach(SLDfeaturetypes, function(SLDfeatureType) {
-				featuretypes.push(SLDfeatureType);
-				var rules = [];
-				_.forEach(SLDrules, function(SLDrule) { 
-					if (SLDrule.featuretype_id === SLDfeatureType.id) {
-						rules.push(SLDrule);
-						var symbolizer_groups = [];
-						_.forEach(SLDparams, function(SLDparam) { 
-							if (SLDparam.rule_id === SLDrule.id) {
-								if (!_.contains(symbolizer_groups, SLDparam.symbolizer_group)) {
-						  			symbolizer_groups.push(SLDparam.symbolizer_group);
-								}
-					  		}
-						});
-						SLDrule.symbolizer_groups = symbolizer_groups;
-					}
+
+			return _.map(SLDfeaturetypes, function (SLDfeatureType) {
+				var featuretype = _.pick(SLDfeatureType, 'id', 'name');
+				var rules = _.where(SLDrules, {featuretype_id: featuretype.id});
+				featuretype.rules = _.map(rules, function (SLDrule) {
+					var rule = _.pick(SLDrule, 'id', 'title');
+					var symbolizers = _.where(SLDsymbolizers, {rule_id: rule.id});
+					rule.symbolizers = _.map(symbolizers, function (SLDsymbolizer) {
+						var symbolizer = _.pick(SLDsymbolizer, 'id', 'type');
+						return symbolizer;
+					});
+					return rule;
 				});
-				SLDfeatureType.rules = rules;
+				return featuretype;
 			});
-			return featuretypes;
 		},
 
 		/**
-	     * @method getParamsBySymbolizergroup
-	     * @return {Array} list sld_params that match the given symbolizer_group and rule_id
+	     * @method getParamsBySymbolizerId
+	     * @return {Array} list sld_params that match the given symbolizer_id
 	     */
-		getParamsBySymbolizergroup: function(symbolizer_group, rule_id) {
-			var sldparams = this.get('sld_params');
-			var paramlist = _.filter(sldparams, {'symbolizer_group' : symbolizer_group, 'rule_id' : rule_id});
-			return paramlist;
-
+		getParamsBySymbolizerId: function(symbolizer_id) {
+			var SLDparams = this.get('sld_params');
+			return _.where(SLDparams, {'symbolizer_id': symbolizer_id});
 		}
 	});
 

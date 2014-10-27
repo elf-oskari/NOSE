@@ -40,6 +40,8 @@ define([
      * @return {Array} list of sld_values that are editable at this state
      */
     returnEditParams: function(params) {
+      console.log('continue here');
+      debugger;
       var paramlist = [];
       _.forEach(this.SLDconfigmodel.get('sld_values'), function(SLDvalue) {
         _.forEach(params, function(param) {
