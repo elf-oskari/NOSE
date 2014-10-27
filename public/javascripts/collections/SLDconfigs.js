@@ -5,7 +5,7 @@ define([
 ], function(_, Backbone, SLDConfig) {
 	var SLDConfigsCollection = Backbone.Collection.extend({
 		model: SLDConfig,
-		urlRoot: "/api/v1/sld_configs",
+		url: "/api/v1/configs",
 		initialize: function(models) {
 			if (_.isUndefined(models)) {
 				this.fetch();

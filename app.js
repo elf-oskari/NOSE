@@ -48,11 +48,15 @@ try {
 
 // pass in all dependency references
 //var routes = require('./routes/api')(app, db, ObjectID, credentials);
-var parse =  require('./sources/parse');
-var store =  require('./sources/store');
-var delete_template =  require('./sources/delete_template');
-var select =  require('./sources/select');
-var routes = require('./routes/api')(app, path, client, parse.parse, store.store, select.select, delete_template.delete_template);
+
+var libs = {
+  parse : require('./sources/parse'),
+  store : require('./sources/store'),
+  delete_template : require('./sources/delete_template'),
+  select : require('./sources/select')  
+}
+
+var routes = require('./routes/api')(app, path, client, libs);
 
 
 // the startup sequence is async, therefore start the server only if everything else also works

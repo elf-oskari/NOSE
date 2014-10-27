@@ -1,11 +1,11 @@
 -- Create scripts for sld_styles Postgres db
 
 CREATE DATABASE sld_styles
-  WITH OWNER = postgres
+  WITH OWNER = "MBLOMBERG"
        ENCODING = 'UTF8'
        TABLESPACE = pg_default
-       LC_COLLATE = 'en_US.UTF-8'
-       LC_CTYPE = 'en_US.UTF-8'
+       LC_COLLATE = 'Finnish_Finland.1252'
+       LC_CTYPE = 'Finnish_Finland.1252'
        CONNECTION LIMIT = -1;
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ sld_template
 
