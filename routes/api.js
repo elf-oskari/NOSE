@@ -70,20 +70,19 @@ module.exports = function (app, path, parse, store, select, delete_template) {
     });
 
 
-    app.delete('/api/v1/:id/sld_upload_testit', function(req, res) {
-        console.log('DELETE /api/v1/' + req.params.id +  '/sld_upload_testit');
-        console.log(' #########  JOU  ###########'); 
+    app.delete('/api/v1/templates/:id', function(req, res) {
+        console.log('DELETE /api/v1/templates/' +req.params.id);
 
         delete_template(req.params.id,
             function (err) {
                 if (err) {
-                    console.log("API ERROR!!!");
+                    console.log("API ERROR!!!", err);
                     res.status(500);
                     res.json({'sld store': 'failed'});
                 } else {
                     console.log("API SUCCESS!!!");
-                    res.status(200);
-                    res.json({'sld store': 'success'});
+                    res.status(204);
+                    //res.json({'sld store': 'success'});
                 }
 
             }            
