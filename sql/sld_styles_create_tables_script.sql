@@ -10,6 +10,9 @@ CREATE DATABASE sld_styles
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ sld_template
 
 
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ sld_template
+
+
 -- Function: procedure_sld_template_update()
 
 -- DROP FUNCTION procedure_sld_template_update();
@@ -135,7 +138,7 @@ CREATE TABLE sld_type
 (
   id bigserial NOT NULL,
   name character varying(256) NOT NULL,
-  symbolizer character varying(256) NOT NULL,
+  symbolizer_parameter character varying(256) NOT NULL,
   CONSTRAINT sld_type_pkey PRIMARY KEY (id)
 )
 WITH (
@@ -191,6 +194,25 @@ WITH (
   OIDS=FALSE
 );
 
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ sld_symbolizer
+-- Table: sld_symbolizer
+
+-- DROP TABLE sld_symbolizer;
+
+CREATE TABLE sld_symbolizer
+(
+  id bigserial NOT NULL,
+  rule_id bigint,
+  symbolizer_order integer,
+  symbolizer_type character varying(32) NOT NULL,
+  CONSTRAINT sld_symbolizer_pkey PRIMARY KEY (id),
+  CONSTRAINT rule_id_fkey FOREIGN KEY (rule_id)
+      REFERENCES sld_rule (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE CASCADE
+)
+WITH (
+  OIDS=FALSE
+);
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ sld_param
 
 
@@ -201,15 +223,14 @@ WITH (
 CREATE TABLE sld_param
 (
   id bigserial NOT NULL,
-  rule_id  bigint,
+  symbolizer_id  bigint,
   template_offset  int,
   type_id  bigint,
   default_value character varying(512) NOT NULL,
-  symbolizer_group character varying(32),
   CONSTRAINT sld_param_pkey PRIMARY KEY (id),
-  CONSTRAINT rule_id_fkey FOREIGN KEY (rule_id)
-      REFERENCES sld_rule (id) MATCH SIMPLE
-      ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT symbolizer_id_fkey FOREIGN KEY (symbolizer_id)
+      REFERENCES sld_symbolizer (id) MATCH SIMPLE
+      ON UPDATE NO ACTION ON DELETE CASCADE,
   CONSTRAINT type_id_fkey FOREIGN KEY (type_id)
       REFERENCES sld_type (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE CASCADE
@@ -230,7 +251,7 @@ CREATE TABLE sld_value
   id bigserial NOT NULL,
   config_id  bigint,
   param_id  bigint,
-  data text,
+  value text,
   CONSTRAINT sld_value_pkey PRIMARY KEY (id),
   CONSTRAINT config_id_fkey FOREIGN KEY (config_id)
       REFERENCES sld_config (id) MATCH SIMPLE
@@ -243,23 +264,47 @@ WITH (
   OIDS=FALSE
 );
 
-CREATE VIEW sld_params_view AS
- SELECT d.id,
-    a.id AS template_id,
-    d.rule_id,
-    d.template_offset,
-    d.default_value,
-    d.symbolizer_group,
-    e.name,
-    e.symbolizer
+CREATE  VIEW sld_all_test AS
+ SELECT a.id AS sld_id,
+    a.name AS template,
+    b.id AS featuretype_id,
+    b.name AS featuretype,
+    b.feature_order,
+    c.name AS rule,
+    e.id AS param_id,
+    e.template_offset,
+    e.default_value,
+    d.symbolizer_order,
+    d.symbolizer_type,
+    f.name AS param_name,
+    f.symbolizer_parameter
    FROM sld_template a,
     sld_featuretype b,
     sld_rule c,
-    sld_param d,
-    sld_type e
-  WHERE a.id = b.template_id AND b.id = c.featuretype_id AND c.id = d.rule_id AND d.type_id = e.id;
+    sld_symbolizer d,
+    sld_param e,
+    sld_type f
+  WHERE a.id = b.template_id AND b.id = c.featuretype_id AND c.id = d.rule_id AND d.id = e.symbolizer_id AND e.type_id = f.id;
 
- CREATE OR REPLACE VIEW sld_rule_view AS
+
+
+CREATE VIEW sld_params_view AS
+ SELECT e.id,
+    a.id AS template_id,
+    e.symbolizer_id,
+    e.template_offset,
+    e.default_value,
+    f.name,
+    f.symbolizer_parameter
+   FROM sld_template a,
+    sld_featuretype b,
+    sld_rule c,
+    sld_symbolizer d,
+    sld_param e,
+    sld_type f
+  WHERE a.id = b.template_id AND b.id = c.featuretype_id AND c.id = d.rule_id AND d.id = e.symbolizer_id AND e.type_id = f.id;
+
+ CREATE VIEW sld_rule_view AS
  SELECT c.id,
     a.id AS template_id,
     c.featuretype_id,
@@ -268,7 +313,17 @@ CREATE VIEW sld_params_view AS
     c.abstract
    FROM sld_template a,
     sld_featuretype b,
+    sld_rule c
+  WHERE  a.id = b.template_id AND b.id = c.featuretype_id;
+
+CREATE  VIEW sld_symbolizer_view AS
+ SELECT d.id,
+    a.id AS template_id,
+    d.rule_id,
+    d.symbolizer_order,
+    d.symbolizer_type
+   FROM sld_template a,
+    sld_featuretype b,
     sld_rule c,
-    sld_param d,
-    sld_type e
-  WHERE a.id = b.template_id AND b.id = c.featuretype_id AND c.id = d.rule_id AND d.type_id = e.id;
+    sld_symbolizer d
+  WHERE  a.id = b.template_id AND b.id = c.featuretype_id AND c.id = d.rule_id;

@@ -1,4 +1,4 @@
-module.exports = function (app, path, parse, store, select, delete_template) {
+module.exports = function (app, path, client, parse, store, select, delete_template) {
 
     var fs = require('fs'),
         formidable = require('formidable'),
@@ -58,7 +58,7 @@ module.exports = function (app, path, parse, store, select, delete_template) {
     // Returns result of sql execution
     app.get('/api/v1/select/:id/sld_template', function(req, res) {
         console.log('GET /api/v1/select/' + req.params.id +  '/sld_template');
-        select(req.params.id,
+        select(req.params.id, client,
             function(error, result) {
                 if (error) return res.send(500);
 

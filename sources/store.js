@@ -124,7 +124,7 @@ PgDatabase.prototype.rollback=function() {
   * into an SQL database. */
 var SldInserter=function() {
 	this.db=null;
-	this.dbConf=null;
+
 }
 
 /** @param {object} pg client */
@@ -209,26 +209,42 @@ SldInserter.prototype.insertRule=function(featureTypeInserted,fieldList) {
 	}));
 };
 
+/** @param {Promise} ruleInserted Should resolve to the ID of an
+ * inserted rule.
+ * @param {Array.<string>} fieldList Data describing the .
+ * @return {Promise} */
+SldInserter.prototype.insertSymbolizer=function(ruleInserted,fieldList) {
+    var self=this;
+
+    return(ruleInserted.then(function(ruleId) {
+        return(self.db.querySingle(
+                'INSERT INTO sld_symbolizer (rule_id,symbolizer_type, symbolizer_order)'+
+                ' VALUES ($1,$2,$3)'+
+                ' RETURNING id',[ruleId.id,fieldList[1],fieldList[2]]
+        ));
+    }));
+};
+
 /** Insert an SLD parameter description into the database.
-  * @param {Promise} ruleInserted Should resolve to the ID of an inserted rule.
+  * @param {Promise} symbolizerInserted Should resolve to the ID of an inserted symbolizer.
   * @param {Array.<string>} fieldList Data describing the parameter type etc.
   * @return {Promise} */
-SldInserter.prototype.insertParam=function(ruleInserted,fieldList) {
+SldInserter.prototype.insertParam=function(symbolizerInserted,fieldList) {
 	var self=this;
 	var defer=new Deferred();
 
-	ruleInserted.then(function(ruleId) {
+	symbolizerInserted.then(function(symbolizerId) {
 		var typeFound=self.db.querySingle(
-			'SELECT id,name,symbolizer'+
+			'SELECT id,name,symbolizer_parameter'+
 			' FROM sld_type'+
-			' WHERE symbolizer=$1',[fieldList[4]]
+			' WHERE symbolizer_parameter=$1',[fieldList[4]]
 		);
 
 		typeFound.then(function(typeRow) {
 			self.db.querySingle(
-				'INSERT INTO sld_param (rule_id,template_offset,type_id,default_value, symbolizer_group)'+
-				' VALUES ($1,$2,$3,$4,$5)'+
-				' RETURNING id',[ruleId.id,fieldList[3],typeRow.id,fieldList[5],fieldList[6]]
+				'INSERT INTO sld_param (symbolizer_id,template_offset,type_id,default_value)'+
+				' VALUES ($1,$2,$3,$4)'+
+				' RETURNING id',[symbolizerId.id,fieldList[3],typeRow.id,fieldList[5]]
 			).then(function() {
 				defer.resolve();
 			});
@@ -236,15 +252,15 @@ SldInserter.prototype.insertParam=function(ruleInserted,fieldList) {
 
 		typeFound.catch(function() {
 			return(self.db.querySingle(
-				'INSERT INTO sld_type (name,symbolizer)'+
+				'INSERT INTO sld_type (name,symbolizer_parameter)'+
 				' VALUES ($1,$2)'+
 				' RETURNING id',['',fieldList[4]]
 			));
 		}).then(function(typeRow) {
 			self.db.querySingle(
-				'INSERT INTO sld_param (rule_id,template_offset,type_id,default_value, symbolizer_group)'+
-				' VALUES ($1,$2,$3,$4,$5)'+
-				' RETURNING id',[ruleId.id,fieldList[3],typeRow.id,fieldList[5], fieldList[6]]
+				'INSERT INTO sld_param (symbolizer_id,template_offset,type_id,default_value)'+
+				' VALUES ($1,$2,$3,$4)'+
+				' RETURNING id',[symbolizerId.id,fieldList[3],typeRow.id,fieldList[5]]
 			).then(function() {
 				defer.resolve();
 			});
@@ -265,7 +281,7 @@ SldInserter.prototype.parseConfig=function(sldConfig,templateId) {
 	var lineList;
 	var lineNum,lineCount;
 	var fieldList;
-	var featureTypeInserted,ruleInserted,fieldInserted;
+	var featureTypeInserted,ruleInserted,fieldInserted,symbolizerInserted;
 
 	lineList=sldConfig;  //.split(/\r?\n/);
 	lineCount=lineList.length;
@@ -292,9 +308,16 @@ SldInserter.prototype.parseConfig=function(sldConfig,templateId) {
 			});
 			promiseList.push(ruleInserted);
 		}
+        if(type=='Symbolizer') {
+            symbolizerInserted=this.insertSymbolizer(ruleInserted,fieldList);
+            symbolizerInserted.catch(function(err) {
+                defer.reject('Error inserting symbolizer: '+err);
+            });
+            promiseList.push(symbolizerInserted);
+        }
 
 		if(type=='Field') {
-			paramInserted=this.insertParam(ruleInserted,fieldList);
+			paramInserted=this.insertParam(symbolizerInserted,fieldList);
 			paramInserted.catch(function(err) {
 				defer.reject('Error inserting field: '+err);
 			});
