@@ -53,6 +53,7 @@ var libs = {
   parse : require('./sources/parse'),
   store : require('./sources/store'),
   delete_template : require('./sources/delete_template'),
+  delete_config : require('./sources/delete_config'),
   select : require('./sources/select')  
 }
 

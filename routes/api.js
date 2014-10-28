@@ -5,6 +5,7 @@ module.exports = function (app, path, client, libs) {
         store = libs.store.store,
         select = libs.select.select,
         delete_template = libs.delete_template.delete_template,
+        delete_config = libs.delete_config.delete_config,
         client = client,
         errorMessage = "We are working on the problem, please try again later. Thanks for understanding!";
 
@@ -94,7 +95,7 @@ module.exports = function (app, path, client, libs) {
                 if (err) {
                     console.log("API ERROR!!!", err);
                     res.status(500);
-                    res.json({'sld store': 'failed'});
+                    res.json({'delete template': 'failed'});
                 } else {
                     console.log("API SUCCESS!!!");
                     // we cannot use 204 as it is not supported by Backbone
@@ -105,6 +106,24 @@ module.exports = function (app, path, client, libs) {
         );
     });
 
+    app.delete('/api/v1/configs/:id', function(req, res) {
+        console.log('DELETE /api/v1/configs/' +req.params.id);
+
+        delete_config(req.params.id,
+            function (err) {
+                if (err) {
+                    console.log("API ERROR!!!", err);
+                    res.status(500);
+                    res.json({'delete config': 'failed'});
+                } else {
+                    console.log("DELETE CONFIG API SUCCESS!!!");
+                    // we cannot use 204 as it is not supported by Backbone
+                    res.status(200);
+                    res.json({});
+                }
+            }            
+        );
+    });
 
     app.get('/api/v1/configs/', function (req, res) {
     var configs = [

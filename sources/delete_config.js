@@ -2,6 +2,7 @@
   * This tool deletes a template and all it's child parametes from a PostgreSQL
   * database. Use like this:
   *
+  * node store.js template.sld fields.csv
   *
  */
 
@@ -181,9 +182,9 @@ SldDeleter.prototype.finish=function() {
  * @param {string/number} id  template id
  *                        if  < 1  --> select all templates
  * @return {Promise} */
-SldDeleter.prototype.selectTestDelete=function(id) {
+SldDeleter.prototype.deleteConfig=function(id) {
     var self=this;
-    return(self.db.queryResult('delete from sld_template where id='+id ));
+    return(self.db.queryResult('delete from sld_config where id='+id ));
 };
 
 
@@ -192,20 +193,20 @@ SldDeleter.prototype.selectTestDelete=function(id) {
  * @param id  templates id to be deleted
  * @param cb {function} status cb
  * */
-exports.delete_template = function(id, cb) {
+exports.delete_config = function(id, cb) {
 
-	console.log("IN DELETE TEMPLATE....");
+	console.log("IN DELETE CONFIG....");
 	var deletes=new SldDeleter(),
         cb = cb;
 
 	var connected=deletes.connect('db.json');
 
-	console.log("0 ############");
+	console.log("0 xxxxxxxxxx");
     var ready=connected.then(function() {
-		console.log("1 ############");
-        return(deletes.selectTestDelete(id));
+		console.log("1 xxxxxxxxxx");
+        return(deletes.deleteConfig(id));
     });
-	console.log("2 ############");
+	console.log("2 xxxxxxxxxx");
     console.log("READY: " , ready.toString());
 
 	ready.catch(function(err) {
@@ -221,7 +222,6 @@ exports.delete_template = function(id, cb) {
 		console.log('Success!');
         cb(false);
 	});
-	console.log("DONE delete_tempalte main function");
+
+	console.log("DONE delete_config main function");
 }
-
-
