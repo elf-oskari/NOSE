@@ -5,21 +5,21 @@
     <div class="panel-body" style="height:800px">
       <form class="edit-sld-form">
         <label>Name</label>
-        <input name="Name" type="text" value="<%= SLDmodel.get('name') %>">
+        <input name="Name" type="text" class="name" data-attribute="name" value="<%= SLDmodel.name %>">
         <br>
         <% if (!paramlist) { %>
           <p>Joku kiva käyttöohje</p>
         <% } %>
-        <% _.forEach(paramlist, function(sld_value) { %>
+        <% _.forEach(paramlist, function(param) { console.log('got param', param); %>
           <div class="form-group">
-            <label>Data</label>
-            <input name="Data" type="text" value="<%= sld_value.data %>">
+            <label><%= param.name %></label>
+            <input name="value" type="text" value="<%= param.value %>">
           </div>
         <% }); %>
-        <button type="submit" class="btn"><%= SLDmodel ? 'Update' : 'Create' %></button>
-        <% if(SLDmodel) { %>
-        <input type="hidden" name="id" value="<%= SLDmodel.get('id') %>" />
-       <button type="button" data-user-id="<%= SLDmodel.get('id') %>" class="btn btn-danger delete">Delete</button>
+        <button type="submit" class="btn save"><%= SLDmodel.id ? 'Update' : 'Create' %></button>
+        <% if(SLDmodel.id) { %>
+        <input type="hidden" name="id" value="<%= SLDmodel.id %>" />
+       <button type="button" data-user-id="<%= SLDmodel.id %>" class="btn btn-danger delete">Delete</button>
        <% }; %>
       </form>
     </div>

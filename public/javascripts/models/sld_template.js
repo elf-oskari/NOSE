@@ -16,7 +16,7 @@ define(['lodash','backbone'], function(_, Backbone) {
 			});
 		},
 		validate: function(attributes) {
-			console.log('Validating...', attributes);
+			console.log('Validating...', attributes, this.isNew());
 			if (attributes.id === null || attributes.id === "") {
 				return "Id cannot be null or empty.";
 			}
@@ -26,10 +26,9 @@ define(['lodash','backbone'], function(_, Backbone) {
 		},
 		getDefaultConfigSLDValues: function() {
 			var SLDparams = this.get('sld_params');
-			return SLDparams.map(function (item) {
-				var param = _.pick(item, 'id', 'default_value');
+			return SLDparams.map(function (param) {
 				// rename id to param_id before returning
-				return {param_id: param.id, data: param.default_value};
+				return {param_id: param.id, value: param.default_value};
 			});
 		},
 
@@ -67,7 +66,8 @@ define(['lodash','backbone'], function(_, Backbone) {
 	     */
 		getParamsBySymbolizerId: function(symbolizer_id) {
 			var SLDparams = this.get('sld_params');
-			return _.where(SLDparams, {'symbolizer_id': symbolizer_id});
+			paramlist = _.where(SLDparams, {'symbolizer_id': symbolizer_id});
+			return paramlist;
 		}
 	});
 

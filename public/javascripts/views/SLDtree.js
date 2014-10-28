@@ -37,9 +37,8 @@ define([
     },
 
     updateSLDeditor: function(event) {
-      var symbolizer_id = $(event.currentTarget).data('symbolizerid');
-      console.log('continue here');
-      // JQuery probably parses numers as strings to numbers and therefore the ruleid must be formatted to string
+      // JQuery probably parses numers as strings to numbers and therefore the symbolizer_id must be formatted to string
+      var symbolizer_id = "" + $(event.currentTarget).data('symbolizerid');
       this.dispatcher.trigger("selectSymbolizer", this.SLDtemplatemodel.getParamsBySymbolizerId(symbolizer_id));
     }
   });

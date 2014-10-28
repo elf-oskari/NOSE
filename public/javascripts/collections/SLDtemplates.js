@@ -8,7 +8,9 @@ define([
 		url: "/api/v1/templates",
 		initialize: function(models) {
 			if (_.isUndefined(models)) {
-				this.fetch();
+				// TODO: bootstrap collections in application.html
+				// http://backbonejs.org/#Collection-fetch
+				this.fetch({reset: true});
 			}
 		},
 		getById: function(id) {

@@ -9,20 +9,20 @@ define(['lodash','backbone'], function(_, Backbone) {
 			created: null,
 			updated: null
 		},
-		url: "configs",
-		urlRoot: "/api/v1",
+		urlRoot: "/api/v1/configs",
 		initialize: function() {
 			this.on('change', function(e){
 				console.log('Change triggered', e);
 			});
 		},
 		validate: function(attributes) {
-			console.log('Validating...', attributes);
-			if (attributes.id === null || attributes.id === "") {
-				return "Id cannot be null or empty.";
+			console.log('Validating...', attributes, this.isNew());
+
+			if (!this.isNew() && !_.isString(attributes.id)) {
+				return "Id must be a string.";
 			}
-			if (attributes.name === null || attributes.name === "") {
-				return "Name cannot be null or empty.";
+			if (!_.isString(attributes.name)) {
+				return "Name must be a string.";
 			}
 		}
 	});

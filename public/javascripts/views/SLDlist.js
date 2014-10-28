@@ -54,15 +54,7 @@ define([
         newConfig: function (event) {
             event.preventDefault();
             var template_id = $(event.currentTarget).data('id');
-            var template = this.templates.get(template_id);
-            var new_config_sld_values = template.getDefaultConfigSLDValues();
-            var new_config = {
-                "id": "new",
-                "template_id": template_id,
-                "sld_values": new_config_sld_values
-            };
-            this.configs.create(new_config);
-            Backbone.history.navigate('/edit/new', true);
+            Backbone.history.navigate('/new/' + template_id, true);
         },
         editConfig: function (event) {
             event.preventDefault();

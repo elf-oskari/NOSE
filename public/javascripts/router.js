@@ -4,7 +4,7 @@ define(['lodash','backbone'], function(_, Backbone) {
 			'application.html' : 'listSLD',
 			'/' : 'listSLD',
 			'edit/:id' : 'editSLD',
-			'new' : 'editSLD',
+			'new/:id' : 'editSLD',
 			'*default' : 'listSLD'
 		},
 
@@ -15,8 +15,21 @@ define(['lodash','backbone'], function(_, Backbone) {
 		editSLD: function(id) {
 			var self = this;
 			var editorPageView;
+			var SLDtemplatemodel;
 			var SLDconfigmodel = self.WebApp.collections.SLDConfigsCollection.getById(id);
-			var SLDtemplatemodel = self.WebApp.collections.SLDTemplatesCollection.getById(SLDconfigmodel.get('template_id'));
+			if (_.isUndefined(SLDconfigmodel)) {
+				SLDtemplatemodel = self.WebApp.collections.SLDTemplatesCollection.getById(id);
+
+	            var new_config_sld_values = SLDtemplatemodel.getDefaultConfigSLDValues();
+	            var new_config = {
+	                "template_id": id,
+	                "sld_values": new_config_sld_values
+	            };
+	            SLDconfigmodel = self.WebApp.collections.SLDConfigsCollection.create(new_config);
+			} else {
+				SLDtemplatemodel = self.WebApp.collections.SLDTemplatesCollection.getById(SLDconfigmodel.get('template_id'));
+			}
+
 			if (!self.WebApp.views.SLDEditorPage) {
 				require(['views/SLDEditorPage'], function(SLDEditorPageView) {
 					editorPageView = new SLDEditorPageView({'SLDconfigmodel': SLDconfigmodel, 'SLDtemplatemodel': SLDtemplatemodel, 'dispatcher': self.WebApp.dispatcher});

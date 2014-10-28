@@ -141,109 +141,109 @@ module.exports = function (app, path, client, libs) {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"1273",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"1288",
-                    "data":"2"
+                    "value":"2"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"??",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"??",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"??",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"??",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"??",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"??",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"??",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"??",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"??",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"??",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"??",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"??",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"??",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"??",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"??",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"??",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
 
             ],
@@ -262,109 +262,109 @@ module.exports = function (app, path, client, libs) {
                     "id":"123242",
                     "config_id":"435",
                     "param_id":"",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 },
                 {
                     "id":"243242",
                     "config_id":"435",
                     "param_id":"",
-                    "data":"#c832d8"
+                    "value":"#c832d8"
                 }
             ]
         }
