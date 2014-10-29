@@ -10,11 +10,6 @@ define(['lodash','backbone'], function(_, Backbone) {
 			wms_url: null
 		},
 		urlRoot: "/api/v1/templates",
-		initialize: function() {
-			this.on('change', function(e){
-				console.log('Change triggered', e);
-			});
-		},
 		validate: function(attributes) {
 			console.log('Validating...', attributes, this.isNew());
 			if (attributes.id === null || attributes.id === "") {

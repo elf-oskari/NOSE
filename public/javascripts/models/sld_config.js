@@ -10,11 +10,6 @@ define(['lodash','backbone'], function(_, Backbone) {
 			updated: null
 		},
 		urlRoot: "/api/v1/configs",
-		initialize: function() {
-			this.on('change', function(e){
-				console.log('Change triggered', e);
-			});
-		},
 		validate: function(attributes) {
 			console.log('Validating...', attributes, this.isNew());
 
@@ -24,6 +19,15 @@ define(['lodash','backbone'], function(_, Backbone) {
 			if (!_.isString(attributes.name)) {
 				return "Name must be a string.";
 			}
+		},
+		getSLDValuesByParams: function(params) {
+			var sld_values = this.get('sld_values');
+			var valueslist = _.map(params, function (param) {
+				var newparam = _.findWhere(sld_values, {"param_id" : param.id});
+					newparam.name = param.param_path;
+					return newparam;
+				});
+			return valueslist;
 		}
 	});
 

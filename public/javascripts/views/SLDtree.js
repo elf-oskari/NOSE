@@ -16,22 +16,20 @@ define([
     },
     initialize: function(params) {
       this.dispatcher = params.dispatcher;
-      this.SLDtemplatemodel = new SLDtemplateModel(params.SLDtemplatemodel.toJSON());
-      this.SLDconfigmodel = new SLDconfigModel(params.SLDconfigmodel.toJSON());
+      this.SLDtemplatemodel = params.SLDtemplatemodel;
+      this.SLDconfigmodel = params.SLDconfigmodel;
       this.SLDfeaturetypeTree = this.SLDtemplatemodel.getFeaturetypeTree();
       _.bindAll(this, 'render');
     },
 
     setModels: function(models) {
-        this.SLDtemplatemodel.set(models.SLDtemplatemodel.toJSON());
-        this.SLDconfigmodel.set(models.SLDconfigmodel.toJSON());
+        this.SLDtemplatemodel = models.SLDtemplatemodel;
+        this.SLDconfigmodel = models.SLDconfigmodel;
         this.SLDfeaturetypeTree = this.SLDtemplatemodel.getFeaturetypeTree();
         return this;
     },
 
     render: function() {
-      console.log(this.dispatcher);
-      console.log('got tree', this.SLDfeaturetypeTree);
       this.$el.html(this.template({SLDfeaturetypeTree: this.SLDfeaturetypeTree, locale: locale}));
       return this;
     },
@@ -39,7 +37,9 @@ define([
     updateSLDeditor: function(event) {
       // JQuery probably parses numers as strings to numbers and therefore the symbolizer_id must be formatted to string
       var symbolizer_id = "" + $(event.currentTarget).data('symbolizerid');
-      this.dispatcher.trigger("selectSymbolizer", this.SLDtemplatemodel.getParamsBySymbolizerId(symbolizer_id));
+      var params = this.SLDtemplatemodel.getParamsBySymbolizerId(symbolizer_id);
+      console.log('sid', symbolizer_id, 'params', params, 'model', this.SLDtemplatemodel);
+      this.dispatcher.trigger("selectSymbolizer", params);
     }
   });
   return SLDTreeView;

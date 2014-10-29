@@ -13,18 +13,36 @@ define([
 	        'click .delete': 'deleteConfig',
 	        'click .upload': 'showUpload',
           'click .save': 'saveConfig',
-          'change .name': 'setAttribute'
+          'change .name': 'setAttribute',
+          'change .param': 'setParam'
     },
 		initialize: function(params) {
       this.dispatcher = params.dispatcher;
       this.listenTo(this.dispatcher, "selectSymbolizer", this.updateEditParams);
-      this.SLDconfigmodel = params.SLDconfigmodel;
-      this.listenTo(this.SLDconfigmodel, "invalid", this.invalidValue);
+      this.listenTo(this.dispatcher, "all", this.logger);
+      this.setModel(params.SLDconfigmodel);
       _.bindAll(this, 'render');
     },
-    render: function() {
+    logger: function() {
+      console.log('listening to all events in SLDeditor model', arguments);
+    },
+    setModel: function(model) {
+      var self = this;
+
+      // we must stop listening first and then add to current model
+      self.stopListening(self.SLDconfigmodel, "invalid");
+      self.stopListening(self.SLDconfigmodel, "all");
+      self.stopListening(self.SLDconfigmodel, "sync");
+      self.SLDconfigmodel = model;
+      self.listenTo(self.SLDconfigmodel, "invalid", self.invalidValue);
+      self.listenTo(self.SLDconfigmodel, "all", self.logger);
+      self.listenTo(self.SLDconfigmodel, "sync", function () { self.render();});
+    },
+    render: function(paramlist) {
       var localization = locale;
-      this.$el.html(this.template({SLDmodel: this.SLDconfigmodel, editSLD: localization, paramlist: false}));
+      var model = this.SLDconfigmodel.pick('id', 'name');
+      var params = _.isUndefined(paramlist) ? false : paramlist;
+      this.$el.html(this.template({SLDmodel: model, editSLD: localization, paramlist: params}));
       return this;
     },
 
@@ -33,23 +51,9 @@ define([
      * Updates SLDeditor view with editable params
      */
     updateEditParams: function(params) {
-      this.paramlist = this.returnEditParams(params);
-      this.$el.html(this.template({SLDmodel: this.SLDconfigmodel, paramlist: this.paramlist}));
-    },
-
-    /**
-     * @method returnEditParams
-     * Returns sld_values that match the given params
-     * @return {Array} list of sld_values that are editable at this state
-     */
-    returnEditParams: function(params) {
-      var sld_values = this.SLDconfigmodel.get('sld_values');
-      var valueslist = _.map(params, function (param) {
-        var newparam = _.findWhere(sld_values, {"param_id" : param.id});
-        newparam.name = param.param_path;
-        return newparam;
-      });
-      return valueslist;
+      console.log('updateEditParams', params);
+      var paramlist = this.SLDconfigmodel.getSLDValuesByParams(params);
+      this.render(paramlist);
     },
 
     setAttribute: function(event) {
@@ -58,7 +62,19 @@ define([
       var newvalue = element.val();
 
       this.SLDconfigmodel.set(attribute, newvalue);
-      console.log('we got a name change!', event, this.SLDconfigmodel);
+    },
+    setParam: function(event) {
+      var element = $(event.currentTarget);
+      var param_id = "" + element.data('param-id');
+      var newvalue = element.val();
+
+      var sld_values = this.SLDconfigmodel.get('sld_values');
+      // we assume the changed param_id is always found
+      var paramIndex = _.findIndex(sld_values, {'param_id': param_id});
+      var param = sld_values[paramIndex];
+      param.value = newvalue;
+
+      this.SLDconfigmodel.set('sld_values', sld_values);
     },
 
     invalidValue: function(event) {
@@ -67,14 +83,9 @@ define([
 
     saveConfig: function(event) {
       event.preventDefault();
-      console.log('saving model', this.SLDconfigmodel.isNew());
-      var self = this;
       this.SLDconfigmodel.save({},{
         wait: true,
-        success: function (model, response, options) {
-          console.log('created');
-          self.dispatcher.trigger("createConfig", model);
-        }, error: function (model, response, options) {
+        error: function (model, response, options) {
           alert('something went wrong!');
           console.log('Error', model, response, options);
         }
@@ -82,15 +93,18 @@ define([
     },
 
     deleteConfig: function () {
-      console.log(this.configs.models);
-      this.configs.models.destroy({
-      success: function () {
-		    console.log('destroyed');
-		    router.navigate('', {trigger:true});
-      }
+      event.preventDefault();
+      this.SLDconfigmodel.destroy({
+        wait: true,
+        success: function (model, response, options) {
+          Backbone.history.navigate('', true);
+        }, error: function (model, response, options) {
+          console.log("something didn't go as planned", model, response, options);
+          alert('Deleting template is not possible');
+        }
       });
-      return false;
-    },
+    }
 	});
+
 	return SLDEditorView;
 });

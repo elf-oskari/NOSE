@@ -21,11 +21,9 @@ define([
         },
         initialize: function(params) {
             this.dispatcher = params.dispatcher;
-            this.SLDtemplatemodel = new SLDtemplateModel(params.SLDtemplatemodel.toJSON());
-            this.SLDconfigmodel = new SLDconfigModel(params.SLDconfigmodel.toJSON());
+            this.SLDtemplatemodel = params.SLDtemplatemodel;
+            this.SLDconfigmodel = params.SLDconfigmodel;
 
-            this.SLDconfigmodel.on("change", function(model, name) {console.log("config model", model, name);});
-            
             this.editorView = new SLDEditorView({'SLDconfigmodel': this.SLDconfigmodel, 'dispatcher': this.dispatcher});
             this.treeView = new SLDTreeView({'SLDconfigmodel': this.SLDconfigmodel, 'SLDtemplatemodel': this.SLDtemplatemodel, 'dispatcher': this.dispatcher});
             this.mapView = new SLDMapView({'dispatcher': this.dispatcher});
@@ -36,12 +34,14 @@ define([
             Backbone.history.navigate('/', true);
         },
         setModels: function(models) {
-            this.SLDtemplatemodel.set(models.SLDtemplatemodel.toJSON());
-            this.SLDconfigmodel.set(models.SLDconfigmodel.toJSON());
+            this.SLDtemplatemodel = models.SLDtemplatemodel;
+            this.SLDconfigmodel = models.SLDconfigmodel;
+            // update model in subview
+            this.editorView.setModel(models.SLDconfigmodel);
+            this.treeView.setModels(models);
             return this;
         },
         render: function() {
-            console.log(this.dispatcher);
             this.$el.html(this.template());
             this.assign(this.treeView, '.tree');
             this.assign(this.editorView, '.page');

@@ -36,20 +36,24 @@ define([
             var target = element.data('target');
             var id = element.data('id');
             $(target).attr('data-id', id).modal();
-
         },
         deleteConfig: function (event) {
             event.preventDefault();
-            $('#deleteConfigModal').modal('hide');
-            alert('Deleting config is not possible');
-            //console.log(this.configs.models);
-            //this.configs.models.destroy({
-                //success: function () {
-                    //console.log('destroyed');
-                    //router.navigate('', {trigger:true});
-                //}
-            //});
-        //return false;
+            var self = this;
+            var config_id = $(event.currentTarget).closest('.modal').data('id');
+            var config = this.configs.get(config_id);
+            config.destroy({
+                wait: true,
+                success: function (model, response, options) {
+                    $('#deleteConfigModal').modal('hide');
+                    self.render();
+                },
+                error: function (model, response, options) {
+                    console.log("something didn't go as planned", model, response, options);
+                    alert('Deleting template is not possible');
+                    $('#deleteConfigModal').modal('hide');
+                },
+            });
         },
         newConfig: function (event) {
             event.preventDefault();

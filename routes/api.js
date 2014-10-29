@@ -7,7 +7,9 @@ module.exports = function (app, path, client, libs) {
         delete_template = libs.delete_template.delete_template,
         delete_config = libs.delete_config.delete_config,
         client = client,
-        errorMessage = "We are working on the problem, please try again later. Thanks for understanding!";
+        errorMessage = "We are working on the problem, please try again later. Thanks for understanding!",
+        configIdCounter = 1,
+        configs = [];
 
 
     app.get('/api/v1/templates/', function (req, res) {
@@ -109,6 +111,12 @@ module.exports = function (app, path, client, libs) {
     app.delete('/api/v1/configs/:id', function(req, res) {
         console.log('DELETE /api/v1/configs/' +req.params.id);
 
+        // temporary in memory stuff to remove deleted
+        var deleteConfigId = req.params.id;
+        configs = configs.filter(function (item) {
+            return item.id !== deleteConfigId;
+        });
+
         delete_config(req.params.id,
             function (err) {
                 if (err) {
@@ -126,252 +134,53 @@ module.exports = function (app, path, client, libs) {
     });
 
     app.get('/api/v1/configs/', function (req, res) {
-    var configs = [
-        {
-            "id":"435",
-            "uuid":"17742-caa42-a34e4-a3ff3",
-            "name":"Kivatyyli_oma_sld",
-            "template_id":"265",
-            "output_path":"null",
-            "created":"2014-02-09 11:14:46.08888+03",
-            "updated":"2014-02-09 11:14:46.08888+03",
-            "wms_url":"#????#",
-            "sld_values": [
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"1273",
-                    "value":"#c832d8"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"1288",
-                    "value":"2"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"??",
-                    "value":"#c832d8"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"??",
-                    "value":"#c832d8"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"??",
-                    "value":"#c832d8"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"??",
-                    "value":"#c832d8"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"??",
-                    "value":"#c832d8"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"??",
-                    "value":"#c832d8"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"??",
-                    "value":"#c832d8"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"??",
-                    "value":"#c832d8"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"??",
-                    "value":"#c832d8"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"??",
-                    "value":"#c832d8"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"??",
-                    "value":"#c832d8"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"??",
-                    "value":"#c832d8"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"??",
-                    "value":"#c832d8"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"??",
-                    "value":"#c832d8"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"??",
-                    "value":"#c832d8"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"??",
-                    "value":"#c832d8"
-                },
-
-            ],
-        },
-        {
-            "id":"436",
-            "uuid":"17742-caa42-a34e4-a3ff3",
-            "name":"Kivatyyli_oma_sld2",
-            "template_id":"265",
-            "output_path":"null",
-            "created":"2014-02-09 11:14:46.08888+03",
-            "updated":"2014-02-09 11:14:46.08888+03",
-            "wms_url":"#????#",
-            "sld_values": [
-                {
-                    "id":"123242",
-                    "config_id":"435",
-                    "param_id":"",
-                    "value":"#c832d8"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"",
-                    "value":"#c832d8"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"",
-                    "value":"#c832d8"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"",
-                    "value":"#c832d8"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"",
-                    "value":"#c832d8"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"",
-                    "value":"#c832d8"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"",
-                    "value":"#c832d8"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"",
-                    "value":"#c832d8"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"",
-                    "value":"#c832d8"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"",
-                    "value":"#c832d8"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"",
-                    "value":"#c832d8"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"",
-                    "value":"#c832d8"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"",
-                    "value":"#c832d8"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"",
-                    "value":"#c832d8"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"",
-                    "value":"#c832d8"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"",
-                    "value":"#c832d8"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"",
-                    "value":"#c832d8"
-                },
-                {
-                    "id":"243242",
-                    "config_id":"435",
-                    "param_id":"",
-                    "value":"#c832d8"
-                }
-            ]
-        }
-    ];
-        console.log('get configs!');
+        console.log('GET /api/v1/configs/');
+        console.log('return in memory configs!', configs);
         res.status(200);
         res.json(configs);
     });
 
+    app.put('/api/v1/configs/:id', function (req, res) {
+        console.log('PUT /api/v1/configs/' +req.params.id);
+        var form = new formidable.IncomingForm();
+        form.parse(req, function (err, fields, files) {
+            console.log('we got', fields);
+
+            // update in memory configs
+            var updateConfigId = req.params.id;
+            configs.forEach(function(item, index, array) {
+                if (item.id === updateConfigId) {
+                    array[index] = fields;
+                }
+            })
+
+            if (err) {
+                res.status(500);
+                res.json({"Error":err});
+            } else {
+                res.status(200);
+                res.json(fields);
+            }
+        });
+    });
+
+    app.post('/api/v1/configs/', function (req, res) {
+        console.log('POST /api/v1/configs/');
+        var form = new formidable.IncomingForm();
+        form.parse(req, function (err, fields, files) {
+            console.log('we got', fields);
+
+            // add id
+            fields.id = "" + configIdCounter++;
+            configs.push(fields);
+
+            if (err) {
+                res.status(500);
+                res.json({"Error":err});
+            } else {
+                res.status(200);
+                res.json(fields);
+            }
+        });
+    });
 }

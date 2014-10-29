@@ -10,10 +10,10 @@
         <% if (!paramlist) { %>
           <p>Joku kiva käyttöohje</p>
         <% } %>
-        <% _.forEach(paramlist, function(param) { console.log('got param', param); %>
+        <% _.forEach(paramlist, function(param) { %>
           <div class="form-group">
             <label><%= param.name %></label>
-            <input name="value" type="text" value="<%= param.value %>">
+            <input name="value" type="text" class="param" data-param-id="<%= param.param_id %>" value="<%= param.value %>">
           </div>
         <% }); %>
         <button type="submit" class="btn save"><%= SLDmodel.id ? 'Update' : 'Create' %></button>

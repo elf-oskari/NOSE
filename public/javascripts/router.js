@@ -4,7 +4,7 @@ define(['lodash','backbone'], function(_, Backbone) {
 			'application.html' : 'listSLD',
 			'/' : 'listSLD',
 			'edit/:id' : 'editSLD',
-			'new/:id' : 'editSLD',
+			'new/:id' : 'newSLD',
 			'*default' : 'listSLD'
 		},
 
@@ -12,23 +12,9 @@ define(['lodash','backbone'], function(_, Backbone) {
 			console.log('WebApp', WebApp);
 			this.WebApp = WebApp;
 		},
-		editSLD: function(id) {
+		editorPage: function(SLDtemplatemodel, SLDconfigmodel) {
 			var self = this;
 			var editorPageView;
-			var SLDtemplatemodel;
-			var SLDconfigmodel = self.WebApp.collections.SLDConfigsCollection.getById(id);
-			if (_.isUndefined(SLDconfigmodel)) {
-				SLDtemplatemodel = self.WebApp.collections.SLDTemplatesCollection.getById(id);
-
-	            var new_config_sld_values = SLDtemplatemodel.getDefaultConfigSLDValues();
-	            var new_config = {
-	                "template_id": id,
-	                "sld_values": new_config_sld_values
-	            };
-	            SLDconfigmodel = self.WebApp.collections.SLDConfigsCollection.create(new_config);
-			} else {
-				SLDtemplatemodel = self.WebApp.collections.SLDTemplatesCollection.getById(SLDconfigmodel.get('template_id'));
-			}
 
 			if (!self.WebApp.views.SLDEditorPage) {
 				require(['views/SLDEditorPage'], function(SLDEditorPageView) {
@@ -44,6 +30,23 @@ define(['lodash','backbone'], function(_, Backbone) {
 					.setModels({'SLDconfigmodel': SLDconfigmodel, 'SLDtemplatemodel': SLDtemplatemodel})
 					.render();
 			}
+		},
+		newSLD: function(template_id) {
+			var self = this;
+			var SLDtemplatemodel = self.WebApp.collections.SLDTemplatesCollection.getById(template_id);
+            var new_config_sld_values = SLDtemplatemodel.getDefaultConfigSLDValues();
+            var new_config = {
+                "template_id": template_id,
+                "sld_values": new_config_sld_values
+            };
+            var SLDconfigmodel = self.WebApp.collections.SLDConfigsCollection.create(new_config);
+            self.editorPage(SLDtemplatemodel, SLDconfigmodel);
+		},
+		editSLD: function(id) {
+			var self = this;
+			var SLDconfigmodel = self.WebApp.collections.SLDConfigsCollection.getById(id);
+			var SLDtemplatemodel = self.WebApp.collections.SLDTemplatesCollection.getById(SLDconfigmodel.get('template_id'));
+            self.editorPage(SLDtemplatemodel, SLDconfigmodel);
 		},
 		listSLD: function(url) {
 			var self = this;
