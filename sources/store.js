@@ -239,7 +239,7 @@ SldInserter.prototype.insertParam=function(symbolizerInserted,fieldList) {
 			' FROM sld_type'+
 			' WHERE symbolizer_parameter=$1',[fieldList[4]]
 		);
-
+//TODO: insert only parameters, which are in sld_type table
 		typeFound.then(function(typeRow) {
 			self.db.querySingle(
 				'INSERT INTO sld_param (symbolizer_id,template_offset,type_id,default_value)'+
@@ -250,7 +250,7 @@ SldInserter.prototype.insertParam=function(symbolizerInserted,fieldList) {
 			});
 		});
 
-		typeFound.catch(function() {
+	/*	typeFound.catch(function() {
 			return(self.db.querySingle(
 				'INSERT INTO sld_type (name,symbolizer_parameter)'+
 				' VALUES ($1,$2)'+
@@ -264,7 +264,7 @@ SldInserter.prototype.insertParam=function(symbolizerInserted,fieldList) {
 			).then(function() {
 				defer.resolve();
 			});
-		}).catch(function(err) {defer.reject(err);});
+		}).catch(function(err) {defer.reject(err);}); */
 	});
 
 	return(defer.promise);

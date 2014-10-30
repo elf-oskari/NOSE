@@ -53,17 +53,24 @@ var fieldSpecList=[
 	},{
 		path:['Stroke','CssParameter',{'name':'stroke-width'}]
 	},{
+        path:['Stroke','CssParameter',{'name':'stroke-linecap'}]
+    },{
 		path:['Fill','GraphicFill','Graphic','Mark','Stroke','CssParameter',{'name':'stroke'}]
 	},{
 		path:['Fill','GraphicFill','Graphic','Mark','Stroke','CssParameter',{'name':'stroke-width'}]
 	},{
         path:['Graphic','Mark','Fill','CssParameter',{'name':'fill'}]
     },{
+        path:['Fill','CssParameter',{'name':'fill'}]
+    },{
         path:['Graphic','Mark','WellKnownName']
     },{
         path:['Size','Literal']
     },{
         path:['Graphic','Mark','Stroke']
+    },
+    {
+        path:['Graphic','Size']
     }
 ];
 
@@ -91,22 +98,24 @@ var Node = function() {};
   * @param {string} defaultValue
   * @param {Rule} rule
    */
-var FieldMarkerNode = function(id,typeName,defaultValue,rule) {
-	this.id = id;
-	this.typeName=typeName;
-	this.defaultValue=defaultValue;
-	this.rule=rule;
+var FieldMarkerNode = function (id, typeName, defaultValue, rule, symbolizer, newsymbl) {
+    this.id = id;
+    this.typeName = typeName;
+    this.defaultValue = defaultValue;
+    this.rule = rule;
+    this.symbolizer = symbolizer;
+    this.newsymbl = newsymbl;
 };
 
 /** @param {XmlEncoder} xmlEncoder
-  * @param {number} outputCharPos Number of characters in the template before
-  * this SLD parameter.
-  * @return {string} */
-FieldMarkerNode.prototype.encode = function(xmlEncoder, outputCharPos) {
-	//console.log('Field'+'\t'+'\t'+this.id+'\t'+outputCharPos+'\t'+this.typeName+'\t'+this.defaultValue);
-    params.push('Field'+'\t'+'\t'+this.id+'\t'+outputCharPos+'\t'+this.typeName+'\t'+this.defaultValue);
+ * @param {number} outputCharPos Number of characters in the template before
+ * this SLD parameter.
+ * @return {string} */
+FieldMarkerNode.prototype.encode = function (xmlEncoder, outputCharPos) {
+    if (this.newsymbl)params.push(this.symbolizer);
+    params.push('Field' + '\t' + '\t' + this.id + '\t' + outputCharPos + '\t' + this.typeName + '\t' + this.defaultValue);
 
-	return('');
+    return('');
 };
 
 /** @constructor
@@ -732,32 +741,33 @@ exports.parse = function (inFileName, fname, tname, cb) {
 		// Maybe in the future we need to process scale denominators:
 		// console.log(node.queryText(['MinScaleDenominator']).txt);
 
-		//console.log('\n'+'Rule'+'\t'+rule.encode(this.xmlEncoder,this.outputCharPos));
         params.push('Rule'+'\t'+rule.encode(this.xmlEncoder,this.outputCharPos));
 
         // Parse symbolizers
         var child = node.childList;
         var cnt=1;
         for (var i = 0; i < child.length; i++) {
-            for (var k = 0; k < symbolizerSpecList.length; k++) {
-                // supported symbolizer ?
-                if(child[i].localName === symbolizerSpecList[k])
-                {
-                    params.push('Symbolizer'+'\t'+symbolizerSpecList[k]+'\t'+cnt++);
+            symbolizerSpecList.forEach(function (symb) {
+                if (child[i].localName === symb) {
+                    var symbl = 'Symbolizer' + '\t' + symb + '\t' + cnt++,
+                        newsymbl = true;
+
+
                     var subnode = child[i];
 
-                    for(var m=0;m<fieldSpecList.length;m++) {
-                        spec=fieldSpecList[m];
-                        field=subnode.queryText(spec.path);
-                        if(!field) continue;
+                    fieldSpecList.forEach(function (spec) {
+                        field = subnode.queryText(spec.path);
+                        if (field) {
+                            marker = new FieldMarkerNode(fieldId++, serializeSpec(spec), field.getText(), rule, symbl, newsymbl);
+                            field.parent.insertBefore(field, marker);
+                            field.setText(placeHolder);
+                            newsymbl = false;
 
-                        marker=new FieldMarkerNode(fieldId++,serializeSpec(spec),field.getText(),rule);
-                        field.parent.insertBefore(field,marker);
-                        field.setText(placeHolder);
-                    }
+                        }
+                    })
 
                 }
-            }
+            });
 
         }
 
@@ -765,12 +775,10 @@ exports.parse = function (inFileName, fname, tname, cb) {
 
 	/** @param {Object} node Sax node object. */
 	parser.onTag=function(node) {
-		//console.log('FeatureType'+'\t'+featureTypeId++);
         params.push('FeatureType'+'\t'+featureTypeId++);
 	};
 
 	parser.onEnd=function() {
-		console.log(' ');
         this.outStream.end();
     };
 

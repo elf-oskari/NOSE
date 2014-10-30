@@ -139,6 +139,7 @@ CREATE TABLE sld_type
   id bigserial NOT NULL,
   name character varying(256) NOT NULL,
   symbolizer_parameter character varying(256) NOT NULL,
+  search_tag character varying(256) NOT NULL,
   CONSTRAINT sld_type_pkey PRIMARY KEY (id)
 )
 WITH (
@@ -327,3 +328,19 @@ CREATE  VIEW sld_symbolizer_view AS
     sld_rule c,
     sld_symbolizer d
   WHERE  a.id = b.template_id AND b.id = c.featuretype_id AND c.id = d.rule_id;
+
+-- Prepare sld_type table for parameters
+INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'WellKnownName', 'Graphic/Mark/WellKnownName', '"Graphic","Mark","WellKnownName"');
+INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'Fill', 'Graphic/Mark/Fill/CssParameter(fill)', '"Graphic","Mark","Fill","CssParameter",{"name":"fill"}');
+INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'Stroke', 'Stroke/CssParameter(stroke)', '"Stroke","CssParameter",{"name":"stroke"}');
+INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'Stroke', 'Graphic/Mark/Stroke', '"Graphic","Mark","Stroke"');
+INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'Stroke-width', 'Stroke/CssParameter(stroke-width)', '"Stroke","CssParameter",{"name":"stroke-width"}');
+INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'WellKnownName', 'Fill/GraphicFill/Graphic/Mark/WellKnownName', '"Fill","GraphicFill","Graphic","Mark","WellKnownName"');
+INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'Stroke', 'Fill/GraphicFill/Graphic/Mark/Stroke/CssParameter(stroke)', '"Fill","GraphicFill","Graphic","Mark","Stroke","CssParameter",{"name":"stroke"}');
+INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'Stroke-width', 'Fill/GraphicFill/Graphic/Mark/Stroke/CssParameter(stroke-width)', '"Fill","GraphicFill","Graphic","Mark","Stroke","CssParameter",{"name":"stroke-width"}');
+INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'Size', 'Fill/GraphicFill/Graphic/Size', '"Fill","GraphicFill","Graphic","Size"');
+INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'Size', 'Size/Literal', '"Size","Literal"');
+INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'Size', 'Graphic/Size', '"Graphic","Size"');
+INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'Stroke-linecal', 'Stroke/CssParameter(stroke-linecap)', '"Stroke","CssParameter",{"name":"stroke-linecap"}');
+INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'Fill', 'Fill/CssParameter(fill)', '"Fill","CssParameter",{"name":"fill"}');
+
