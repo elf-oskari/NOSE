@@ -199,13 +199,9 @@ exports.delete_template = function(id, cb) {
         cb = cb;
 
 	var connected=deletes.connect('db.json');
-
-	console.log("0 ############");
     var ready=connected.then(function() {
-		console.log("1 ############");
         return(deletes.selectTestDelete(id));
     });
-	console.log("2 ############");
     console.log("READY: " , ready.toString());
 
 	ready.catch(function(err) {

@@ -4,8 +4,11 @@ module.exports = function (app, path, client, libs) {
         parse = libs.parse.parse,
         store = libs.store.store,
         select = libs.select.select,
+        store_config_post = libs.store_config_post.store_config_post,
+        select_config = libs.select_config.select_config,
         delete_template = libs.delete_template.delete_template,
         delete_config = libs.delete_config.delete_config,
+        update_config = libs.update_config.update_config,
         client = client,
         errorMessage = "We are working on the problem, please try again later. Thanks for understanding!",
         configIdCounter = 1,
@@ -111,12 +114,6 @@ module.exports = function (app, path, client, libs) {
     app.delete('/api/v1/configs/:id', function(req, res) {
         console.log('DELETE /api/v1/configs/' +req.params.id);
 
-        // temporary in memory stuff to remove deleted
-        var deleteConfigId = req.params.id;
-        configs = configs.filter(function (item) {
-            return item.id !== deleteConfigId;
-        });
-
         delete_config(req.params.id,
             function (err) {
                 if (err) {
@@ -133,34 +130,64 @@ module.exports = function (app, path, client, libs) {
         );
     });
 
+
+    app.get('/api/v1/configs/:id', function (req, res) {
+        console.log('getting config with id');
+        console.log('GET /api/v1/configs/' + req.params.id);
+        // TODO: refactor -1 to something more descriptive
+        select_config(req.params.id, client,
+            function(error, result) {
+                if (error) {
+                    console.log('An error occurred:', error);
+                    return res.send(500);
+                }
+
+                console.log("resultti: ", result);
+                res.status(200);
+                res.json(result);
+            }
+        );
+    });
+
+
     app.get('/api/v1/configs/', function (req, res) {
+        console.log('getting config without id --> ALL');
         console.log('GET /api/v1/configs/');
-        console.log('return in memory configs!', configs);
-        res.status(200);
-        res.json(configs);
+
+        select_config(-1, client,
+            function(err, result) {
+                if (err) {
+                    console.log('An error occurred:', error);
+                    return res.send(500);
+                }
+
+                console.log("config ALL result: ", result);
+                console.log("config ALL DONE!!");
+                res.status(200);
+                res.json(result);
+            }
+        );
     });
 
     app.put('/api/v1/configs/:id', function (req, res) {
         console.log('PUT /api/v1/configs/' +req.params.id);
         var form = new formidable.IncomingForm();
         form.parse(req, function (err, fields, files) {
-            console.log('we got', fields);
-
-            // update in memory configs
-            var updateConfigId = req.params.id;
-            configs.forEach(function(item, index, array) {
-                if (item.id === updateConfigId) {
-                    array[index] = fields;
-                }
-            })
-
-            if (err) {
-                res.status(500);
-                res.json({"Error":err});
-            } else {
-                res.status(200);
-                res.json(fields);
-            }
+            //console.log('we got', fields);
+            update_config(fields, client,
+                function (err) {
+                    if (err) {
+                        console.log("API ERROR!!!", err);
+                        res.status(500);
+                        res.json({'delete template': 'failed'});
+                    } else {
+                        console.log("API SUCCESS!!!");
+                        // we cannot use 204 as it is not supported by Backbone
+                        res.status(200);
+                        res.json({});
+                    }
+                } 
+            );           
         });
     });
 
@@ -172,15 +199,36 @@ module.exports = function (app, path, client, libs) {
 
             // add id
             fields.id = "" + configIdCounter++;
-            configs.push(fields);
+            console.log("POST YYY", fields.name);
+            var lista = fields.sld_values;
 
-            if (err) {
-                res.status(500);
-                res.json({"Error":err});
-            } else {
-                res.status(200);
-                res.json(fields);
-            }
+            for (var i = lista.length - 1; i >= 0; i--) {
+                console.log("G: ", lista[i])
+            };
+
+            store_config_post(fields, client,
+                function (err, result_id) {
+                    if (err) {
+                        console.log("API ERROR!!!", err);
+                        res.status(500);
+                        res.json({'delete template': 'failed'});
+                    } else {
+                        console.log("API SUCCESS!!! for 3 -->:",result_id);
+                        select_config(result_id, client,
+                            function(err, result) {
+                                if (err) {
+                                    console.log('An error occurred:', error);
+                                    return res.send(500);
+                                }
+
+                                console.log("config.post.result: ", result);
+                                res.status(200);
+                                res.json(result);
+                            }
+                        );
+                    }
+                } 
+            );  
         });
     });
 }
