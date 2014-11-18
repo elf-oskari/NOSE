@@ -43,38 +43,7 @@ var symbolizerSpecList=['PolygonSymbolizer', 'LineSymbolizer', 'PointSymbolizer'
 /** List of fields (editable SLD parameters) and how to find them.
   * Describes each field's parent tags up to its parent rule.
   * A tag's required attributes are listed in an object after its name. */
-var fieldSpecList=[
-	{
-		path:['Fill','GraphicFill','Graphic','Mark','WellKnownName']
-	},{
-		path:['Fill','GraphicFill','Graphic','Size']
-	},{
-		path:['Stroke','CssParameter',{'name':'stroke'}]
-	},{
-		path:['Stroke','CssParameter',{'name':'stroke-width'}]
-	},{
-        path:['Stroke','CssParameter',{'name':'stroke-linecap'}]
-    },{
-		path:['Fill','GraphicFill','Graphic','Mark','Stroke','CssParameter',{'name':'stroke'}]
-	},{
-		path:['Fill','GraphicFill','Graphic','Mark','Stroke','CssParameter',{'name':'stroke-width'}]
-	},{
-        path:['Graphic','Mark','Fill','CssParameter',{'name':'fill'}]
-    },{
-        path:['Fill','CssParameter',{'name':'fill'}]
-    },{
-        path:['Graphic','Mark','WellKnownName']
-    },{
-        path:['Size','Literal']
-    },{
-        path:['Graphic','Mark','Stroke']
-    },
-    {
-        path:['Graphic','Size']
-    }
-];
-
-
+var fieldSpecList=[];
 
 /** Return a new function that calls fn making it see the desired scope
   * through its "this" variable.
@@ -84,7 +53,7 @@ function bindToScope(scope, fn) {
 	return function() {
 		fn.apply(scope, arguments);
 	};
-};
+}
 
 /** @constructor */
 var Node = function() {};
@@ -374,7 +343,7 @@ EntityEncoder.prototype.encode = function(txt) {
   * the FieldMarkerNode, CommentNode, TextNode and TagNode classes. */
 var XmlEncoder = function() {
 	this.entityEncoder = new EntityEncoder();
-}
+};
 
 /** @param {Object} node Sax node object.
   * @return {string} */
@@ -665,7 +634,7 @@ SldParser.prototype.onEnd = function() {};
 SldParser.prototype.onTag = function(node) {};
 
 /** Parse function,  input sld file stream and writes output as sld_template */
-exports.parse = function (inFileName, fname, tname, cb) {
+exports.parse = function (inFileName, fname, tname, rfields, cb) {
 	var featureTypeId=0;
 	var ruleId=0;
 	var fieldId=0;
@@ -682,16 +651,18 @@ exports.parse = function (inFileName, fname, tname, cb) {
         cb(params, fname, tname, file, err);
     });
 
+	fieldSpecList = rfields;
+
 	var parser = new SldParser(outStream);
 
 	/** Handle all processing of SLD rules.
 	  * @param {TagNode} node */
 	parser.onCaptureDone = function(node, cb) {
-		var rule;
-		var spec;
-		var field;
-		var marker;
-		var nameNode;
+		var rule,
+			field,
+			marker,
+			nameNode,
+			i;
 
 		var namePathList=[
 			['Name'],['Title'],['Abstract']
@@ -731,7 +702,7 @@ exports.parse = function (inFileName, fname, tname, cb) {
 		// It might be a human-readable description of the rule.
 		if(node.comment) rule.setComment(node.comment);
 
-		for(var i=0;i<namePathList.length;i++) {
+		for(i=0;i<namePathList.length;i++) {
 			nameNode=node.queryText(namePathList[i]);
 			if(nameNode) {
 				rule.addName(nameNode.getText());
@@ -746,7 +717,7 @@ exports.parse = function (inFileName, fname, tname, cb) {
         // Parse symbolizers
         var child = node.childList;
         var cnt=1;
-        for (var i = 0; i < child.length; i++) {
+        for (i = 0; i < child.length; i++) {
             symbolizerSpecList.forEach(function (symb) {
                 if (child[i].localName === symb) {
                     var symbl = 'Symbolizer' + '\t' + symb + '\t' + cnt++,
@@ -783,5 +754,5 @@ exports.parse = function (inFileName, fname, tname, cb) {
     };
 
 	parser.parse(inStream);
-}
+};
 

@@ -200,7 +200,7 @@ exports.select = function(id, client, cb) {
     var ready = templateSelected.then(function (templateResult) {
        //Loop templates
             var ind = 0;
-            var maxind = templateResult.lenght;
+            var maxind = templateResult.length;
             var feaSelected = null;
             var ruleSelected = null;
             var symbolizerSelected = null;
@@ -223,7 +223,7 @@ exports.select = function(id, client, cb) {
 
         });
         return allSelected;
-    };
+    }
 
     function subSelectRules(ind, id) {
         var rulesSelected = selecter.selectRules(id);
@@ -232,7 +232,7 @@ exports.select = function(id, client, cb) {
 
         });
         return allSelected;
-    };
+    }
 
     function subSelectSymbolizers(ind, id) {
         var symsSelected = selecter.selectSymbolizers(id);
@@ -241,7 +241,7 @@ exports.select = function(id, client, cb) {
 
         });
         return allSelected;
-    };
+    }
 
     function subSelectParams(ind, id) {
         var paramsSelected = selecter.selectParams(id);
@@ -250,7 +250,7 @@ exports.select = function(id, client, cb) {
 
         });
         return allSelected;
-    };
+    }
 
     ready.catch(function(err) {
        // selecter.abort();
@@ -262,5 +262,5 @@ exports.select = function(id, client, cb) {
         console.log('Select success!');
         cb(false,result);
     });
-}
+};
 

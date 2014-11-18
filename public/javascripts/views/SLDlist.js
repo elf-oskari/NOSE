@@ -66,10 +66,8 @@ define([
         },
         downloadConfig: function (event) {
             event.preventDefault();
-            // TODO: use url from collection instead.
             var apiUrl = "/api/v1/configs/";
-            window.open(apiUrl + $(event.currentTarget).blur().data('id') + "/download");
-            alert('Downloading config is not possible');
+            window.open(apiUrl + $(event.currentTarget).data('id') + "/download");
         },
         deleteTemplate: function (event) {
             event.preventDefault();
@@ -87,7 +85,7 @@ define([
                     console.log("something didn't go as planned", model, response, options);
                     alert('Deleting template is not possible');
                     $('#deleteTemplateModal').modal('hide');
-                },
+                }
             });
         },
         upload: function(event) {

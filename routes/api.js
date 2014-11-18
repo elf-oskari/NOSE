@@ -6,6 +6,8 @@ module.exports = function (app, path, client, libs) {
         select = libs.select.select,
         store_config_post = libs.store_config_post.store_config_post,
         select_config = libs.select_config.select_config,
+        select_fields = libs.select_fields.select_fields,
+        download_config = libs.download_config.download_config,
         delete_template = libs.delete_template.delete_template,
         delete_config = libs.delete_config.delete_config,
         update_config = libs.update_config.update_config,
@@ -37,43 +39,49 @@ module.exports = function (app, path, client, libs) {
             var old_path = files.sldfile.path,
                 fname = files.sldfile.name,
                 template_id = 0;
-                tname = fields['tname'] || '';
+            var tname = fields['tname'] || '';
 
             console.log("fields", fields);
             console.log("file name", fname);
 
-            // sld parse and store to db
-            parse(old_path, fname, tname,
-                function (params, fname, tname, tfile, err) {
-                    console.log("params", params);
-
-                    if (err) {
-                        res.status(500);
-                        res.json({'sld parse': 'failed for sld file ' + fname});
-                    } else {
-                        store(params, client, fname, tname, tfile,
-                            function (err, template_id) {
-                                if (err || template_id === 0) {
-                                    res.status(500);
-                                    res.json({'sld store': 'failed'});
-                                } else {
-                                    select(template_id, client,
-                                        function(error, result) {
-                                            if (error) return res.send(500);
-                                            res.status(200);
-                                            // we assume there is just one and return that
-                                            res.json(result[0]);
-                                        }
-                                    );
-                                }
-
-                            }
-                        );
+            select_fields(client,
+                function (error, rfields) {
+                    if (error) {
+                        console.log('An error occurred:', error);
+                        return res.send(500);
                     }
+                    console.log("result fields: ", rfields);
 
-                });
-
-
+                    // sld parse and store to db
+                    parse(old_path, fname, tname, rfields,
+                        function (params, fname, tname, tfile, err) {
+                            console.log("params", params);
+                            if (err) {
+                                res.status(500);
+                                res.json({'sld parse': 'failed for sld file ' + fname});
+                            } else {
+                                store(params, client, fname, tname, tfile,
+                                    function (err, template_id) {
+                                        if (err || template_id === 0) {
+                                            res.status(500);
+                                            res.json({'sld store': 'failed'});
+                                        } else {
+                                            select(template_id, client,
+                                                function (error, result) {
+                                                    if (error) return res.send(500);
+                                                    res.status(200);
+                                                    // we assume there is just one and return that
+                                                    res.json(result[0]);
+                                                }
+                                            );
+                                        }
+                                    }
+                                );
+                            }
+                        }
+                    );
+                }
+            );
         });
     });
 
@@ -149,6 +157,32 @@ module.exports = function (app, path, client, libs) {
         );
     });
 
+    // Download an SLD file
+    app.get('/api/v1/configs/:id/download', function (req, res) {
+        console.log('downloading sld file with id');
+        console.log('GET /api/v1/configs/' + req.params.id);
+        download_config(req.params.id, client,
+            function(error, result) {
+                if (error) {
+                    console.log('An error occurred:', error);
+                    return res.send(500);
+                }
+                console.log("result: ", result);
+                res.status(200);
+                res.setHeader('Content-disposition', 'attachment; filename=download.sld');
+                res.setHeader('Content-type', 'text/plain; charset=utf-8');
+                res.write(result);
+                res.end();
+
+                /*  download file from disk
+                res.setHeader('Content-disposition', 'attachment; filename=download.sld');
+                res.setHeader('Content-type', 'application/xml');
+                res.download('db.json');
+                */
+            }
+        );
+    });
+
 
     app.get('/api/v1/configs/', function (req, res) {
         console.log('getting config without id --> ALL');
@@ -204,7 +238,7 @@ module.exports = function (app, path, client, libs) {
 
             for (var i = lista.length - 1; i >= 0; i--) {
                 console.log("G: ", lista[i])
-            };
+            }
 
             store_config_post(fields, client,
                 function (err, result_id) {
@@ -231,4 +265,4 @@ module.exports = function (app, path, client, libs) {
             );  
         });
     });
-}
+};

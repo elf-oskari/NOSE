@@ -42,7 +42,7 @@ function bindToScope(scope, fn) {
 	return function() {
 		fn.apply(scope, arguments);
 	};
-};
+}
 
 /** @constructor
   * PostgreSQL database interface.
@@ -63,7 +63,7 @@ PgDatabase.prototype.connect=function(client) {
 	}); */
     defer.resolve();
 	return(defer.promise);
-}
+};
 
 /* PgDatabase.prototype.close=function(conf) {
 	return(Promise.resolve(this.client.end()));
@@ -83,7 +83,7 @@ PgDatabase.prototype.exec=function() {
 	});
 
 	return(defer.promise);
-}
+};
 
 /** Send query to database and read a single result row. */
 PgDatabase.prototype.querySingle=function() {
@@ -105,19 +105,19 @@ PgDatabase.prototype.querySingle=function() {
 	});
 
 	return(defer.promise);
-}
+};
 
 PgDatabase.prototype.begin=function() {
 	return(this.exec('BEGIN TRANSACTION'));
-}
+};
 
 PgDatabase.prototype.commit=function() {
 	return(this.exec('COMMIT'));
-}
+};
 
 PgDatabase.prototype.rollback=function() {
 	return(this.exec('ROLLBACK'));
-}
+};
 
 /** @constructor
   * SldInserter stores a parsed SLD template and field configuration
@@ -125,7 +125,7 @@ PgDatabase.prototype.rollback=function() {
 var SldInserter=function() {
 	this.db=null;
 
-}
+};
 
 /** @param {object} pg client */
 SldInserter.prototype.connect=function(client) {
@@ -382,5 +382,5 @@ exports.store = function(params, client, name, tname, tfile, cb) {
 		console.log('Store success!');
         cb(false, template_id);
 	});
-}
+};
 

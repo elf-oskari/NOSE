@@ -54,11 +54,13 @@ var libs = {
   store : require('./sources/store'),
   store_config_post : require('./sources/store_config_post'),
   select_config : require('./sources/select_config'),
+  select_fields : require('./sources/select_fields'),
+  download_config : require('./sources/download_config'),
   update_config : require('./sources/update_config'),
   delete_template : require('./sources/delete_template'),
   delete_config : require('./sources/delete_config'),
   select : require('./sources/select')  
-}
+};
 
 var routes = require('./routes/api')(app, path, client, libs);
 
