@@ -100,7 +100,7 @@ define([
           Backbone.history.navigate('', true);
         }, error: function (model, response, options) {
           console.log("something didn't go as planned", model, response, options);
-          alert('Deleting template is not possible');
+          alert('Deleting template is not possible1234');
         }
       });
     }

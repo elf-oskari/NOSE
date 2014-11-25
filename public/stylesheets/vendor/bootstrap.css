@@ -5454,6 +5454,11 @@ button.close {
   position: relative;
   padding: 15px;
 }
+.error-message {
+  position: relative;
+  padding: 15px;
+  background-color: #222;
+}
 .modal-footer {
   padding: 15px;
   text-align: right;

@@ -49,9 +49,11 @@ define([
                     self.render();
                 },
                 error: function (model, response, options) {
-                    console.log("something didn't go as planned", model, response, options);
-                    alert('Deleting template is not possible');
-                    $('#deleteConfigModal').modal('hide');
+                    console.log("RAMI learns jep jep! something didn't go as planned", model, response, options);
+                    $('#errorrrr').show();
+                    //alert(response.responseJSON["delete config"]);
+                    //$('#deleteConfigModal').modal('hide');
+                    $('#deleteConfigModal').modal('show');
                 },
             });
         },
