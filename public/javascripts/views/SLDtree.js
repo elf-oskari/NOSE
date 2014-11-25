@@ -37,9 +37,10 @@ define([
     updateSLDeditor: function(event) {
       // JQuery probably parses numers as strings to numbers and therefore the symbolizer_id must be formatted to string
       var symbolizer_id = "" + $(event.currentTarget).data('symbolizerid');
+      var symbolizer_type = String($(event.currentTarget).data('symbolizertype')).toLowerCase();
       var params = this.SLDtemplatemodel.getParamsBySymbolizerId(symbolizer_id);
       console.log('sid', symbolizer_id, 'params', params, 'model', this.SLDtemplatemodel);
-      this.dispatcher.trigger("selectSymbolizer", params);
+      this.dispatcher.trigger("selectSymbolizer", params, symbolizer_type);
     }
   });
   return SLDTreeView;
