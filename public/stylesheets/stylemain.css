@@ -125,23 +125,20 @@ body
     }
 }
 
-div.symbolizer
-{
-}
-
 .symbolizer-attribute-value
-{
-    max-width: 150px;
-}
-
-.symbolizer-attribute-label
 {
     width: 100px;
 }
 
+.symbolizer-attribute-label
+{
+    width: 120px;
+}
+
 .symbolizer-column
 {
-    width: 40%;
+    margin-left: 0;
+    width: 50%;
 }
 
 .hidden

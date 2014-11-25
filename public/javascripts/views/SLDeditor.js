@@ -44,7 +44,7 @@ define([
         var localization = locale;
         var model = this.SLDconfigmodel.pick('id', 'name');
         var params = _.isUndefined(paramlist) ? false : paramlist;
-        var type = _.isUndefined(symbolType) ? false : symbolType;
+        var type = _.isUndefined(symbolType) ? "none" : symbolType;
         var data;
         var key;
         var i;
@@ -57,7 +57,7 @@ define([
             }
             if (data.graphic.values.hasOwnProperty(key)) {
                 for (i=0; i<params.length; i++) {
-                    if (key === params[i].name) {
+                    if ((key === params[i].name)||(key+"/Literal" === params[i].name)) {
                         data.graphic.values[key].param_id = params[i].param_id;
                         data.graphic.values[key].value = params[i].value;
                         data.graphic.values[key].class = "";
@@ -111,40 +111,53 @@ define([
                 pointsymbolizer: "",
                 linesymbolizer: "",
                 polygonsymbolizer: "hidden",
+                none: "hidden",
                 values: {
-                    "Graphic/ExternalGraphic/OnlineResource": { class: "hidden" },
-                    "Graphic/ExternalGraphic/Format": { class: "hidden" },
-                    "Graphic/Size": { class: "hidden" },
-                    "Graphic/Opacity": { class: "hidden" },
-                    "Graphic/Rotation": { class: "hidden" },
+                    "Graphic/ExternalGraphic/OnlineResource": { class: "" },
+                    "Graphic/ExternalGraphic/Format": { class: "" },
+                    "Graphic/Size": { class: "" },
+                    //"Graphic/Opacity": { class: "" },
+                    "Graphic/Rotation": { class: "" },
 
-                    "Graphic/Mark/WellKnownName": { class: "hidden" },
-                    "Graphic/Mark/Fill/CssParameter(fill)": { class: "hidden" },
-                    "Graphic/Mark/Fill/CssParameter(fill-opacity)": { class: "hidden" },
+                    "Graphic/Mark/WellKnownName": { class: "" },
+                    "Graphic/Mark/Fill/CssParameter(fill)": { class: "" },
+                    "Graphic/Mark/Fill/CssParameter(fill-opacity)": { class: "" },
 
-                    "Graphic/Mark/Stroke/CssParameter(stroke)": { class: "hidden" },
-                    "Graphic/Mark/Stroke/CssParameter(stroke-opacity)": { class: "hidden" },
-                    "Graphic/Mark/Stroke/CssParameter(stroke-width)": { class: "hidden" },
-                    "Graphic/Mark/Stroke/CssParameter(stroke-linejoin)": { class: "hidden" },
-                    "Graphic/Mark/Stroke/CssParameter(stroke-linecap)": { class: "hidden" },
-                    "Graphic/Mark/Stroke/CssParameter(stroke-dasharray)": { class: "hidden" },
-                    "Graphic/Mark/Stroke/CssParameter(stroke-dashoffset)": { class: "hidden" }
+                    "Graphic/Mark/Stroke/CssParameter(stroke)": { class: "" },
+                    "Graphic/Mark/Stroke/CssParameter(stroke-opacity)": { class: "" },
+                    "Graphic/Mark/Stroke/CssParameter(stroke-width)": { class: "" },
+                    "Graphic/Mark/Stroke/CssParameter(stroke-linejoin)": { class: "" },
+                    "Graphic/Mark/Stroke/CssParameter(stroke-linecap)": { class: "" },
+                    "Graphic/Mark/Stroke/CssParameter(stroke-dasharray)": { class: "" },
+                    "Graphic/Mark/Stroke/CssParameter(stroke-dashoffset)": { class: "" }
                 }
             },
             line: {
                 pointsymbolizer: "hidden",
                 linesymbolizer: "",
-                polygonsymbolizer: "hidden"
+                polygonsymbolizer: "hidden",
+                none: "hidden",
+                values: {
+                    "Stroke/CssParameter(stroke)": {class: "hidden"},
+                    "Stroke/CssParameter(stroke-opacity)": {class: "hidden"},
+                    "Stroke/CssParameter(stroke-width)": {class: "hidden"},
+                    "Stroke/CssParameter(stroke-linejoin)": {class: "hidden"},
+                    "Stroke/CssParameter(stroke-linecap)": {class: "hidden"},
+                    "Stroke/CssParameter(stroke-dasharray)": {class: "hidden"},
+                    "Stroke/CssParameter(stroke-dashoffset)": {class: "hidden"}
+                }
             },
             polygon: {
                 pointsymbolizer: "hidden",
                 linesymbolizer: "",
-                polygonsymbolizer: ""
+                polygonsymbolizer: "",
+                none: "hidden"
             },
             text: {
                 pointsymbolizer: "hidden",
                 linesymbolizer: "hidden",
-                polygonsymbolizer: "hidden"
+                polygonsymbolizer: "hidden",
+                none: "hidden"
             }
         }
     },
