@@ -6,115 +6,120 @@
         <label>Name</label>
         <p><input name="Name" type="text" class="name" data-attribute="name" value="<%= SLDmodel.name %>"></p>
         <br>
-        <div class="form-group">
-            <div class="    col-sm-offset-2 col-sm-10 symbolizer-column">
-                <div class="<%= attrData.graphic[symbolType] %>" data-pg-id="1322">
-                    <span class="label label-default">Point</span>
-                    <div class="form-group symbolizer-form-group param <%= attrData.graphic.values['Graphic/Size'].class %>" data-pg-id="1323">
-                        <label class="control-label symbolizer-attribute-value symbolizer-attribute-label  col-sm-2" for="graphic-symbol">Symbol</label>
-                        <div class="symbolizer-column col-sm-10">
-                            <select id="graphic-symbol" class="form-control symbolizer-attribute-value">
-                                <option>Circle</option>
-                                <option>Cross</option>
-                                <option>Square</option>
-                                <option>Star</option>
-                                <option>Triangle</option>
-                                <option>X</option>
-                                <option value="" disabled="disabled">────────────</option>
-                                <option>From file</option>
-                                <option>External source</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group symbolizer-form-group param <%= attrData.graphic.values['Graphic/Size'].class %>" data-pg-id="1336">
-                        <label class="control-label               symbolizer-attribute-label  col-sm-2" for="graphic-size">Size</label>
-                        <div class=" symbolizer-column  col-sm-10">
-                            <input type="number" class="form-control symbolizer-attribute-value" id="graphic-size" data-param-id="<%= attrData.graphic.values['Graphic/Size'].param_id %>" value="<%= attrData.graphic.values['Graphic/Size'].value %>" data-pg-id="1339">
-                        </div>
-                    </div>
-                    <div class="form-group symbolizer-form-group param">
-                        <label class="control-label               symbolizer-attribute-label  col-sm-2" for="graphic-rotation">Rotation</label>
-                        <div class=" symbolizer-column  col-sm-10">
-                            <input type="number" class="form-control symbolizer-attribute-value" id="graphic-rotation" data-param-id="" value="">
-                        </div>
-                    </div>
-                    <div class="form-group symbolizer-form-group param">
-                        <label class="control-label         symbolizer-attribute-label  col-sm-2" for="graphic-opacity">Opacity
-                            <br>
-                        </label>
-                        <div class=" symbolizer-column  col-sm-10">
-                            <input type="number" class="form-control symbolizer-attribute-value" id="graphic-opacity" data-param-id="" value="">
-                        </div>
-                    </div>
-                    <div class="form-group symbolizer-form-group param">
-                        <label class="control-label        symbolizer-attribute-label  col-sm-2" for="graphic-color">Color</label>
-                        <div class=" symbolizer-column  col-sm-10">
-                            <input type="color" class="form-control symbolizer-attribute-value" id="graphic-color" data-param-id="" value="">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="  col-sm-offset-2 col-sm-10"></div>
-                    </div>
-                </div>
-                <div class="<%= attrData.graphic[symbolType] %>" data-pg-id="1355">
-                    <span class="label label-default">Stroke</span>
-                    <div class="form-group symbolizer-form-group param">
-                        <label class="control-label symbolizer-attribute-value symbolizer-attribute-label  col-sm-2" for="graphic-symbol">Line join</label>
-                        <div class="symbolizer-column col-sm-10">
-                            <select id="graphic-symbol" class="form-control symbolizer-attribute-value">
-                                <option>Miter</option>
-                                <option>Round</option>
-                                <option>Bevel</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group symbolizer-form-group param">
-                        <label class="control-label symbolizer-attribute-value symbolizer-attribute-label  col-sm-2" for="graphic-symbol">Line cap</label>
-                        <div class="symbolizer-column col-sm-10">
-                            <select id="graphic-symbol" class="form-control symbolizer-attribute-value">
-                                <option>Butt</option>
-                                <option>Round</option>
-                                <option>Square</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="form-group symbolizer-form-group param <%= attrData.graphic.values['Graphic/Size'].class %>" data-pg-id="1369">
-                        <label class="control-label               symbolizer-attribute-label  col-sm-2" for="graphic-size">Dash array</label>
-                        <div class=" symbolizer-column  col-sm-10">
-                            <input type="number" class="form-control symbolizer-attribute-value" id="graphic-size" data-param-id="<%= attrData.graphic.values['Graphic/Size'].param_id %>" value="<%= attrData.graphic.values['Graphic/Size'].value %>" data-pg-id="1372">
-                        </div>
-                    </div>
-                    <div class="form-group symbolizer-form-group param">
-                        <label class="control-label               symbolizer-attribute-label  col-sm-2" for="graphic-rotation">Dash offset</label>
-                        <div class=" symbolizer-column  col-sm-10">
-                            <input type="number" class="form-control symbolizer-attribute-value" id="graphic-rotation" data-param-id="" value="">
-                        </div>
-                    </div>
-                    <div class="form-group symbolizer-form-group param">
-                        <label class="control-label         symbolizer-attribute-label  col-sm-2" for="graphic-opacity">Opacity
-                            <br>
-                        </label>
-                        <div class=" symbolizer-column  col-sm-10">
-                            <input type="number" class="form-control symbolizer-attribute-value" id="graphic-opacity" data-param-id="" value="">
-                        </div>
-                    </div>
-                    <div class="form-group symbolizer-form-group param">
-                        <label class="control-label        symbolizer-attribute-label  col-sm-2" for="graphic-color">Color</label>
-                        <div class=" symbolizer-column  col-sm-10">
-                            <input type="color" class="form-control symbolizer-attribute-value" id="graphic-color" data-param-id="" value="">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="  col-sm-offset-2 col-sm-10"></div>
-                    </div>
-                </div>
-            </div>
+        <div class="col-md-9">
+          <div class="form-group">
+              <div class="symbolizer-column">
+                  <div class="<%= attrData.graphic[symbolType] %>" data-pg-id="1322">
+                      <span class="label label-default">Point</span>
+                      <div class="form-group symbolizer-form-group param <%= attrData.graphic.values['Graphic/Size'].class %>" data-pg-id="1323">
+                          <label class="control-label symbolizer-attribute-value symbolizer-attribute-label  col-sm-2" for="graphic-symbol">Symbol</label>
+                          <div class="symbolizer-column col-sm-10">
+                              <select id="graphic-symbol" class="form-control symbolizer-attribute-value">
+                                  <option>Circle</option>
+                                  <option>Cross</option>
+                                  <option>Square</option>
+                                  <option>Star</option>
+                                  <option>Triangle</option>
+                                  <option>X</option>
+                                  <option value="" disabled="disabled">────────────</option>
+                                  <option>From file</option>
+                                  <option>External source</option>
+                              </select>
+                          </div>
+                      </div>
+                      <div class="form-group symbolizer-form-group param <%= attrData.graphic.values['Graphic/Size'].class %>" data-pg-id="1336">
+                          <label class="control-label               symbolizer-attribute-label  col-sm-2" for="graphic-size">Size</label>
+                          <div class=" symbolizer-column  col-sm-10">
+                              <input type="number" class="form-control symbolizer-attribute-value" id="graphic-size" data-param-id="<%= attrData.graphic.values['Graphic/Size'].param_id %>" value="<%= attrData.graphic.values['Graphic/Size'].value %>" data-pg-id="1339">
+                          </div>
+                      </div>
+                      <div class="form-group symbolizer-form-group param">
+                          <label class="control-label               symbolizer-attribute-label  col-sm-2" for="graphic-rotation">Rotation</label>
+                          <div class=" symbolizer-column  col-sm-10">
+                              <input type="number" class="form-control symbolizer-attribute-value" id="graphic-rotation" data-param-id="" value="">
+                          </div>
+                      </div>
+                      <div class="form-group symbolizer-form-group param">
+                          <label class="control-label         symbolizer-attribute-label  col-sm-2" for="graphic-opacity">Opacity
+                              <br>
+                          </label>
+                          <div class=" symbolizer-column  col-sm-10">
+                              <input type="number" class="form-control symbolizer-attribute-value" id="graphic-opacity" data-param-id="" value="">
+                          </div>
+                      </div>
+                      <div class="form-group symbolizer-form-group param">
+                          <label class="control-label        symbolizer-attribute-label  col-sm-2" for="graphic-color">Color</label>
+                          <div class=" symbolizer-column  col-sm-10">
+                              <input type="color" class="form-control symbolizer-attribute-value" id="graphic-color" data-css-parameter="fill" data-param-id="" value="">
+                          </div>
+                      </div>
+                      <div class="form-group">
+                          <div class="  col-sm-offset-2 col-sm-10"></div>
+                      </div>
+                  </div>
+                  <div class="<%= attrData.graphic[symbolType] %>" data-pg-id="1355">
+                      <span class="label label-default">Stroke</span>
+                      <div class="form-group symbolizer-form-group param">
+                          <label class="control-label symbolizer-attribute-value symbolizer-attribute-label  col-sm-2" for="graphic-symbol">Line join</label>
+                          <div class="symbolizer-column col-sm-10">
+                              <select id="graphic-symbol" class="form-control symbolizer-attribute-value">
+                                  <option>Miter</option>
+                                  <option>Round</option>
+                                  <option>Bevel</option>
+                              </select>
+                          </div>
+                      </div>
+                      <div class="form-group symbolizer-form-group param">
+                          <label class="control-label symbolizer-attribute-value symbolizer-attribute-label  col-sm-2" for="graphic-symbol">Line cap</label>
+                          <div class="symbolizer-column col-sm-10">
+                              <select id="graphic-symbol" class="form-control symbolizer-attribute-value">
+                                  <option>Butt</option>
+                                  <option>Round</option>
+                                  <option>Square</option>
+                              </select>
+                          </div>
+                      </div>
+                      <div class="form-group symbolizer-form-group param <%= attrData.graphic.values['Graphic/Size'].class %>" data-pg-id="1369">
+                          <label class="control-label               symbolizer-attribute-label  col-sm-2" for="graphic-size">Dash array</label>
+                          <div class=" symbolizer-column  col-sm-10">
+                              <input type="number" class="form-control symbolizer-attribute-value" id="graphic-size" data-param-id="<%= attrData.graphic.values['Graphic/Size'].param_id %>" value="<%= attrData.graphic.values['Graphic/Size'].value %>" data-pg-id="1372">
+                          </div>
+                      </div>
+                      <div class="form-group symbolizer-form-group param">
+                          <label class="control-label               symbolizer-attribute-label  col-sm-2" for="graphic-rotation">Dash offset</label>
+                          <div class=" symbolizer-column  col-sm-10">
+                              <input type="number" class="form-control symbolizer-attribute-value" id="graphic-rotation" data-param-id="" value="">
+                          </div>
+                      </div>
+                      <div class="form-group symbolizer-form-group param">
+                          <label class="control-label         symbolizer-attribute-label  col-sm-2" for="graphic-opacity">Opacity
+                              <br>
+                          </label>
+                          <div class=" symbolizer-column  col-sm-10">
+                              <input type="number" class="form-control symbolizer-attribute-value" id="graphic-opacity" data-param-id="" value="">
+                          </div>
+                      </div>
+                      <div class="form-group symbolizer-form-group param">
+                          <label class="control-label        symbolizer-attribute-label  col-sm-2" for="graphic-color">Color</label>
+                          <div class=" symbolizer-column  col-sm-10">
+                              <input type="color" class="form-control symbolizer-attribute-value" id="graphic-color" data-param-id="" value="">
+                          </div>
+                      </div>
+                      <div class="form-group">
+                          <div class="  col-sm-offset-2 col-sm-10"></div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <button type="submit" class="btn save"><%= SLDmodel.id ? 'Update' : 'Create' %></button>
+          <% if(SLDmodel.id) { %>
+          <input type="hidden" name="id" value="<%= SLDmodel.id %>" />
+         <button type="button" data-user-id="<%= SLDmodel.id %>" class="btn btn-danger delete">Delete</button>
+         <% }; %>
         </div>
-        <button type="submit" class="btn save"><%= SLDmodel.id ? 'Update' : 'Create' %></button>
-        <% if(SLDmodel.id) { %>
-        <input type="hidden" name="id" value="<%= SLDmodel.id %>" />
-       <button type="button" data-user-id="<%= SLDmodel.id %>" class="btn btn-danger delete">Delete</button>
-       <% }; %>
+        <div class="col-md-3">
+          <div id="preview"></div>
+        </div>
       </form>
     </div>
   </div>
