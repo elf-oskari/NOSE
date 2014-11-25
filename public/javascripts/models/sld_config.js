@@ -25,6 +25,7 @@ define(['lodash','backbone'], function(_, Backbone) {
 			var valueslist = _.map(params, function (param) {
 				var newparam = _.findWhere(sld_values, {"param_id" : param.id});
 					newparam.name = param.param_path;
+					newparam.attributeName = param.name;
 					return newparam;
 				});
 			return valueslist;
