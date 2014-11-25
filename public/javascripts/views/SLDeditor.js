@@ -9,9 +9,11 @@ define([
 	var SLDEditorView = Backbone.View.extend({
     className: 'page',
 		template: _.template(editSLDTemplate),
+        // Configuration:
+        attrData: {},
 		events: {
-	        'click .delete': 'deleteConfig',
-	        'click .upload': 'showUpload',
+	      'click .delete': 'deleteConfig',
+	      'click .upload': 'showUpload',
           'click .save': 'saveConfig',
           'change .name': 'setAttribute',
           'change .param': 'setParam'
@@ -38,22 +40,44 @@ define([
       self.listenTo(self.SLDconfigmodel, "all", self.logger);
       self.listenTo(self.SLDconfigmodel, "sync", function () { self.render();});
     },
-    render: function(paramlist) {
-      var localization = locale;
-      var model = this.SLDconfigmodel.pick('id', 'name');
-      var params = _.isUndefined(paramlist) ? false : paramlist;
-      this.$el.html(this.template({SLDmodel: model, editSLD: localization, paramlist: params}));
-      return this;
+    render: function(paramlist,symbolType) {
+        var localization = locale;
+        var model = this.SLDconfigmodel.pick('id', 'name');
+        var params = _.isUndefined(paramlist) ? false : paramlist;
+        var type = _.isUndefined(symbolType) ? false : symbolType;
+        var data;
+        var key;
+        var i;
+        // Generate attribute data
+        this.initAttrData();
+        var data = this.attrData;
+        for (key in data.graphic.values) {
+            if (!type) {
+                break; // return in the future
+            }
+            if (data.graphic.values.hasOwnProperty(key)) {
+                for (i=0; i<params.length; i++) {
+                    if (key === params[i].name) {
+                        data.graphic.values[key].param_id = params[i].param_id;
+                        data.graphic.values[key].value = params[i].value;
+                        data.graphic.values[key].class = "";
+                        break;
+                    }
+                }
+            }
+        }
+        this.$el.html(this.template({SLDmodel: model, editSLD: localization, attrData: data, symbolType: type}));
+        return this;
     },
 
     /**
      * @method updateEditParams
      * Updates SLDeditor view with editable params
      */
-    updateEditParams: function(params) {
+    updateEditParams: function(params,type) {
       console.log('updateEditParams', params);
       var paramlist = this.SLDconfigmodel.getSLDValuesByParams(params);
-      this.render(paramlist);
+      this.render(paramlist,type);
     },
 
     setAttribute: function(event) {
@@ -64,7 +88,7 @@ define([
       this.SLDconfigmodel.set(attribute, newvalue);
     },
     setParam: function(event) {
-      var element = $(event.currentTarget);
+      var element = $(event.currentTarget).find("input.symbolizer-attribute-value");
       var param_id = "" + element.data('param-id');
       var newvalue = element.val();
 
@@ -79,6 +103,42 @@ define([
 
     invalidValue: function(event) {
       console.log('got invalid', event, arguments);
+    },
+
+    initAttrData: function () {
+        this.attrData = {
+            graphic: {
+                pointsymbolizer: "",
+                linesymbolizer: "hidden",
+                polygonsymbolizer: "hidden",
+                values: {
+                    "Size/Literal": {
+                        class: "hidden"
+                    },
+                    "Graphic/Mark/Fill/CssParameter(fill)": {
+                        class: "hidden"
+                    },
+                    "Graphic/Size": {
+                        class: "hidden"
+                    }
+                }
+            },
+            line: {
+                pointsymbolizer: "",
+                linesymbolizer: "",
+                polygonsymbolizer: ""
+            },
+            polygon: {
+                pointsymbolizer: "hidden",
+                linesymbolizer: "hidden",
+                polygonsymbolizer: "hidden"
+            },
+            text: {
+                pointsymbolizer: "",
+                linesymbolizer: "hidden",
+                polygonsymbolizer: ""
+            }
+        }
     },
 
     saveConfig: function(event) {

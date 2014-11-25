@@ -1,21 +1,58 @@
-
 <div class="view" id="edit-sld">
   <div class="panel panel-primary">
     <div class="panel-heading">SLD Editor</div>
     <div class="panel-body" style="height:800px">
-      <form class="edit-sld-form">
+      <form role="form" class="edit-sld-form form-horizontal">
         <label>Name</label>
-        <input name="Name" type="text" class="name" data-attribute="name" value="<%= SLDmodel.name %>">
+        <p><input name="Name" type="text" class="name" data-attribute="name" value="<%= SLDmodel.name %>"></p>
         <br>
-        <% if (!paramlist) { %>
-          <p>Joku kiva käyttöohje</p>
-        <% } %>
-        <% _.forEach(paramlist, function(param) { %>
-          <div class="form-group">
-            <label><%= param.name %></label>
-            <input name="value" type="text" class="param" data-param-id="<%= param.param_id %>" value="<%= param.value %>">
-          </div>
-        <% }); %>
+        <div class="<%= attrData.graphic[symbolType] %>" data-pg-id="1198">
+            <div class="form-group symbolizer-form-group param">
+                <label class="control-label symbolizer-attribute-value symbolizer-attribute-label  col-sm-2" for="graphic-symbol">Symbol</label>
+                <div class="symbolizer-column col-sm-10">
+                    <select id="graphic-symbol" class="form-control symbolizer-attribute-value">
+                        <option>Circle</option>
+                        <option>Cross</option>
+                        <option>Square</option>
+                        <option>Star</option>
+                        <option>Triangle</option>
+                        <option>X</option>
+                        <option value="" disabled="disabled">─────────────</option>
+                        <option>From file</option>
+                        <option>External source</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group symbolizer-form-group param <%= attrData.graphic.values['Size/Literal'].class %>" data-pg-id="1151">
+                <label class="control-label symbolizer-attribute-label  col-sm-2" for="graphic-size">Size</label>
+                <div class=" symbolizer-column  col-sm-10">
+                    <input type="number" class="form-control symbolizer-attribute-value" id="graphic-size" data-param-id="<%= attrData.graphic.values['Size/Literal'].param_id %>" value="<%= attrData.graphic.values['Size/Literal'].value %>">
+                </div>
+            </div>
+            <div class="form-group symbolizer-form-group param">
+                <label class="control-label symbolizer-attribute-label  col-sm-2" for="graphic-rotation">Rotation</label>
+                <div class=" symbolizer-column  col-sm-10">
+                    <input type="number" class="form-control symbolizer-attribute-value" id="graphic-rotation" data-param-id="" value="">
+                </div>
+            </div>
+            <div class="form-group symbolizer-form-group param">
+                <label class="control-label symbolizer-attribute-label  col-sm-2" for="graphic-opacity">Opacity
+                    <br>
+                </label>
+                <div class=" symbolizer-column  col-sm-10">
+                    <input type="number" class="form-control symbolizer-attribute-value" id="graphic-opacity" data-param-id="" value="">
+                </div>
+            </div>
+            <div class="form-group symbolizer-form-group param">
+                <label class="control-label symbolizer-attribute-label  col-sm-2" for="graphic-color">Color</label>
+                <div class=" symbolizer-column  col-sm-10">
+                    <input type="color" class="form-control symbolizer-attribute-value" id="graphic-color" data-param-id="" value="">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="  col-sm-offset-2 col-sm-10"></div>
+            </div>
+        </div>
         <button type="submit" class="btn save"><%= SLDmodel.id ? 'Update' : 'Create' %></button>
         <% if(SLDmodel.id) { %>
         <input type="hidden" name="id" value="<%= SLDmodel.id %>" />
