@@ -109,34 +109,42 @@ define([
         this.attrData = {
             graphic: {
                 pointsymbolizer: "",
-                linesymbolizer: "hidden",
+                linesymbolizer: "",
                 polygonsymbolizer: "hidden",
                 values: {
-                    "Size/Literal": {
-                        class: "hidden"
-                    },
-                    "Graphic/Mark/Fill/CssParameter(fill)": {
-                        class: "hidden"
-                    },
-                    "Graphic/Size": {
-                        class: "hidden"
-                    }
+                    "Graphic/ExternalGraphic/OnlineResource": { class: "hidden" },
+                    "Graphic/ExternalGraphic/Format": { class: "hidden" },
+                    "Graphic/Size": { class: "hidden" },
+                    "Graphic/Opacity": { class: "hidden" },
+                    "Graphic/Rotation": { class: "hidden" },
+
+                    "Graphic/Mark/WellKnownName": { class: "hidden" },
+                    "Graphic/Mark/Fill/CssParameter(fill)": { class: "hidden" },
+                    "Graphic/Mark/Fill/CssParameter(fill-opacity)": { class: "hidden" },
+
+                    "Graphic/Mark/Stroke/CssParameter(stroke)": { class: "hidden" },
+                    "Graphic/Mark/Stroke/CssParameter(stroke-opacity)": { class: "hidden" },
+                    "Graphic/Mark/Stroke/CssParameter(stroke-width)": { class: "hidden" },
+                    "Graphic/Mark/Stroke/CssParameter(stroke-linejoin)": { class: "hidden" },
+                    "Graphic/Mark/Stroke/CssParameter(stroke-linecap)": { class: "hidden" },
+                    "Graphic/Mark/Stroke/CssParameter(stroke-dasharray)": { class: "hidden" },
+                    "Graphic/Mark/Stroke/CssParameter(stroke-dashoffset)": { class: "hidden" }
                 }
             },
             line: {
-                pointsymbolizer: "",
+                pointsymbolizer: "hidden",
                 linesymbolizer: "",
-                polygonsymbolizer: ""
+                polygonsymbolizer: "hidden"
             },
             polygon: {
                 pointsymbolizer: "hidden",
-                linesymbolizer: "hidden",
-                polygonsymbolizer: "hidden"
+                linesymbolizer: "",
+                polygonsymbolizer: ""
             },
             text: {
-                pointsymbolizer: "",
+                pointsymbolizer: "hidden",
                 linesymbolizer: "hidden",
-                polygonsymbolizer: ""
+                polygonsymbolizer: "hidden"
             }
         }
     },
