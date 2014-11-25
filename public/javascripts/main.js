@@ -6,7 +6,8 @@ requirejs.config({
 		lodash: 'lib/lodash',
 		ol3: 'lib/ol3-v3.0.0-debug',
 		i18n: 'lib/i18n',
-		bootstrap: 'lib/bootstrap'
+		bootstrap: 'lib/bootstrap',
+		svg: 'lib/svg'
 	},
 	shim: {
 		'bootstrap': {

@@ -3,9 +3,10 @@ define([
 	'backbone',
 	'jquery',
 	'bootstrap',
+  'svg',
 	'i18n!localization/nls/SLDeditor',
 	'text!templates/SLDeditor.html'
-], function(_, Backbone, $, Bootstrap, locale, editSLDTemplate) {
+], function(_, Backbone, $, Bootstrap, SVG, locale, editSLDTemplate) {
 	var SLDEditorView = Backbone.View.extend({
     className: 'page',
 		template: _.template(editSLDTemplate),
@@ -67,6 +68,9 @@ define([
             }
         }
         this.$el.html(this.template({SLDmodel: model, editSLD: localization, attrData: data, symbolType: type}));
+        if (paramlist) {
+          this.renderPreview(paramlist, symbolType);
+        }
         return this;
     },
 
@@ -184,6 +188,67 @@ define([
           alert('Deleting template is not possible');
         }
       });
+    },
+
+    renderPreview: function (params, symbolType) {
+      this.preview = SVG('preview').size(100,100);
+      //var element = preview.rect(50, 50).attr({ fill: '#f06' })
+      if (symbolType === "pointsymbolizer") {
+        this.renderPoint(params);
+      } else if (symbolType === "linesymbolizer") {
+        this.renderLine(params);
+      } else if (symbolType === "polygonsymbolizer") {
+        this.renderArea(params);
+      } else {
+        alert("geometryType of params is not defined");
+      }
+    },
+
+    renderPoint: function (params) {
+      // graphic paths are from this website: http://raphaeljs.com/icons/
+      this.graphicPaths = {
+        "triangle": "M23.963,20.834L17.5,9.64c-0.825-1.429-2.175-1.429-3,0L8.037,20.834c-0.825,1.429-0.15,2.598,1.5,2.598h12.926C24.113,23.432,24.788,22.263,23.963,20.834z",
+        "star": "M16,22.375L7.116,28.83l3.396-10.438l-8.883-6.458l10.979,0.002L16.002,1.5l3.391,10.434h10.981l-8.886,6.457l3.396,10.439L16,22.375L16,22.375z",
+        "cross": "M25.979,12.896 19.312,12.896 19.312,6.229 12.647,6.229 12.647,12.896 5.979,12.896 5.979,19.562 12.647,19.562 12.647,26.229 19.312,26.229 19.312,19.562 25.979,19.562z",
+        "x": "M24.778,21.419 19.276,15.917 24.777,10.415 21.949,7.585 16.447,13.087 10.945,7.585 8.117,10.415 13.618,15.917 8.116,21.419 10.946,24.248 16.447,18.746 21.948,24.248z",
+        "rectangle": "M5.5,5.5h20v20h-20z"
+      }
+
+      //parse attributes and check if the element is Mark or ExternalGraphic
+      var attributes = {};
+      var hasWellKnownName = false;
+      for (i=0; i < params.length; i++) {
+        if (params[i].attributeName === "wellknownname") {
+          hasWellKnownName = true;
+          var wellknownname = params[i].value
+        } else {
+          var attribute = params[i].attributeName;
+          var attributeValue = params[i].value;
+          attributes[attribute] = attributeValue;
+        }
+      }
+
+      //create preview element
+      if (hasWellKnownName === true) {
+        if (!_.has(this.graphicPaths, wellknownname)) {
+          var element = this.preview.circle(50,50,10);
+          element.attr(attributes);
+        } else {
+          var path = this.graphicPaths[wellknownname];
+          var element = this.preview.path(path);
+          element.attr(attributes);
+        }
+      } else {
+        console.log("external graphics are not yet supported");
+      }
+    },
+
+    renderLine: function (params) {
+      console.log("rendering line is not yet supported");
+    },
+
+    renderArea: function (params) {
+      console.log("rendering area is not yet supported");
     }
 	});
 
