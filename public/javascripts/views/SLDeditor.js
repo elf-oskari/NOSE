@@ -92,10 +92,27 @@ define([
       this.SLDconfigmodel.set(attribute, newvalue);
     },
     setParam: function(event) {
-      var element = $(event.currentTarget).find("input.symbolizer-attribute-value");
-      var param_id = "" + element.data('param-id');
-      var newvalue = element.val();
-
+      // if shape is changed
+      if (event.currentTarget.innerText === "Symbol") {
+        var element = $(event.currentTarget).find("#graphic-symbol");
+        var newvalue = element[0].value.toLowerCase();
+        this.renderWellKnownName(newvalue)
+      } else {
+        var element = $(event.currentTarget).find("input.symbolizer-attribute-value");
+        var param_id = "" + element.data('param-id');
+        var param_css_parameter = element.data('css-parameter');
+        var newvalue = element.val();
+        if (param_css_parameter === "rotation") {
+          this.elementRotation = newvalue;
+          this.previewElement.transform({rotation: this.elementRotation});
+        } else if (param_css_parameter === "size") {
+          this.elementSize = parseInt(newvalue);
+          this.previewElement.size(this.elementSize);
+        } else {
+          this.attributes[param_css_parameter] = newvalue;
+          this.updatePreview();
+        }
+      }
       var sld_values = this.SLDconfigmodel.get('sld_values');
       // we assume the changed param_id is always found
       var paramIndex = _.findIndex(sld_values, {'param_id': param_id});
@@ -189,8 +206,7 @@ define([
     },
 
     renderPreview: function (params, symbolType) {
-      this.preview = SVG('preview').size(100,100);
-      //var element = preview.rect(50, 50).attr({ fill: '#f06' })
+      this.preview = SVG('preview').size(150,150);
       if (symbolType === "pointsymbolizer") {
         this.renderPoint(params);
       } else if (symbolType === "linesymbolizer") {
@@ -209,36 +225,53 @@ define([
         "star": "M16,22.375L7.116,28.83l3.396-10.438l-8.883-6.458l10.979,0.002L16.002,1.5l3.391,10.434h10.981l-8.886,6.457l3.396,10.439L16,22.375L16,22.375z",
         "cross": "M25.979,12.896 19.312,12.896 19.312,6.229 12.647,6.229 12.647,12.896 5.979,12.896 5.979,19.562 12.647,19.562 12.647,26.229 19.312,26.229 19.312,19.562 25.979,19.562z",
         "x": "M24.778,21.419 19.276,15.917 24.777,10.415 21.949,7.585 16.447,13.087 10.945,7.585 8.117,10.415 13.618,15.917 8.116,21.419 10.946,24.248 16.447,18.746 21.948,24.248z",
-        "rectangle": "M5.5,5.5h20v20h-20z"
-      };
+        "square": "M5.5,5.5h20v20h-20z"
+      }
 
       //parse attributes and check if the element is Mark or ExternalGraphic
-      var attributes = {};
+      this.attributes = {};
       var hasWellKnownName = false;
-      for (var i=0; i < params.length; i++) {
+      for (i=0; i < params.length; i++) {
         if (params[i].attributeName === "wellknownname") {
           hasWellKnownName = true;
           var wellknownname = params[i].value
+        } else if (params[i].attributeName === "size") {
+          this.elementSize = params[i].value;
+        } else if (params[i].attributeName === "rotation") {
+          this.elementRotation = params[i].value;
         } else {
+          this.elementSize = 20;
+          this.elementRotation = 0;
           var attribute = params[i].attributeName;
           var attributeValue = params[i].value;
-          attributes[attribute] = attributeValue;
+          this.attributes[attribute] = attributeValue;
         }
       }
 
       //create preview element
       if (hasWellKnownName === true) {
-        if (!_.has(this.graphicPaths, wellknownname)) {
-          var element = this.preview.circle(50,50,10);
-          element.attr(attributes);
-        } else {
-          var path = this.graphicPaths[wellknownname];
-          var element = this.preview.path(path);
-          element.attr(attributes);
-        }
+        this.renderWellKnownName(wellknownname);
       } else {
-        console.log("external graphics are not yet supported");
+        this.renderExternalGraphics();
       }
+    },
+
+    renderWellKnownName: function(wellknownname) {
+      this.preview.clear();
+      if (!_.has(this.graphicPaths, wellknownname)) {
+        this.previewElement = this.preview.circle(this.elementSize);
+      } else {
+        var path = this.graphicPaths[wellknownname];
+        this.previewElement = this.preview.path(path);
+      }
+      this.previewElement.attr(this.attributes);
+      this.previewElement.size(this.elementSize);
+      this.previewElement.move(75, 75);
+      this.previewElement.transform({rotation: this.elementRotation});
+    },
+
+    renderExternalGraphics: function () {
+      console.log("external graphics are not yet supported");
     },
 
     renderLine: function (params) {
@@ -247,6 +280,10 @@ define([
 
     renderArea: function (params) {
       console.log("rendering area is not yet supported");
+    },
+
+    updatePreview: function () {
+      this.previewElement.attr(this.attributes);
     }
 	});
 
