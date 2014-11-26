@@ -36,8 +36,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // DB client
 try {
-       var data = fs.readFileSync('db.json','utf-8');
-       client = new pg.Client(JSON.parse(data));
+       var data = JSON.parse(fs.readFileSync('db.json','utf-8'));
+       client = new pg.Client(data);
        client.connect(function(err) {
         if (err) {
           console.error('Could not connect to postgres', err);
@@ -59,10 +59,11 @@ var libs = {
   update_config : require('./sources/update_config'),
   delete_template : require('./sources/delete_template'),
   delete_config : require('./sources/delete_config'),
-  select : require('./sources/select')  
+  select : require('./sources/select'),
+  pg : pg
 };
 
-var routes = require('./routes/api')(app, path, client, libs);
+var routes = require('./routes/api')(app, path, client, data, libs);
 
 
 // the startup sequence is async, therefore start the server only if everything else also works
