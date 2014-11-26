@@ -124,14 +124,6 @@ module.exports = function (app, path, client, libs) {
 
         delete_config(req.params.id,
             function (err) {
-
-////////
-                    console.log("API ERROR!!!", err);
-                    res.status(500);
-                    res.json({'delete config': 'failed'});
-
-////////
-/*
                 if (err) {
                     console.log("API ERROR!!!", err);
                     res.status(500);
@@ -141,7 +133,7 @@ module.exports = function (app, path, client, libs) {
                     // we cannot use 204 as it is not supported by Backbone
                     res.status(200);
                     res.json({});
-                } */
+                }
             }            
         );
     });
@@ -158,7 +150,7 @@ module.exports = function (app, path, client, libs) {
                     return res.send(500);
                 }
 
-                console.log("resultti: ", result);
+                //console.log("resultti: ", result);
                 res.status(200);
                 res.json(result);
             }
@@ -203,7 +195,7 @@ module.exports = function (app, path, client, libs) {
                     return res.send(500);
                 }
 
-                console.log("config ALL result: ", result);
+                //console.log("config ALL result: ", result);
                 console.log("config ALL DONE!!");
                 res.status(200);
                 res.json(result);
@@ -263,7 +255,7 @@ module.exports = function (app, path, client, libs) {
                                     return res.send(500);
                                 }
 
-                                console.log("config.post.result: ", result);
+                                //console.log("config.post.result: ", result);
                                 res.status(200);
                                 res.json(result);
                             }

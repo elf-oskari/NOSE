@@ -163,62 +163,6 @@ SldSelecter.prototype.finish=function() {
 /** Top function, to execute sql statement
  * @param {String} sql_template id
  * */
- /**
-exports.select_config = function(id, client, cb) {
-
-    console.log("in select_config");
-
-    var selecter=new SldSelecter(),
-        cb = cb,
-        ressu = {};
-
-    var connected=selecter.connect(client);
-
-    var configSelected=connected.then(function() {
-        return(selecter.selectConfig(id));
-    });
-
-    var ready = configSelected.then(function (configResult) {
-
-        var ind = 0;
-        var maxind = configResult.lenght;
-        var valueSelected = null;
-        //console.log("configResult: ", configResult);
-
-
-        configResult.forEach(function(row){
-            ressu = row;
-            valueSelected = subSelectValues(ind, row.id);
-            ind++;
-        });
-        return valueSelected;
-    }); 
-
-    function subSelectValues(ind, id) {
-        var featuretypeSelected = selecter.selectValues(id);
-        var allSelected = featuretypeSelected.then(function (valueResult) {
-            console.log("valueResult: ", valueResult);
-            ressu.sld_values = valueResult;
-        });
-        return allSelected;
-    };
-
-    ready.catch(function(err) {
-       // selecter.abort();
-        console.error(err);
-        return;
-    });
-
-    ready.then(function() {
-        console.log('Select success!');
-        cb(false,ressu);
-    });
-} */
-
-
-/** Top function, to execute sql statement
- * @param {String} sql_template id
- * */
 exports.select_config = function(id, client, cb) {
 
 
@@ -243,9 +187,6 @@ exports.select_config = function(id, client, cb) {
             var ind = 0;
             var maxind = configResult.lenght;
             var feaSelected = null;
-            //var ruleSelected = null;
-            //var symbolizerSelected = null;
-            //var paramSelected = null;
         configResult.forEach(function(row){
             result.push(row);
             valuesSelected = subSelectValues(ind, row.id);
@@ -257,7 +198,7 @@ exports.select_config = function(id, client, cb) {
     function subSelectValues(ind, id) {
         var featuretypeSelected = selecter.selectValues(id);
         var allSelected = featuretypeSelected.then(function (valueResult) {
-            console.log("valueResult: ", valueResult);
+            //console.log("valueResult: ", valueResult);
             result[ind].sld_values = valueResult;
 
         });
@@ -272,7 +213,7 @@ exports.select_config = function(id, client, cb) {
     });
 
     ready.then(function() {
-        console.log('Select success!');
+        console.log('success in select_config!');
 
         if(id != -1){
             console.log("id != -1: ", id);
