@@ -146,13 +146,10 @@ body
     background-color: #543737;
 }
 
-.preview
+.sld-tree
 {
-    width: 100px;
-    height: 100px;
-    float: right;
+    overflow: auto;
 }
-
 .symbolizer
 {
     width: 50%;
