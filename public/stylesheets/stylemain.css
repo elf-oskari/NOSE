@@ -138,19 +138,12 @@ body
 .symbolizer-column
 {
     margin-left: 0;
-    width: 75%;
+    width: 60%;
 }
 
 .hidden
 {
     background-color: #543737;
-}
-
-.preview
-{
-    width: 100px;
-    height: 100px;
-    float: right;
 }
 
 .symbolizer
