@@ -27,6 +27,7 @@ define({
 			"title": "Are you sure you want to delete this template?",
 			"body": "Deleting this template will also delete all the configs of this template.",
 			"delete": "Delete template"
-		}
+		},
+		"internalError": "Hups, tallennus ei väliaikaisesti toimi, kokeile myöhemmin uudelleen."
 	}
 });

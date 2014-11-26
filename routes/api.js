@@ -114,7 +114,7 @@ module.exports = function (app, path, client, libs) {
                     // we cannot use 204 as it is not supported by Backbone
                     res.status(200);
                     res.json({});
-                }
+                } 
             }            
         );
     });
@@ -124,6 +124,14 @@ module.exports = function (app, path, client, libs) {
 
         delete_config(req.params.id,
             function (err) {
+
+////////
+                    console.log("API ERROR!!!", err);
+                    res.status(500);
+                    res.json({'delete config': 'failed'});
+
+////////
+/*
                 if (err) {
                     console.log("API ERROR!!!", err);
                     res.status(500);
@@ -133,7 +141,7 @@ module.exports = function (app, path, client, libs) {
                     // we cannot use 204 as it is not supported by Backbone
                     res.status(200);
                     res.json({});
-                }
+                } */
             }            
         );
     });
