@@ -51,14 +51,14 @@ define([
         var i;
         // Generate attribute data
         this.initAttrData();
-        var data = this.attrData;
+        data = this.attrData;
         for (key in data.graphic.values) {
             if (!type) {
                 break; // return in the future
             }
             if (data.graphic.values.hasOwnProperty(key)) {
                 for (i=0; i<params.length; i++) {
-                    if ((key === params[i].name)||(key+"/Literal" === params[i].name)) {
+                    if (key === params[i].attributeName) {
                         data.graphic.values[key].param_id = params[i].param_id;
                         data.graphic.values[key].value = params[i].value;
                         data.graphic.values[key].class = "";
@@ -117,23 +117,21 @@ define([
                 polygonsymbolizer: "hidden",
                 none: "hidden",
                 values: {
-                    "Graphic/ExternalGraphic/OnlineResource": { class: "" },
-                    "Graphic/ExternalGraphic/Format": { class: "" },
-                    "Graphic/Size": { class: "" },
-                    //"Graphic/Opacity": { class: "" },
-                    "Graphic/Rotation": { class: "" },
+                    "size": { class: "" },
+                    //"opacity": { class: "" },
+                    "rotation": { class: "" },
 
-                    "Graphic/Mark/WellKnownName": { class: "" },
-                    "Graphic/Mark/Fill/CssParameter(fill)": { class: "" },
-                    "Graphic/Mark/Fill/CssParameter(fill-opacity)": { class: "" },
+                    "wellknownname": { class: "" },
+                    "fill": { class: "" },
+                    "fill-opacity": { class: "" },
 
-                    "Graphic/Mark/Stroke/CssParameter(stroke)": { class: "" },
-                    "Graphic/Mark/Stroke/CssParameter(stroke-opacity)": { class: "" },
-                    "Graphic/Mark/Stroke/CssParameter(stroke-width)": { class: "" },
-                    "Graphic/Mark/Stroke/CssParameter(stroke-linejoin)": { class: "" },
-                    "Graphic/Mark/Stroke/CssParameter(stroke-linecap)": { class: "" },
-                    "Graphic/Mark/Stroke/CssParameter(stroke-dasharray)": { class: "" },
-                    "Graphic/Mark/Stroke/CssParameter(stroke-dashoffset)": { class: "" }
+                    "stroke": { class: "" },
+                    "stroke-opacity": { class: "" },
+                    "stroke-width": { class: "" },
+                    "stroke-linejoin": { class: "" },
+                    "stroke-linecap": { class: "" },
+                    "stroke-dasharray": { class: "" },
+                    "stroke-dashoffset": { class: "" }
                 }
             },
             line: {
@@ -212,12 +210,12 @@ define([
         "cross": "M25.979,12.896 19.312,12.896 19.312,6.229 12.647,6.229 12.647,12.896 5.979,12.896 5.979,19.562 12.647,19.562 12.647,26.229 19.312,26.229 19.312,19.562 25.979,19.562z",
         "x": "M24.778,21.419 19.276,15.917 24.777,10.415 21.949,7.585 16.447,13.087 10.945,7.585 8.117,10.415 13.618,15.917 8.116,21.419 10.946,24.248 16.447,18.746 21.948,24.248z",
         "rectangle": "M5.5,5.5h20v20h-20z"
-      }
+      };
 
       //parse attributes and check if the element is Mark or ExternalGraphic
       var attributes = {};
       var hasWellKnownName = false;
-      for (i=0; i < params.length; i++) {
+      for (var i=0; i < params.length; i++) {
         if (params[i].attributeName === "wellknownname") {
           hasWellKnownName = true;
           var wellknownname = params[i].value
