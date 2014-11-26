@@ -113,7 +113,7 @@ define([
         this.attrData = {
             graphic: {
                 pointsymbolizer: "",
-                linesymbolizer: "",
+                linesymbolizer: "hidden",
                 polygonsymbolizer: "hidden",
                 none: "hidden",
                 values: {
@@ -135,9 +135,9 @@ define([
                 }
             },
             line: {
-                pointsymbolizer: "hidden",
+                pointsymbolizer: "",
                 linesymbolizer: "",
-                polygonsymbolizer: "hidden",
+                polygonsymbolizer: "",
                 none: "hidden",
                 values: {
                     "Stroke/CssParameter(stroke)": {class: "hidden"},
@@ -151,7 +151,7 @@ define([
             },
             polygon: {
                 pointsymbolizer: "hidden",
-                linesymbolizer: "",
+                linesymbolizer: "hidden",
                 polygonsymbolizer: "",
                 none: "hidden"
             },
