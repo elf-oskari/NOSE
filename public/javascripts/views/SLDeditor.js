@@ -157,13 +157,13 @@ define([
                 polygonsymbolizer: "",
                 none: "hidden",
                 values: {
-                    "Stroke/CssParameter(stroke)": {class: "hidden"},
-                    "Stroke/CssParameter(stroke-opacity)": {class: "hidden"},
-                    "Stroke/CssParameter(stroke-width)": {class: "hidden"},
-                    "Stroke/CssParameter(stroke-linejoin)": {class: "hidden"},
-                    "Stroke/CssParameter(stroke-linecap)": {class: "hidden"},
-                    "Stroke/CssParameter(stroke-dasharray)": {class: "hidden"},
-                    "Stroke/CssParameter(stroke-dashoffset)": {class: "hidden"}
+                    "stroke": {class: "hidden"},
+                    "stroke-opacity": {class: "hidden"},
+                    "stroke-width": {class: "hidden"},
+                    "stroke-linejoin": {class: "hidden"},
+                    "stroke-linecap": {class: "hidden"},
+                    "stroke-dasharray": {class: "hidden"},
+                    "stroke-dashoffset": {class: "hidden"}
                 }
             },
             polygon: {
