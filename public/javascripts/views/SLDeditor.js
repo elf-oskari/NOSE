@@ -206,6 +206,7 @@ define([
     },
 
     renderPreview: function (params, symbolType) {
+      this.attributes = {};
       this.preview = SVG('preview').size(150,150);
       if (symbolType === "pointsymbolizer") {
         this.renderPoint(params);
@@ -229,7 +230,6 @@ define([
       }
 
       //parse attributes and check if the element is Mark or ExternalGraphic
-      this.attributes = {};
       var hasWellKnownName = false;
       for (i=0; i < params.length; i++) {
         if (params[i].attributeName === "wellknownname") {
@@ -275,7 +275,14 @@ define([
     },
 
     renderLine: function (params) {
-      console.log("rendering line is not yet supported");
+      this.preview.clear();
+      for (i=0; i < params.length; i++) {
+        var attribute = params[i].attributeName;
+        var attributeValue = params[i].value;
+        this.attributes[attribute] = attributeValue;
+      }
+      this.previewElement = this.preview.line(20, 20, 130, 130).stroke({width: 1});
+      this.previewElement.attr(this.attributes);
     },
 
     renderArea: function (params) {

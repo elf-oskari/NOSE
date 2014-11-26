@@ -138,7 +138,7 @@ body
 .symbolizer-column
 {
     margin-left: 0;
-    width: 60%;
+    width: 75%;
 }
 
 .hidden
@@ -146,6 +146,10 @@ body
     background-color: #543737;
 }
 
+.sld-tree
+{
+    overflow: auto;
+}
 .symbolizer
 {
     width: 50%;
