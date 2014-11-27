@@ -132,51 +132,60 @@ define([
                 pointsymbolizer: "",
                 linesymbolizer: "hidden",
                 polygonsymbolizer: "hidden",
+                textsymbolizer: "hidden",
                 none: "hidden",
                 values: {
-                    "size": { class: "" },
-                    //"opacity": { class: "" },
-                    "rotation": { class: "" },
-
-                    "wellknownname": { class: "" },
-                    "fill": { class: "" },
-                    "fill-opacity": { class: "" },
-
-                    "stroke": { class: "" },
-                    "stroke-opacity": { class: "" },
-                    "stroke-width": { class: "" },
-                    "stroke-linejoin": { class: "" },
-                    "stroke-linecap": { class: "" },
-                    "stroke-dasharray": { class: "" },
-                    "stroke-dashoffset": { class: "" }
+                    "graphic-size": {class: ""},
+                    "graphic-opacity": {class: ""},
+                    "graphic-rotation": {class: ""},
+                    "graphic-wellknownname": {class: ""},
+                    "graphic-color": {class: ""}
+                    //"graphic-fill-opacity", vs. graphic-opacity?
                 }
             },
             line: {
-                pointsymbolizer: "",
+                pointsymbolizer: "hidden",
                 linesymbolizer: "",
                 polygonsymbolizer: "",
+                textsymbolizer: "hidden",
                 none: "hidden",
                 values: {
-                    "stroke": {class: "hidden"},
-                    "stroke-opacity": {class: "hidden"},
-                    "stroke-width": {class: "hidden"},
-                    "stroke-linejoin": {class: "hidden"},
-                    "stroke-linecap": {class: "hidden"},
-                    "stroke-dasharray": {class: "hidden"},
-                    "stroke-dashoffset": {class: "hidden"}
+                    "stroke-color": {class: ""},
+                    "stroke-opacity": {class: ""},
+                    "stroke-width": {class: ""},
+                    "stroke-linejoin": {class: ""},
+                    "stroke-linecap": {class: ""},
+                    "stroke-dasharray": {class: ""},
+                    "stroke-dashoffset": {class: ""}
                 }
             },
             polygon: {
                 pointsymbolizer: "hidden",
                 linesymbolizer: "hidden",
                 polygonsymbolizer: "",
-                none: "hidden"
+                textsymbolizer: "hidden",
+                none: "hidden",
+                values: {
+                    "polygon-fill-color": {class: ""},
+                    "polygon-fill-opacity": {class: ""}
+                }
             },
             text: {
                 pointsymbolizer: "hidden",
                 linesymbolizer: "hidden",
                 polygonsymbolizer: "hidden",
-                none: "hidden"
+                textsymbolizer: "",
+                none: "hidden",
+                values: {
+                    "font-family": {class: ""},
+                    "font-style": {class: ""},
+                    "font-weight": {class: ""},
+                    "font-size": {class: ""},
+                    "font-placement": {class: ""},
+                    "font-color": {class: ""},
+                    "font-halo-color": {class: ""},
+                    "font-halo-radius": {class: ""}
+                }
             }
         }
     },

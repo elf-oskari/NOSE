@@ -580,6 +580,8 @@
                             <Size>500</Size>
                         </Graphic>
                     </PointSymbolizer>
+                    <TextSymbolizer>
+                    </TextSymbolizer>
                 </Rule>
             </FeatureTypeStyle>
             <FeatureTypeStyle>
