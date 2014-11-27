@@ -11,10 +11,8 @@
                         <div class="symbolizer-column">
                             <div class="<%= attrData.graphic[symbolType] %>">
                                 <span class="label label-default">Point</span>
-                                <div
-                                        class="form-group symbolizer-form-group param <%= attrData.graphic.values['graphic-wellknownname'].class %>">
+                                <div class="form-group symbolizer-form-group param <%= attrData.graphic.values['wellknownname'].class %>">
                                     <label class="control-label symbolizer-attribute-value symbolizer-attribute-label col-sm-2" for="graphic-symbol">Symbol</label>
-
                                     <div class="col-sm-10 symbolizer">
                                         <select id="graphic-symbol" class="form-control symbolizer-attribute-value">
                                             <option>Circle</option>
@@ -29,33 +27,33 @@
                                     </div>
                                 </div>
                                 <div
-                                        class="form-group symbolizer-form-group param <%= attrData.graphic.values['graphic-size'].class %>">
-                                    <label class="control-label symbolizer-attribute-label col-sm-2" for="graphic-size">Size</label>
-                                    <div class="col-sm-10 symbolizer">
-                                        <input type="number" class="form-control symbolizer-attribute-value" id="graphic-size" data-param-id="<%= attrData.graphic.values['graphic-size'].param_id %>" value="<%= attrData.graphic.values['graphic-size'].value %>">
-                                    </div>
-                                </div>
-                                <div class="form-group symbolizer-form-group param <%= attrData.graphic.values['graphic-rotation'].class %>">
-                                    <label class="control-label symbolizer-attribute-label col-sm-2" for="graphic-rotation">Rotation</label>
-                                    <div class=" col-sm-10 symbolizer">
-                                        <input type="number" class="form-control symbolizer-attribute-value" id="graphic-rotation" data-param-id="<%= attrData.graphic.values['graphic-rotation'].param_id %>" value="<%= attrData.graphic.values['graphic-rotation'].value %>">
-                                    </div>
-                                </div>
-                                <div
-                                        class="form-group symbolizer-form-group param <%= attrData.graphic.values['graphic-opacity'].class %>">
-                                    <label class="control-label symbolizer-attribute-label col-sm-2" for="graphic-opacity">Opacity
-                                        <br>
-                                    </label>
+                                        class="form-group symbolizer-form-group param <%= attrData.graphic.values['size'].class %>">
+                                    <label class="control-label symbolizer-attribute-label col-sm-2" for="size">Size</label>
                                     <div class="col-sm-10 symbolizer">
                                         <input type="number" class="form-control symbolizer-attribute-value"
-                                               id="graphic-opacity"
-                                               data-param-id="<%= attrData.graphic.values['graphic-opacity'].param_id %>" value="<%= attrData.graphic.values['graphic-opacity'].value %>">
+                                                id="size" data-param-id="<%= attrData.graphic.values['size'].param_id %>" value="<%= attrData.graphic.values['size'].value %>">
                                     </div>
                                 </div>
-                                <div class="form-group symbolizer-form-group param <%= attrData.graphic.values['graphic-color'].class %>">
-                                    <label class="control-label symbolizer-attribute-label col-sm-2" for="graphic-color">Color</label>
+                                <div class="form-group symbolizer-form-group param <%= attrData.graphic.values['rotation'].class %>">
+                                    <label class="control-label symbolizer-attribute-label col-sm-2" for="rotation">Rotation</label>
+                                    <div class=" col-sm-10 symbolizer">
+                                        <input type="number" class="form-control symbolizer-attribute-value" id="rotation" data-param-id="<%= attrData.graphic.values['rotation'].param_id %>" value="<%= attrData.graphic.values['rotation'].value %>">
+                                    </div>
+                                </div>
+                                <div class="form-group symbolizer-form-group param <%=
+                                 attrData.graphic.values['opacity'].class %>">
+                                    <label class="control-label symbolizer-attribute-label col-sm-2" for="opacity">Opacity</label>
                                     <div class="col-sm-10 symbolizer">
-                                        <input type="color" class="form-control symbolizer-attribute-value" id="graphic-color" data-param-id="<%= attrData.graphic.values['graphic-color'].param_id %>" value="<%= attrData.graphic.values['graphic-color'].value %>">
+                                        <input type="number" class="form-control symbolizer-attribute-value"
+                                               id="opacity"
+                                               data-param-id="<%= attrData.graphic.values['opacity'].param_id %>" value="<%= attrData.graphic.values['opacity'].value %>">
+                                    </div>
+                                </div>
+                                <div class="form-group symbolizer-form-group param <%= attrData.graphic.values['mark-fill'].class %>">
+                                    <label class="control-label symbolizer-attribute-label col-sm-2"
+                                            for="mark-fill">Color</label>
+                                    <div class="col-sm-10 symbolizer">
+                                        <input type="color" class="form-control symbolizer-attribute-value" id="mark-fill" data-param-id="<%= attrData.graphic.values['mark-fill'].param_id %>" value="<%= attrData.graphic.values['mark-fill'].value %>">
                                     </div>
                                 </div>
                             </div>
@@ -115,18 +113,17 @@
                                     </div>
                                 </div>
                                 <div class="form-group symbolizer-form-group
-                                 param <%= attrData.line.values['stroke-color'].class %>">
+                                 param <%= attrData.line.values['stroke'].class %>">
                                     <label class="control-label symbolizer-attribute-label col-sm-2"
-                                           for="stroke-color">Color</label>
+                                           for="stroke">Color</label>
                                     <div class="col-sm-10 symbolizer">
                                         <input type="color" class="form-control symbolizer-attribute-value"
-                                                id="stroke-color"
-                                                data-param-id="<%= attrData.line.values['stroke-color'].param_id %>"
-                                                value="<%= attrData.line.values['stroke-color'].value %>">
+                                                id="stroke"
+                                                data-param-id="<%= attrData.line.values['stroke'].param_id %>"
+                                                value="<%= attrData.line.values['stroke'].value %>">
                                     </div>
                                 </div>
-                                <div
-                                        class="form-group symbolizer-form-group param <%= attrData.line.values['stroke-width'].class %>">
+                                <div class="form-group symbolizer-form-group param <%=attrData.line.values['stroke-width'].class %>">
                                     <label class="control-label symbolizer-attribute-label col-sm-2" for="stroke-width">Width</label>
                                     <div class="col-sm-10 symbolizer">
                                         <input type="number" class="form-control symbolizer-attribute-value"
@@ -137,27 +134,25 @@
                                 </div>
                             </div>
                             <div class="<%= attrData.polygon[symbolType] %>">
-                                <span class="label label-default">Fill</span>
-                                <div class="form-group symbolizer-form-group param <%= attrData.polygon.values['polygon-fill-opacity'].class %>">
-                                    <label class="control-label symbolizer-attribute-label col-sm-2" for="polygon-fill-opacity">Opacity
-                                        <br>
-                                    </label>
+                                <span class="label label-default">Fill opacity</span>
+                                <div class="form-group symbolizer-form-group param <%= attrData.polygon.values['fill-opacity'].class %>">
+                                    <label class="control-label symbolizer-attribute-label col-sm-2" for="fill-opacity">Opacity</label>
                                     <div class="col-sm-10 symbolizer">
                                         <input type="number" class="form-control symbolizer-attribute-value"
-                                                id="polygon-fill-opacity"
-                                                data-param-id="<%= attrData.polygon.values['polygon-fill-opacity'].param_id %>"
-                                                value="<%= attrData.polygon.values['polygon-fill-opacity'].value %>">
+                                                id="fill-opacity"
+                                                data-param-id="<%= attrData.polygon.values['fill-opacity'].param_id %>"
+                                                value="<%= attrData.polygon.values['fill-opacity'].value %>">
                                     </div>
                                 </div>
                                 <div class="form-group symbolizer-form-group param <%=
-                                 attrData.polygon.values['polygon-fill-color'].class %>">
+                                 attrData.polygon.values['fill'].class %>">
                                     <label class="control-label symbolizer-attribute-label col-sm-2"
-                                            for="polygon-fill-color">Color</label>
+                                            for="fill">Color</label>
                                     <div class="col-sm-10 symbolizer">
                                         <input type="color" class="form-control symbolizer-attribute-value"
-                                                id="polygon-fill-color"
-                                                data-param-id="<%= attrData.polygon.values['polygon-fill-color'].param_id %>"
-                                                value="<%= attrData.polygon.values['polygon-fill-color'].value %>">
+                                                id="fill"
+                                                data-param-id="<%= attrData.polygon.values['fill'].param_id %>"
+                                                value="<%= attrData.polygon.values['fill'].value %>">
                                     </div>
                                 </div>
                             </div>
@@ -211,35 +206,33 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="form-group symbolizer-form-group
-                                 param <%= attrData.text.values['font-color'].class %>">
-                                    <label class="control-label symbolizer-attribute-label col-sm-2" for="font-color">Color</label>
+                                <div class="form-group symbolizer-form-group param <%= attrData.text.values['text-fill'].class %>">
+                                    <label class="control-label symbolizer-attribute-label col-sm-2" for="text-fill">Color</label>
                                     <div class="col-sm-10 symbolizer">
                                         <input type="color" class="form-control symbolizer-attribute-value"
-                                                id="font-color"
-                                                data-param-id="<%= attrData.text.values['font-color'].param_id %>"
-                                                value="<%= attrData.text.values['font-color'].value %>">
+                                                id="text-fill"
+                                                data-param-id="<%= attrData.text.values['text-fill'].param_id %>"
+                                                value="<%= attrData.text.values['text-fill'].value %>">
                                     </div>
                                 </div>
-                                <div
-                                        class="form-group symbolizer-form-group param <%= attrData.text.values['font-halo-color'].class %>">
+                                <div class="form-group symbolizer-form-group param <%= attrData.text.values['halo-color'].class %>">
                                     <label class="control-label symbolizer-attribute-label col-sm-2"
-                                            for="font-halo-color">Halo color</label>
+                                            for="halo-color">Halo color</label>
                                     <div class="col-sm-10 symbolizer">
                                         <input type="color" class="form-control symbolizer-attribute-value"
-                                                id="font-halo-color"
-                                                data-param-id="<%= attrData.text.values['font-halo-color'].param_id %>"
-                                                value="<%= attrData.text.values['font-halo-color'].value %>">
+                                                id="halo-color"
+                                                data-param-id="<%= attrData.text.values['halo-color'].param_id %>"
+                                                value="<%= attrData.text.values['halo-color'].value %>">
                                     </div>
                                 </div>
                                 <div
-                                        class="form-group symbolizer-form-group param <%= attrData.text.values['font-halo-radius'].class %>">
-                                    <label class="control-label symbolizer-attribute-label col-sm-2" for="font-halo-radius">Radius</label>
+                                        class="form-group symbolizer-form-group param <%= attrData.text.values['halo-radius'].class %>">
+                                    <label class="control-label symbolizer-attribute-label col-sm-2" for="halo-radius">Radius</label>
                                     <div class="col-sm-10 symbolizer">
                                         <input type="number" class="form-control symbolizer-attribute-value"
-                                                id="font-halo-radius"
-                                                data-param-id="<%= attrData.text.values['font-halo-radius'].param_id %>"
-                                                value="<%= attrData.text.values['font-halo-radius'].value %>">
+                                                id="halo-radius"
+                                                data-param-id="<%= attrData.text.values['halo-radius'].param_id %>"
+                                                value="<%= attrData.text.values['halo-radius'].value %>">
                                     </div>
                                 </div>
                             </div>

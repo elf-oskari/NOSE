@@ -93,15 +93,17 @@ define([
     },
     setParam: function(event) {
       // if shape is changed
+      var element,
+          newvalue;
       if (event.currentTarget.innerText === "Symbol") {
-        var element = $(event.currentTarget).find("#graphic-symbol");
-        var newvalue = element[0].value.toLowerCase();
+        element = $(event.currentTarget).find("#graphic-symbol");
+        newvalue = element[0].value.toLowerCase();
         this.renderWellKnownName(newvalue)
       } else {
-        var element = $(event.currentTarget).find("input.symbolizer-attribute-value");
+        element = $(event.currentTarget).find("input.symbolizer-attribute-value");
         var param_id = "" + element.data('param-id');
         var param_css_parameter = element.data('css-parameter');
-        var newvalue = element.val();
+        newvalue = element.val();
         if (param_css_parameter === "rotation") {
           this.elementRotation = newvalue;
           this.previewElement.transform({rotation: this.elementRotation});
@@ -135,12 +137,13 @@ define([
                 textsymbolizer: "hidden",
                 none: "hidden",
                 values: {
-                    "graphic-size": {class: ""},
-                    "graphic-opacity": {class: ""},
-                    "graphic-rotation": {class: ""},
-                    "graphic-wellknownname": {class: ""},
-                    "graphic-color": {class: ""}
-                    //"graphic-fill-opacity", vs. graphic-opacity?
+                    "size": {class: ""},
+                    "opacity": {class: ""},
+                    "rotation": {class: ""},
+                    "onlineresource": {class: ""},
+                    "wellknownname": {class: ""},
+                    "mark-fill": {class: ""},
+                    "mark-fill-opacity": {class: ""}
                 }
             },
             line: {
@@ -150,7 +153,7 @@ define([
                 textsymbolizer: "hidden",
                 none: "hidden",
                 values: {
-                    "stroke-color": {class: ""},
+                    "stroke": {class: ""},
                     "stroke-opacity": {class: ""},
                     "stroke-width": {class: ""},
                     "stroke-linejoin": {class: ""},
@@ -166,8 +169,8 @@ define([
                 textsymbolizer: "hidden",
                 none: "hidden",
                 values: {
-                    "polygon-fill-color": {class: ""},
-                    "polygon-fill-opacity": {class: ""}
+                    "fill": {class: ""},
+                    "fill-opacity": {class: ""}
                 }
             },
             text: {
@@ -177,14 +180,21 @@ define([
                 textsymbolizer: "",
                 none: "hidden",
                 values: {
+                    "label": {class: ""},
                     "font-family": {class: ""},
                     "font-style": {class: ""},
                     "font-weight": {class: ""},
                     "font-size": {class: ""},
-                    "font-placement": {class: ""},
-                    "font-color": {class: ""},
-                    "font-halo-color": {class: ""},
-                    "font-halo-radius": {class: ""}
+                    "pointplacement-anchorpointx": {class: ""},
+                    "pointplacement-anchorpointy": {class: ""},
+                    "pointplacement-displacementx": {class: ""},
+                    "pointplacement-displacementy": {class: ""},
+                    "pointplacement-rotation": {class: ""},
+                    "lineplacement-perpendicularoffset": {class: ""},
+                    "text-fill": {},
+                    "text-fill-opacity": {},
+                    "halo-color": {class: ""},
+                    "halo-radius": {class: ""}
                 }
             }
         }
@@ -236,11 +246,11 @@ define([
         "cross": "M25.979,12.896 19.312,12.896 19.312,6.229 12.647,6.229 12.647,12.896 5.979,12.896 5.979,19.562 12.647,19.562 12.647,26.229 19.312,26.229 19.312,19.562 25.979,19.562z",
         "x": "M24.778,21.419 19.276,15.917 24.777,10.415 21.949,7.585 16.447,13.087 10.945,7.585 8.117,10.415 13.618,15.917 8.116,21.419 10.946,24.248 16.447,18.746 21.948,24.248z",
         "square": "M5.5,5.5h20v20h-20z"
-      }
+      };
 
       //parse attributes and check if the element is Mark or ExternalGraphic
       var hasWellKnownName = false;
-      for (i=0; i < params.length; i++) {
+      for (var i=0; i < params.length; i++) {
         if (params[i].attributeName === "wellknownname") {
           hasWellKnownName = true;
           var wellknownname = params[i].value
@@ -285,7 +295,7 @@ define([
 
     renderLine: function (params) {
       this.preview.clear();
-      for (i=0; i < params.length; i++) {
+      for (var i=0; i < params.length; i++) {
         var attribute = params[i].attributeName;
         var attributeValue = params[i].value;
         this.attributes[attribute] = attributeValue;
