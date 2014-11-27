@@ -47,22 +47,29 @@ define([
         var params = _.isUndefined(paramlist) ? false : paramlist;
         var type = _.isUndefined(symbolType) ? "none" : symbolType;
         var data;
-        var key;
+        var typeKey;
+        var attrKey;
         var i;
         // Generate attribute data
         this.initAttrData();
         data = this.attrData;
-        for (key in data.graphic.values) {
-            if (!type) {
-                break; // return in the future
-            }
-            if (data.graphic.values.hasOwnProperty(key)) {
-                for (i=0; i<params.length; i++) {
-                    if (key === params[i].attributeName) {
-                        data.graphic.values[key].param_id = params[i].param_id;
-                        data.graphic.values[key].value = params[i].value;
-                        data.graphic.values[key].class = "";
-                        break;
+
+        // Visit all types
+        if (type) {
+            for (typeKey in data) {
+                if (data.hasOwnProperty(typeKey)) {
+                    // Visit all supported type attributes
+                    for (attrKey in data[typeKey].values) {
+                        if (data[typeKey].values.hasOwnProperty(attrKey)) {
+                            for (i = 0; i < params.length; i++) {
+                                if (attrKey === params[i].attributeName) {
+                                    data[typeKey].values[attrKey].param_id = params[i].param_id;
+                                    data[typeKey].values[attrKey].value = params[i].value;
+                                    data[typeKey].values[attrKey].class = "";
+                                    break;
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -100,7 +107,7 @@ define([
         newvalue = element[0].value.toLowerCase();
         this.renderWellKnownName(newvalue)
       } else {
-        element = $(event.currentTarget).find("input.symbolizer-attribute-value");
+        element = $(event.currentTarget).find(".symbolizer-attribute-value");
         var param_id = "" + element.data('param-id');
         var param_css_parameter = element.data('css-parameter');
         newvalue = element.val();
