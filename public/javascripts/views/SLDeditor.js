@@ -109,7 +109,7 @@ define([
       } else {
         element = $(event.currentTarget).find(".symbolizer-attribute-value");
         var param_id = "" + element.data('param-id');
-        var param_css_parameter = element.data('css-parameter');
+        var param_css_parameter = element[0].id;
         newvalue = element.val();
         if (param_css_parameter === "rotation") {
           this.elementRotation = newvalue;
@@ -233,13 +233,13 @@ define([
 
     renderPreview: function (params, symbolType) {
       this.attributes = {};
-      this.preview = SVG('preview').size(150,150);
+      this.preview = SVG('preview');
       if (symbolType === "pointsymbolizer") {
         this.renderPoint(params);
       } else if (symbolType === "linesymbolizer") {
         this.renderLine(params);
       } else if (symbolType === "polygonsymbolizer") {
-        this.renderArea(params);
+        this.renderPolygon(params);
       } else {
         alert("geometryType of params is not defined");
       }
@@ -292,17 +292,20 @@ define([
       }
       this.previewElement.attr(this.attributes);
       this.previewElement.size(this.elementSize);
-      this.previewElement.move(75, 75);
+      this.previewElement.center(75, 75);
       this.previewElement.transform({rotation: this.elementRotation});
     },
 
     renderExternalGraphics: function () {
-      console.log("external graphics are not yet supported");
+      console.log('External graphics are not yet supported');
+      //this.previewElement = this.preview.image(this.xlink, this.elementSize);
+      //this.previewElement.center(75, 75);
+      //this.previewElement.transform({rotation: this.elementRotation});
     },
 
     renderLine: function (params) {
       this.preview.clear();
-      for (var i=0; i < params.length; i++) {
+      for (i=0; i < params.length; i++) {
         var attribute = params[i].attributeName;
         var attributeValue = params[i].value;
         this.attributes[attribute] = attributeValue;
@@ -311,8 +314,15 @@ define([
       this.previewElement.attr(this.attributes);
     },
 
-    renderArea: function (params) {
-      console.log("rendering area is not yet supported");
+    renderPolygon: function (params) {
+      this.preview.clear();
+      for (i=0; i < params.length; i++) {
+        var attribute = params[i].attributeName;
+        var attributeValue = params[i].value;
+        this.attributes[attribute] = attributeValue;
+      }
+      this.previewElement = this.preview.polygon('20,50 100,40 80,130 20,100').fill('none');
+      this.previewElement.attr(this.attributes);
     },
 
     updatePreview: function () {
