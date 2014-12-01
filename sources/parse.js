@@ -34,6 +34,8 @@ var err = false;
  * Parameters for db store
  */
 var params = [];
+// symbolizer switch
+var symbolizer = '';
 
 /** List of symbolizers to be supported inside rule
  . */
@@ -73,7 +75,6 @@ var FieldMarkerNode = function (id, typeName, defaultValue, rule, symbolizer, ne
     this.defaultValue = defaultValue;
     this.rule = rule;
     this.symbolizer = symbolizer;
-    this.newsymbl = newsymbl;
 };
 
 /** @param {XmlEncoder} xmlEncoder
@@ -81,8 +82,9 @@ var FieldMarkerNode = function (id, typeName, defaultValue, rule, symbolizer, ne
  * this SLD parameter.
  * @return {string} */
 FieldMarkerNode.prototype.encode = function (xmlEncoder, outputCharPos) {
-    if (this.newsymbl)params.push(this.symbolizer);
+    if (this.symbolizer != symbolizer)params.push(this.symbolizer);
     params.push('Field' + '\t' + '\t' + this.id + '\t' + outputCharPos + '\t' + this.typeName + '\t' + this.defaultValue);
+    symbolizer = this.symbolizer;
 
     return('');
 };
@@ -639,6 +641,7 @@ exports.parse = function (inFileName, fname, tname, rfields, cb) {
 	var ruleId=0;
 	var fieldId=0;
 
+    params = [];
     // Select paramlist for parser
 
 	//var outFileName = 'sld_test_template.sld';
@@ -701,6 +704,7 @@ exports.parse = function (inFileName, fname, tname, rfields, cb) {
 		// Store any comment immediately before a rule.
 		// It might be a human-readable description of the rule.
 		if(node.comment) rule.setComment(node.comment);
+        else rule.setComment('Rule_'+rule.id);
 
 		for(i=0;i<namePathList.length;i++) {
 			nameNode=node.queryText(namePathList[i]);
@@ -713,6 +717,8 @@ exports.parse = function (inFileName, fname, tname, rfields, cb) {
 		// console.log(node.queryText(['MinScaleDenominator']).txt);
 
         params.push('Rule'+'\t'+rule.encode(this.xmlEncoder,this.outputCharPos));
+        // Symbolizer switch
+        symbolizer = '';
 
         // Parse symbolizers
         var child = node.childList;
@@ -720,20 +726,23 @@ exports.parse = function (inFileName, fname, tname, rfields, cb) {
         for (i = 0; i < child.length; i++) {
             symbolizerSpecList.forEach(function (symb) {
                 if (child[i].localName === symb) {
-                    var symbl = 'Symbolizer' + '\t' + symb + '\t' + cnt++,
-                        newsymbl = true;
-
-
+                    var uom = 'pixel';
+                    if(node.attributes) {
+                        var suom;
+                        if(node.attributes['uom']) {
+                            suom = node.attributes['uom'].split('/');
+                            if( suom.length > 0) uom = suom[suom.length-1];
+                        }
+                    }
+                    var symbl = 'Symbolizer' + '\t' + symb + '\t' + cnt++ +'\t + uom';
                     var subnode = child[i];
 
                     fieldSpecList.forEach(function (spec) {
                         field = subnode.queryText(spec.path);
                         if (field) {
-                            marker = new FieldMarkerNode(fieldId++, serializeSpec(spec), field.getText(), rule, symbl, newsymbl);
+                            marker = new FieldMarkerNode(fieldId++, serializeSpec(spec), field.getText(), rule, symbl);
                             field.parent.insertBefore(field, marker);
                             field.setText(placeHolder);
-                            newsymbl = false;
-
                         }
                     })
 

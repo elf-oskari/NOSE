@@ -286,9 +286,6 @@ define([
               style: self.createPolygonStyleFunction()
           });
 
-
-
-
           var vectorLines = new ol.layer.Vector({
               source: new ol.source.GeoJSON({
                   projection: 'EPSG:3857',
@@ -341,11 +338,12 @@ define([
               condition: ol.events.condition.mouseMove
           }));
 
+
       } else {
         // map node has been detached.
         // Note! event handling might not function properly, but since we currently do not have any map specific
         // event handling, this is not tested. Look at assign in SLDEditorPage for more details.
-        this.$el.replaceWith(this.map.getTarget());
+        this.$el.replaceWith(this.map.getViewport());
         // reset map view
         this.map.getView().setCenter([2776000, 8444000], 13);
       }
