@@ -7,6 +7,6 @@ define({
 			"download": "Download",
 			"upload": "Upload",
 			"cancel": "Cancel"
-		},
+		}
 	}
 });
