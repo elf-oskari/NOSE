@@ -75,8 +75,9 @@ define([
             }
         }
         // Handle external graphic
-        if (data.graphic.values["external-graphic"]){
-            data.graphic.values["wellknownname"] = "external";
+        if (typeof data.graphic.values["external-graphic"].value !== "undefined"){
+            data.graphic.values["external-graphic"].class = ""; // Not hidden
+            data.graphic.values["wellknownname"] = "external";  // Drop-down value
         }
         this.$el.html(this.template({SLDmodel: model, editSLD: localization, attrData: data, symbolType: type}));
         if (paramlist) {
