@@ -15,9 +15,9 @@ define([
 		events: {
 	      'click .delete': 'deleteConfig',
 	      'click .upload': 'showUpload',
-          'click .save': 'saveConfig',
-          'change .name': 'setAttribute',
-          'change .param': 'setParam'
+        'click .save': 'saveConfig',
+        'change .name': 'setAttribute',
+        'change .param': 'setParam'
     },
 		initialize: function(params) {
       this.dispatcher = params.dispatcher;
@@ -85,7 +85,6 @@ define([
         }
         return this;
     },
-
     /**
      * @method updateEditParams
      * Updates SLDeditor view with editable params
