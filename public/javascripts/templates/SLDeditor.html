@@ -18,243 +18,249 @@ var updateExternalGraphic = function(target) {
 <div class="view" id="edit-sld">
     <div class="panel panel-primary">
         <div class="panel-heading">SLD Editor</div>
-        <div class="panel-body" style="height:800px">
+        <div class="panel-body sld-editor-page" style="height:800px">
             <form role="form" class="edit-sld-form form-horizontal">
                 <label>Name</label>
                 <p><input name="Name" type="text" class="name" data-attribute="name" value="<%= SLDmodel.name %>"></p>
                 <br>
-                <div class="col-sm-8">
-                    <div class="form-group">
-                        <div class="symbolizer-column">
-                            <div class="<%= attrData.graphic[symbolType] %>">
-                                <span class="label label-default">Point</span>
-                                <div class="form-group symbolizer-form-group param <%= attrData.graphic.values['wellknownname'].class %>">
-                                    <label class="control-label symbolizer-attribute-label col-sm-2" for="graphic-symbol">Symbol</label>
-                                    <div class="col-sm-10 symbolizer">
-                                        <select onchange="(<%= updateExternalGraphic %>)(this)" id="graphic-symbol" class="form-control symbolizer-attribute-value">
-                                            <option <%= generateOptionValue("circle",attrData.graphic.values['wellknownname'].value) %>>Circle</option>
-                                            <option <%= generateOptionValue("cross",attrData.graphic.values['wellknownname'].value) %>>Cross</option>
-                                            <option <%= generateOptionValue("square",attrData.graphic.values['wellknownname'].value) %>>Square</option>
-                                            <option <%= generateOptionValue("star",attrData.graphic.values['wellknownname'].value) %>>Star</option>
-                                            <option <%= generateOptionValue("triangle",attrData.graphic.values['wellknownname'].value) %>>Triangle</option>
-                                            <option <%= generateOptionValue("x",attrData.graphic.values['wellknownname'].value) %>>X</option>
-                                            <option value="" disabled="disabled">────────────&nbsp;&nbsp;&nbsp;&nbsp;</option>
-                                            <option <%= generateOptionValue("external",attrData.graphic.values['wellknownname'].value) %>>External graphic</option>
-                                        </select>
+                <div class="row-fluid">
+                    <div class="col-sm-12 col-md-7 col-lg-7 parameter-form">
+                        <div class="form-group">
+                            <div class="symbolizer-column">
+                                <div class="<%= attrData.graphic[symbolType] %>">
+                                    <span class="label label-default">Point</span>
+                                    <div class="form-group symbolizer-form-group param <%= attrData.graphic.values['wellknownname'].class %>">
+                                        <label class="control-label symbolizer-attribute-label col-sm-2" for="graphic-symbol">Symbol</label>
+                                        <div class="col-sm-10 symbolizer">
+                                            <select onchange="(<%= updateExternalGraphic %>)(this)" id="graphic-symbol" class="form-control symbolizer-attribute-value">
+                                                <option <%= generateOptionValue("circle",attrData.graphic.values['wellknownname'].value) %>>Circle</option>
+                                                <option <%= generateOptionValue("cross",attrData.graphic.values['wellknownname'].value) %>>Cross</option>
+                                                <option <%= generateOptionValue("square",attrData.graphic.values['wellknownname'].value) %>>Square</option>
+                                                <option <%= generateOptionValue("star",attrData.graphic.values['wellknownname'].value) %>>Star</option>
+                                                <option <%= generateOptionValue("triangle",attrData.graphic.values['wellknownname'].value) %>>Triangle</option>
+                                                <option <%= generateOptionValue("x",attrData.graphic.values['wellknownname'].value) %>>X</option>
+                                                <option value="" disabled="disabled">────────────&nbsp;&nbsp;&nbsp;&nbsp;</option>
+                                                <option <%= generateOptionValue("external",attrData.graphic.values['wellknownname'].value) %>>External graphic</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group symbolizer-form-group param external-graphic <%= attrData.graphic.values['external-graphic'].class %>">
+                                        <label class="control-label symbolizer-attribute-label col-sm-2" for="external-graphic">URL</label>
+                                        <div class="col-sm-10 symbolizer">
+                                            <input type="text" class="form-control symbolizer-attribute-value"
+                                                    id="external-graphic" data-param-id="<%= attrData.graphic.values['external-graphic'].param_id %>" value="<%= attrData.graphic.values['external-graphic'].value %>">
+                                        </div>
+                                    </div>
+                                    <div class="form-group symbolizer-form-group param <%= attrData.graphic.values['size'].class %>">
+                                        <label class="control-label symbolizer-attribute-label col-sm-2" for="size">Size</label>
+                                        <div class="col-sm-10 symbolizer">
+                                            <input type="number" class="form-control symbolizer-attribute-value"
+                                                    id="size" data-param-id="<%= attrData.graphic.values['size'].param_id %>" value="<%= attrData.graphic.values['size'].value %>">
+                                        </div>
+                                    </div>
+                                    <div class="form-group symbolizer-form-group param <%= attrData.graphic.values['rotation'].class %>">
+                                        <label class="control-label symbolizer-attribute-label col-sm-2" for="rotation">Rotation</label>
+                                        <div class=" col-sm-10 symbolizer">
+                                            <input type="number" class="form-control symbolizer-attribute-value" id="rotation" data-param-id="<%= attrData.graphic.values['rotation'].param_id %>" value="<%= attrData.graphic.values['rotation'].value %>">
+                                        </div>
+                                    </div>
+                                    <div class="form-group symbolizer-form-group param <%=
+                                     attrData.graphic.values['opacity'].class %>">
+                                        <label class="control-label symbolizer-attribute-label col-sm-2" for="opacity">Opacity</label>
+                                        <div class="col-sm-10 symbolizer">
+                                            <input type="number" class="form-control symbolizer-attribute-value"
+                                                   id="opacity"
+                                                   data-param-id="<%= attrData.graphic.values['opacity'].param_id %>" value="<%= attrData.graphic.values['opacity'].value %>">
+                                        </div>
+                                    </div>
+                                    <div class="form-group symbolizer-form-group param <%= attrData.graphic.values['fill'].class %>">
+                                        <label class="control-label symbolizer-attribute-label col-sm-2" for="fill">Color</label>
+                                        <div class="col-sm-10 symbolizer">
+                                            <input type="color" class="form-control symbolizer-attribute-value" id="fill" data-param-id="<%= attrData.graphic.values['fill'].param_id %>" value="<%= attrData.graphic.values['fill'].value %>">
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="form-group symbolizer-form-group param external-graphic <%= attrData.graphic.values['external-graphic'].class %>">
-                                    <label class="control-label symbolizer-attribute-label col-sm-2" for="external-graphic">URL</label>
-                                    <div class="col-sm-10 symbolizer">
-                                        <input type="text" class="form-control symbolizer-attribute-value"
-                                                id="external-graphic" data-param-id="<%= attrData.graphic.values['external-graphic'].param_id %>" value="<%= attrData.graphic.values['external-graphic'].value %>">
+                                <div class="<%= attrData.line[symbolType] %>">
+                                    <span class="label label-default">Line</span>
+                                    <div class="form-group symbolizer-form-group param">
+                                        <label class="control-label  symbolizer-attribute-label col-sm-2" for="stroke-linejoin">Line join</label>
+                                        <div class="col-sm-10 symbolizer">
+                                            <select id="stroke-linejoin" class="form-control symbolizer-attribute-value">
+                                                <option <%= generateOptionValue("miter",attrData.line.values['stroke-linejoin'].value) %>>Miter</option>
+                                                <option <%= generateOptionValue("round",attrData.line.values['stroke-linejoin'].value) %>>Round</option>
+                                                <option <%= generateOptionValue("bevel",attrData.line.values['stroke-linejoin'].value) %>>Bevel</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group symbolizer-form-group param">
+                                        <label class="control-label symbolizer-attribute-label col-sm-2" for="stroke-linecap">Line cap</label>
+                                        <div class="col-sm-10 symbolizer">
+                                            <select id="stroke-linecap" class="form-control symbolizer-attribute-value">
+                                                <option <%= generateOptionValue("butt",attrData.line.values['stroke-linecap'].value) %>>Butt</option>
+                                                <option <%= generateOptionValue("round",attrData.line.values['stroke-linecap'].value) %>>Round</option>
+                                                <option <%= generateOptionValue("square",attrData.line.values['stroke-linecap'].value) %>>Square</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group symbolizer-form-group param <%= attrData.line.values['stroke-dasharray'].class %>">
+                                        <label class="control-label symbolizer-attribute-label col-sm-2"
+                                                for="stroke-dasharray">Dash array</label>
+                                        <div class="col-sm-10 symbolizer">
+                                            <input type="text" class="form-control symbolizer-attribute-value"
+                                                    id="stroke-dasharray"
+                                                    data-param-id="<%= attrData.line.values['stroke-dasharray'].param_id %>" value="<%= attrData.line.values['stroke-dasharray'].value %>">
+                                        </div>
+                                    </div>
+                                    <div class="form-group symbolizer-form-group param <%= attrData.line.values['stroke-dashoffset'].class %>">
+                                        <label class="control-label symbolizer-attribute-label col-sm-2"
+                                                for="stroke-dashoffset">Dash offset</label>
+                                        <div class="col-sm-10 symbolizer">
+                                            <input type="number" class="form-control symbolizer-attribute-value"
+                                                    id="stroke-dashoffset"
+                                                    data-param-id="<%= attrData.line.values['stroke-dashoffset'].param_id %>" value="<%= attrData.line.values['stroke-dashoffset'].value %>">
+                                        </div>
+                                    </div>
+                                    <div
+                                            class="form-group symbolizer-form-group param <%= attrData.line.values['stroke-opacity'].class %>">
+                                        <label class="control-label symbolizer-attribute-label col-sm-2" for="stroke-opacity">Opacity
+                                            <br>
+                                        </label>
+                                        <div class="col-sm-10 symbolizer">
+                                            <input type="number" class="form-control symbolizer-attribute-value"
+                                                    id="stroke-opacity"
+                                                    data-param-id="<%= attrData.line.values['stroke-opacity'].param_id %>"
+                                                    value="<%= attrData.line.values['stroke-opacity'].value %>">
+                                        </div>
+                                    </div>
+                                    <div class="form-group symbolizer-form-group
+                                     param <%= attrData.line.values['stroke'].class %>">
+                                        <label class="control-label symbolizer-attribute-label col-sm-2"
+                                               for="stroke">Color</label>
+                                        <div class="col-sm-10 symbolizer">
+                                            <input type="color" class="form-control symbolizer-attribute-value"
+                                                    id="stroke"
+                                                    data-param-id="<%= attrData.line.values['stroke'].param_id %>"
+                                                    value="<%= attrData.line.values['stroke'].value %>">
+                                        </div>
+                                    </div>
+                                    <div class="form-group symbolizer-form-group param <%=attrData.line.values['stroke-width'].class %>">
+                                        <label class="control-label symbolizer-attribute-label col-sm-2" for="stroke-width">Width</label>
+                                        <div class="col-sm-10 symbolizer">
+                                            <input type="number" class="form-control symbolizer-attribute-value"
+                                                    id="stroke-width"
+                                                    data-param-id="<%= attrData.line.values['stroke-width'].param_id %>"
+                                                    value="<%= attrData.line.values['stroke-width'].value %>">
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="form-group symbolizer-form-group param <%= attrData.graphic.values['size'].class %>">
-                                    <label class="control-label symbolizer-attribute-label col-sm-2" for="size">Size</label>
-                                    <div class="col-sm-10 symbolizer">
-                                        <input type="number" class="form-control symbolizer-attribute-value"
-                                                id="size" data-param-id="<%= attrData.graphic.values['size'].param_id %>" value="<%= attrData.graphic.values['size'].value %>">
+                                <div class="<%= attrData.polygon[symbolType] %>">
+                                    <span class="label label-default">Fill opacity</span>
+                                    <div class="form-group symbolizer-form-group param <%= attrData.polygon.values['fill-opacity'].class %>">
+                                        <label class="control-label symbolizer-attribute-label col-sm-2" for="fill-opacity">Opacity</label>
+                                        <div class="col-sm-10 symbolizer">
+                                            <input type="number" class="form-control symbolizer-attribute-value"
+                                                    id="fill-opacity"
+                                                    data-param-id="<%= attrData.polygon.values['fill-opacity'].param_id %>"
+                                                    value="<%= attrData.polygon.values['fill-opacity'].value %>">
+                                        </div>
+                                    </div>
+                                    <div class="form-group symbolizer-form-group param <%=
+                                     attrData.polygon.values['fill'].class %>">
+                                        <label class="control-label symbolizer-attribute-label col-sm-2"
+                                                for="fill">Color</label>
+                                        <div class="col-sm-10 symbolizer">
+                                            <input type="color" class="form-control symbolizer-attribute-value"
+                                                    id="fill"
+                                                    data-param-id="<%= attrData.polygon.values['fill'].param_id %>"
+                                                    value="<%= attrData.polygon.values['fill'].value %>">
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="form-group symbolizer-form-group param <%= attrData.graphic.values['rotation'].class %>">
-                                    <label class="control-label symbolizer-attribute-label col-sm-2" for="rotation">Rotation</label>
-                                    <div class=" col-sm-10 symbolizer">
-                                        <input type="number" class="form-control symbolizer-attribute-value" id="rotation" data-param-id="<%= attrData.graphic.values['rotation'].param_id %>" value="<%= attrData.graphic.values['rotation'].value %>">
+                                <div class="<%= attrData.text[symbolType] %>">
+                                    <span class="label label-default">Text</span>
+                                    <div class="form-group symbolizer-form-group param">
+                                        <label class="control-label symbolizer-attribute-label col-sm-2" for="font-family">Font</label>
+                                        <div class="col-sm-10 symbolizer">
+                                            <select id="font-family" class="form-control symbolizer-attribute-value">
+                                                <option <%= generateOptionValue("arial",attrData.text.values['font-family'].value) %>>Arial</option>
+                                                <option <%= generateOptionValue("leveltica",attrData.text.values['font-family'].value) %>>Helvetica</option>
+                                                <option <%= generateOptionValue("sans-serif",attrData.text.values['font-family'].value) %>>Sand-Serif</option>
+                                                <option <%= generateOptionValue("verdana",attrData.text.values['font-family'].value) %>>Verdana</option>
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="form-group symbolizer-form-group param <%=
-                                 attrData.graphic.values['opacity'].class %>">
-                                    <label class="control-label symbolizer-attribute-label col-sm-2" for="opacity">Opacity</label>
-                                    <div class="col-sm-10 symbolizer">
-                                        <input type="number" class="form-control symbolizer-attribute-value"
-                                               id="opacity"
-                                               data-param-id="<%= attrData.graphic.values['opacity'].param_id %>" value="<%= attrData.graphic.values['opacity'].value %>">
+                                    <div class="form-group symbolizer-form-group param">
+                                        <label class="control-label symbolizer-attribute-label col-sm-2" for="font-style">Style</label>
+                                        <div class="col-sm-10 symbolizer">
+                                            <select id="font-style" class="form-control symbolizer-attribute-value">
+                                                <option <%= generateOptionValue("normal",attrData.text.values['font-style'].value) %>>Normal</option>
+                                                <option <%= generateOptionValue("italic",attrData.text.values['font-style'].value) %>>Italic</option>
+                                                <option <%= generateOptionValue("oblique",attrData.text.values['font-style'].value) %>>Oblique</option>
+                                            </select>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="form-group symbolizer-form-group param <%= attrData.graphic.values['fill'].class %>">
-                                    <label class="control-label symbolizer-attribute-label col-sm-2" for="fill">Color</label>
-                                    <div class="col-sm-10 symbolizer">
-                                        <input type="color" class="form-control symbolizer-attribute-value" id="fill" data-param-id="<%= attrData.graphic.values['fill'].param_id %>" value="<%= attrData.graphic.values['fill'].value %>">
+                                    <div class="form-group symbolizer-form-group param">
+                                        <label class="control-label symbolizer-attribute-label col-sm-2" for="font-weight">Weight</label>
+                                        <div class="col-sm-10 symbolizer">
+                                            <select id="font-weight" class="form-control symbolizer-attribute-value">
+                                                <option <%= generateOptionValue("normal",attrData.text.values['font-weight'].value) %>>Normal</option>
+                                                <option <%= generateOptionValue("bold",attrData.text.values['font-weight'].value) %>>Bold</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="form-group symbolizer-form-group param <%= attrData.text.values['font-size'].class %>">
+                                        <label class="control-label symbolizer-attribute-label col-sm-2" for="font-size">Size</label>
+                                        <div class="col-sm-10 symbolizer">
+                                            <input type="number" class="form-control symbolizer-attribute-value"
+                                                    id="font-size"
+                                                    data-param-id="<%= attrData.text.values['font-size'].param_id %>"
+                                                    value="<%= attrData.text.values['font-size'].value %>">
+                                        </div>
+                                    </div>
+                                    <div class="form-group symbolizer-form-group param <%= attrData.text.values['text-fill'].class %>">
+                                        <label class="control-label symbolizer-attribute-label col-sm-2" for="text-fill">Color</label>
+                                        <div class="col-sm-10 symbolizer">
+                                            <input type="color" class="form-control symbolizer-attribute-value"
+                                                    id="text-fill"
+                                                    data-param-id="<%= attrData.text.values['text-fill'].param_id %>"
+                                                    value="<%= attrData.text.values['text-fill'].value %>">
+                                        </div>
+                                    </div>
+                                    <div class="form-group symbolizer-form-group param <%= attrData.text.values['halo-color'].class %>">
+                                        <label class="control-label symbolizer-attribute-label col-sm-2"
+                                                for="halo-color">Halo color</label>
+                                        <div class="col-sm-10 symbolizer">
+                                            <input type="color" class="form-control symbolizer-attribute-value"
+                                                    id="halo-color"
+                                                    data-param-id="<%= attrData.text.values['halo-color'].param_id %>"
+                                                    value="<%= attrData.text.values['halo-color'].value %>">
+                                        </div>
+                                    </div>
+                                    <div class="form-group symbolizer-form-group param <%= attrData.text.values['halo-radius'].class %>">
+                                        <label class="control-label symbolizer-attribute-label col-sm-2" for="halo-radius">Radius</label>
+                                        <div class="col-sm-10 symbolizer">
+                                            <input type="number" class="form-control symbolizer-attribute-value"
+                                                    id="halo-radius"
+                                                    data-param-id="<%= attrData.text.values['halo-radius'].param_id %>"
+                                                    value="<%= attrData.text.values['halo-radius'].value %>">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="<%= attrData.line[symbolType] %>">
-                                <span class="label label-default">Line</span>
-                                <div class="form-group symbolizer-form-group param">
-                                    <label class="control-label  symbolizer-attribute-label col-sm-2" for="stroke-linejoin">Line join</label>
-                                    <div class="col-sm-10 symbolizer">
-                                        <select id="stroke-linejoin" class="form-control symbolizer-attribute-value">
-                                            <option <%= generateOptionValue("miter",attrData.line.values['stroke-linejoin'].value) %>>Miter</option>
-                                            <option <%= generateOptionValue("round",attrData.line.values['stroke-linejoin'].value) %>>Round</option>
-                                            <option <%= generateOptionValue("bevel",attrData.line.values['stroke-linejoin'].value) %>>Bevel</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-group symbolizer-form-group param">
-                                    <label class="control-label symbolizer-attribute-label col-sm-2" for="stroke-linecap">Line cap</label>
-                                    <div class="col-sm-10 symbolizer">
-                                        <select id="stroke-linecap" class="form-control symbolizer-attribute-value">
-                                            <option <%= generateOptionValue("butt",attrData.line.values['stroke-linecap'].value) %>>Butt</option>
-                                            <option <%= generateOptionValue("round",attrData.line.values['stroke-linecap'].value) %>>Round</option>
-                                            <option <%= generateOptionValue("square",attrData.line.values['stroke-linecap'].value) %>>Square</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-group symbolizer-form-group param <%= attrData.line.values['stroke-dasharray'].class %>">
-                                    <label class="control-label symbolizer-attribute-label col-sm-2"
-                                            for="stroke-dasharray">Dash array</label>
-                                    <div class="col-sm-10 symbolizer">
-                                        <input type="text" class="form-control symbolizer-attribute-value"
-                                                id="stroke-dasharray"
-                                                data-param-id="<%= attrData.line.values['stroke-dasharray'].param_id %>" value="<%= attrData.line.values['stroke-dasharray'].value %>">
-                                    </div>
-                                </div>
-                                <div class="form-group symbolizer-form-group param <%= attrData.line.values['stroke-dashoffset'].class %>">
-                                    <label class="control-label symbolizer-attribute-label col-sm-2"
-                                            for="stroke-dashoffset">Dash offset</label>
-                                    <div class="col-sm-10 symbolizer">
-                                        <input type="number" class="form-control symbolizer-attribute-value"
-                                                id="stroke-dashoffset"
-                                                data-param-id="<%= attrData.line.values['stroke-dashoffset'].param_id %>" value="<%= attrData.line.values['stroke-dashoffset'].value %>">
-                                    </div>
-                                </div>
-                                <div
-                                        class="form-group symbolizer-form-group param <%= attrData.line.values['stroke-opacity'].class %>">
-                                    <label class="control-label symbolizer-attribute-label col-sm-2" for="stroke-opacity">Opacity
-                                        <br>
-                                    </label>
-                                    <div class="col-sm-10 symbolizer">
-                                        <input type="number" class="form-control symbolizer-attribute-value"
-                                                id="stroke-opacity"
-                                                data-param-id="<%= attrData.line.values['stroke-opacity'].param_id %>"
-                                                value="<%= attrData.line.values['stroke-opacity'].value %>">
-                                    </div>
-                                </div>
-                                <div class="form-group symbolizer-form-group
-                                 param <%= attrData.line.values['stroke'].class %>">
-                                    <label class="control-label symbolizer-attribute-label col-sm-2"
-                                           for="stroke">Color</label>
-                                    <div class="col-sm-10 symbolizer">
-                                        <input type="color" class="form-control symbolizer-attribute-value"
-                                                id="stroke"
-                                                data-param-id="<%= attrData.line.values['stroke'].param_id %>"
-                                                value="<%= attrData.line.values['stroke'].value %>">
-                                    </div>
-                                </div>
-                                <div class="form-group symbolizer-form-group param <%=attrData.line.values['stroke-width'].class %>">
-                                    <label class="control-label symbolizer-attribute-label col-sm-2" for="stroke-width">Width</label>
-                                    <div class="col-sm-10 symbolizer">
-                                        <input type="number" class="form-control symbolizer-attribute-value"
-                                                id="stroke-width"
-                                                data-param-id="<%= attrData.line.values['stroke-width'].param_id %>"
-                                                value="<%= attrData.line.values['stroke-width'].value %>">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="<%= attrData.polygon[symbolType] %>">
-                                <span class="label label-default">Fill opacity</span>
-                                <div class="form-group symbolizer-form-group param <%= attrData.polygon.values['fill-opacity'].class %>">
-                                    <label class="control-label symbolizer-attribute-label col-sm-2" for="fill-opacity">Opacity</label>
-                                    <div class="col-sm-10 symbolizer">
-                                        <input type="number" class="form-control symbolizer-attribute-value"
-                                                id="fill-opacity"
-                                                data-param-id="<%= attrData.polygon.values['fill-opacity'].param_id %>"
-                                                value="<%= attrData.polygon.values['fill-opacity'].value %>">
-                                    </div>
-                                </div>
-                                <div class="form-group symbolizer-form-group param <%=
-                                 attrData.polygon.values['fill'].class %>">
-                                    <label class="control-label symbolizer-attribute-label col-sm-2"
-                                            for="fill">Color</label>
-                                    <div class="col-sm-10 symbolizer">
-                                        <input type="color" class="form-control symbolizer-attribute-value"
-                                                id="fill"
-                                                data-param-id="<%= attrData.polygon.values['fill'].param_id %>"
-                                                value="<%= attrData.polygon.values['fill'].value %>">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="<%= attrData.text[symbolType] %>">
-                                <span class="label label-default">Text</span>
-                                <div class="form-group symbolizer-form-group param">
-                                    <label class="control-label symbolizer-attribute-label col-sm-2" for="font-family">Font</label>
-                                    <div class="col-sm-10 symbolizer">
-                                        <select id="font-family" class="form-control symbolizer-attribute-value">
-                                            <option <%= generateOptionValue("arial",attrData.text.values['font-family'].value) %>>Arial</option>
-                                            <option <%= generateOptionValue("leveltica",attrData.text.values['font-family'].value) %>>Helvetica</option>
-                                            <option <%= generateOptionValue("sans-serif",attrData.text.values['font-family'].value) %>>Sand-Serif</option>
-                                            <option <%= generateOptionValue("verdana",attrData.text.values['font-family'].value) %>>Verdana</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-group symbolizer-form-group param">
-                                    <label class="control-label symbolizer-attribute-label col-sm-2" for="font-style">Style</label>
-                                    <div class="col-sm-10 symbolizer">
-                                        <select id="font-style" class="form-control symbolizer-attribute-value">
-                                            <option <%= generateOptionValue("normal",attrData.text.values['font-style'].value) %>>Normal</option>
-                                            <option <%= generateOptionValue("italic",attrData.text.values['font-style'].value) %>>Italic</option>
-                                            <option <%= generateOptionValue("oblique",attrData.text.values['font-style'].value) %>>Oblique</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-group symbolizer-form-group param">
-                                    <label class="control-label symbolizer-attribute-label col-sm-2" for="font-weight">Weight</label>
-                                    <div class="col-sm-10 symbolizer">
-                                        <select id="font-weight" class="form-control symbolizer-attribute-value">
-                                            <option <%= generateOptionValue("normal",attrData.text.values['font-weight'].value) %>>Normal</option>
-                                            <option <%= generateOptionValue("bold",attrData.text.values['font-weight'].value) %>>Bold</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-group symbolizer-form-group param <%= attrData.text.values['font-size'].class %>">
-                                    <label class="control-label symbolizer-attribute-label col-sm-2" for="font-size">Size</label>
-                                    <div class="col-sm-10 symbolizer">
-                                        <input type="number" class="form-control symbolizer-attribute-value"
-                                                id="font-size"
-                                                data-param-id="<%= attrData.text.values['font-size'].param_id %>"
-                                                value="<%= attrData.text.values['font-size'].value %>">
-                                    </div>
-                                </div>
-                                <div class="form-group symbolizer-form-group param <%= attrData.text.values['text-fill'].class %>">
-                                    <label class="control-label symbolizer-attribute-label col-sm-2" for="text-fill">Color</label>
-                                    <div class="col-sm-10 symbolizer">
-                                        <input type="color" class="form-control symbolizer-attribute-value"
-                                                id="text-fill"
-                                                data-param-id="<%= attrData.text.values['text-fill'].param_id %>"
-                                                value="<%= attrData.text.values['text-fill'].value %>">
-                                    </div>
-                                </div>
-                                <div class="form-group symbolizer-form-group param <%= attrData.text.values['halo-color'].class %>">
-                                    <label class="control-label symbolizer-attribute-label col-sm-2"
-                                            for="halo-color">Halo color</label>
-                                    <div class="col-sm-10 symbolizer">
-                                        <input type="color" class="form-control symbolizer-attribute-value"
-                                                id="halo-color"
-                                                data-param-id="<%= attrData.text.values['halo-color'].param_id %>"
-                                                value="<%= attrData.text.values['halo-color'].value %>">
-                                    </div>
-                                </div>
-                                <div class="form-group symbolizer-form-group param <%= attrData.text.values['halo-radius'].class %>">
-                                    <label class="control-label symbolizer-attribute-label col-sm-2" for="halo-radius">Radius</label>
-                                    <div class="col-sm-10 symbolizer">
-                                        <input type="number" class="form-control symbolizer-attribute-value"
-                                                id="halo-radius"
-                                                data-param-id="<%= attrData.text.values['halo-radius'].param_id %>"
-                                                value="<%= attrData.text.values['halo-radius'].value %>">
-                                    </div>
-                                </div>
-                            </div>
-                            <button type="submit" class="btn save"><%= SLDmodel.id ? 'Update' : 'Create' %></button>
-                            <% if(SLDmodel.id) { %>
-                            <input type="hidden" name="id" value="<%= SLDmodel.id %>"/>
-                            <button type="button" data-user-id="<%= SLDmodel.id %>" class="btn btn-danger delete">Delete</button>
-                            <% }; %>
                         </div>
                     </div>
+                    <div class="col-sm-12 col-md-5 col-lg-5">
+                        <div id="preview"></div>
+                    </div>
                 </div>
-                <div class="col-sm-4">
-                    <div id="preview"></div>
+                <div class="row-fluid">
+                    <div class="col-sm-12 col-md-12">
+                        <button type="submit" class="btn save"><%= SLDmodel.id ? 'Update' : 'Create' %></button>
+                        <% if(SLDmodel.id) { %>
+                        <input type="hidden" name="id" value="<%= SLDmodel.id %>"/>
+                        <button type="button" data-user-id="<%= SLDmodel.id %>" class="btn btn-danger delete">Delete</button>
+                        <% }; %>
+                    </div>
                 </div>
             </form>
         </div>
