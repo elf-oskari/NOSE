@@ -45,10 +45,10 @@ define([
        * @method setParams2MapStyle
        * Set map style for one symbolizer
        */
-      setParams2MapStyle: function(params, type) {
+      setParams2MapStyle: function(params, symbolizer) {
           console.log('setParams2MapStyle', params);
           this.params = params;
-          console.log('setParams2MapStyle', params, ' type: ', type);
+          console.log('setParams2MapStyle', params, ' type: ', symbolizer.type);
           if(this.map)
           {
               var polygons, points, lines;
@@ -58,25 +58,25 @@ define([
                 if (l.get('title') == 'Lines') lines = l;
                 if (l.get('title') == 'Points') points = l;
               });
-              if(polygons && type =='polygonsymbolizer') {
+              if(polygons && symbolizer.type =='PolygonSymbolizer') {
                   polygons.setStyle(this.getPolygonOrLineStyle());
                   polygons.setVisible(true);
                   if(lines) lines.setVisible(false);
                   if(points) points.setVisible(false);
               }
-              else if(lines && type =='linesymbolizer') {
+              else if(lines && symbolizer.type =='LineSymbolizer') {
                   lines.setStyle(this.getPolygonOrLineStyle());
                   lines.setVisible(true);
                   if(polygons) polygons.setVisible(false);
                   if(points) points.setVisible(false);
               }
-              else if(points && type =='pointsymbolizer') {
+              else if(points && symbolizer.type =='PointSymbolizer') {
                   points.setStyle(this.getPointStyle());
                   points.setVisible(true);
                   if(lines) lines.setVisible(false);
                   if(polygons) polygons.setVisible(false);
               }
-              else if( type =='textsymbolizer') {
+              else if( symbolizer.type =='TextSymbolizer') {
                   points.setStyle(this.getPointTextStyle());
                   points.setVisible(true);
                   if(lines) lines.setVisible(false);
@@ -89,7 +89,7 @@ define([
       },
       // Style for points
       getPointStyle : function(stylein) {
-          var fill = this.getFill(stylein),
+          var fill = this.getImageFill(stylein),
               style;
         if(fill) {
             style = new ol.style.Style({
@@ -236,6 +236,24 @@ define([
 
           return fill;
       },
+      getImageFill : function(style) {
+          var self = this,
+              fill,
+              color;
+
+          if(style) {
+              if (style.getImage())
+                  if(style.getImage().getFill() ) color = style.getImage().getFill().getColor();
+          }
+          if (self.params) {
+              self.params.forEach(function (param) {
+                  if (param['name'] === 'fill') color = !style ?  param['default_value'] : param['value'] ;
+              });
+          }
+          if (color) fill =  new ol.style.Fill({color: color});
+
+          return fill;
+      },
       getStrokeWidth : function(style) {
           var self = this;
           var width = 1;
@@ -282,18 +300,18 @@ define([
           return name;
       },
       getTextStyle : function() {
-          var align = 'Center';
-          var baseline = 'Middle';
-          var size = '12px';
-          var offsetX = 10;
-          var offsetY = 10;
-          var weight = 'Normal';
-          var rotation = 0.0;
-          var font = weight + ' ' + size + ' ' + 'Arial';
-          var fillColor = '#000000';
-          var outlineColor = 'black';
-          var outlineWidth =  0;
-          var text = 'Label text';
+          var align = 'Center',
+           baseline = 'Middle',
+           size = '12px',
+           offsetX = 10,
+           offsetY = 10,
+           weight = 'Normal',
+           rotation = 0.0,
+           font = weight + ' ' + size + ' ' + 'Arial',
+           fillColor = '#000000',
+           outlineColor = 'black',
+           outlineWidth = 0,
+           text = 'Label text';
           return new ol.style.Text({
               textAlign: align,
               textBaseline: baseline,

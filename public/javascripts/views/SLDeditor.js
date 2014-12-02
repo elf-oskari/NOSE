@@ -85,10 +85,10 @@ define([
      * @method updateEditParams
      * Updates SLDeditor view with editable params
      */
-    updateEditParams: function(params,type) {
+    updateEditParams: function(params,symbolizer) {
       console.log('updateEditParams', params);
       var paramlist = this.SLDconfigmodel.getSLDValuesByParams(params);
-      this.render(paramlist,type);
+      this.render(paramlist,symbolizer.type.toLowerCase());
     },
 
     setAttribute: function(event) {

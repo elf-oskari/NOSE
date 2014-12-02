@@ -39,8 +39,9 @@ define([
       var symbolizer_id = "" + $(event.currentTarget).data('symbolizerid');
       var symbolizer_type = String($(event.currentTarget).data('symbolizertype')).toLowerCase();
       var params = this.SLDtemplatemodel.getParamsBySymbolizerId(symbolizer_id);
+      var symbolizer = this.SLDtemplatemodel.getSymbolizerById(symbolizer_id);
       console.log('sid', symbolizer_id, 'params', params, 'model', this.SLDtemplatemodel);
-      this.dispatcher.trigger("selectSymbolizer", params, symbolizer_type);
+      this.dispatcher.trigger("selectSymbolizer", params, symbolizer[0]);
     }
   });
   return SLDTreeView;

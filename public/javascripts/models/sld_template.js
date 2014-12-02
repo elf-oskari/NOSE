@@ -63,7 +63,16 @@ define(['lodash','backbone'], function(_, Backbone) {
 			var SLDparams = this.get('sld_params');
 			paramlist = _.where(SLDparams, {'symbolizer_id': symbolizer_id});
 			return paramlist;
-		}
+		},
+        /**
+         * @method getSymbolizerById
+         * @return {Array} symbolizer properties that match the given id
+         */
+        getSymbolizerById: function(id) {
+            var SLDsymbolizers = this.get('sld_symbolizers');
+            symbolizerlist = _.where(SLDsymbolizers, {'id': id});
+            return symbolizerlist;
+        }
 	});
 
 	return SLDtemplateModel;
