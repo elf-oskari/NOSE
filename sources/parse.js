@@ -734,7 +734,7 @@ exports.parse = function (inFileName, fname, tname, rfields, cb) {
                             if( suom.length > 0) uom = suom[suom.length-1];
                         }
                     }
-                    var symbl = 'Symbolizer' + '\t' + symb + '\t' + cnt++ +'\t + uom';
+                    var symbl = 'Symbolizer' + '\t' + symb + '\t' + cnt++ +'\t' + uom;
                     var subnode = child[i];
 
                     fieldSpecList.forEach(function (spec) {
