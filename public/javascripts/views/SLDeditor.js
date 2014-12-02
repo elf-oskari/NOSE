@@ -155,8 +155,9 @@ define([
                     "rotation": {class: ""},
                     "onlineresource": {class: ""},
                     "wellknownname": {class: ""},
-                    "mark-fill": {class: ""},
-                    "mark-fill-opacity": {class: ""}
+                    "fill": {class: ""},
+                    "fill-opacity": {class: ""},
+                    "external-graphic": {class: "hidden"}
                 }
             },
             line: {
