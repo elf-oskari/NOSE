@@ -8,6 +8,7 @@ var generateOptionValue = function(itemValue,selectedValue) {
 };
 
 var updateExternalGraphic = function(target) {
+console.log(target);
 };
 %>
 <div class="view" id="edit-sld">
@@ -26,7 +27,7 @@ var updateExternalGraphic = function(target) {
                                 <div class="form-group symbolizer-form-group param <%= attrData.graphic.values['wellknownname'].class %>">
                                     <label class="control-label symbolizer-attribute-label col-sm-2" for="graphic-symbol">Symbol</label>
                                     <div class="col-sm-10 symbolizer">
-                                        <select onchange="" id="graphic-symbol" class="form-control symbolizer-attribute-value">
+                                        <select onchange="<%= updateExternalGraphic(this) %>" id="graphic-symbol" class="form-control symbolizer-attribute-value">
                                             <option <%= generateOptionValue("circle",attrData.graphic.values['wellknownname'].value) %>>Circle</option>
                                             <option <%= generateOptionValue("cross",attrData.graphic.values['wellknownname'].value) %>>Cross</option>
                                             <option <%= generateOptionValue("square",attrData.graphic.values['wellknownname'].value) %>>Square</option>
@@ -34,7 +35,7 @@ var updateExternalGraphic = function(target) {
                                             <option <%= generateOptionValue("triangle",attrData.graphic.values['wellknownname'].value) %>>Triangle</option>
                                             <option <%= generateOptionValue("x",attrData.graphic.values['wellknownname'].value) %>>X</option>
                                             <option value="" disabled="disabled">──────────&nbsp;</option>
-                                            <option <%= generateOptionValue("external",attrData.graphic.values['wellknownname'].value) %>>&gt; External graphic</option>
+                                            <option <%= generateOptionValue("external",attrData.graphic.values['wellknownname'].value) %>>External graphic</option>
                                         </select>
                                     </div>
                                 </div>

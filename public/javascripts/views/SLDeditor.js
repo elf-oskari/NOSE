@@ -74,6 +74,10 @@ define([
                 }
             }
         }
+        // Handle external graphic
+        if (data.graphic.values["external-graphic"]){
+            data.graphic.values["wellknownname"] = "external";
+        }
         this.$el.html(this.template({SLDmodel: model, editSLD: localization, attrData: data, symbolType: type}));
         if (paramlist) {
           this.renderPreview(paramlist, symbolType);
@@ -107,7 +111,7 @@ define([
         element = $(event.currentTarget).find("#graphic-symbol");
         newvalue = element[0].value.toLowerCase();
         // Update map style
-        this.renderWellKnownName(newvalue)
+        this.renderWellKnownName(newvalue);
         this.dispatcher.trigger("updateMapStyle",{'name':'wellknownname','value': newvalue} );
       } else {
         element = $(event.currentTarget).find(".symbolizer-attribute-value");
