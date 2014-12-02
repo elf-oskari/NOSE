@@ -122,9 +122,12 @@ define([
         if (param_css_parameter === "rotation") {
           this.elementRotation = newvalue;
           this.previewElement.transform({rotation: this.elementRotation});
+        // we don't want preview to update size
         } else if (param_css_parameter === "size") {
           this.elementSize = parseInt(newvalue);
-          this.previewElement.size(this.elementSize);
+        // we don't want preview to update stroke-width
+        } else if (param_css_parameter === "stroke-width") {
+          this.strokeWidth = parseInt(newvalue);
         } else {
           this.attributes[param_css_parameter] = newvalue;
           this.updatePreview();
@@ -297,14 +300,13 @@ define([
     renderWellKnownName: function(wellknownname) {
       this.preview.clear();
       if (!_.has(this.graphicPaths, wellknownname)) {
-        this.previewElement = this.preview.circle(this.elementSize);
+        this.previewElement = this.preview.circle(50);
       } else {
         var path = this.graphicPaths[wellknownname];
         this.previewElement = this.preview.path(path);
       }
       this.previewElement.attr(this.attributes);
-      this.previewElement.size(this.elementSize);
-      this.previewElement.center(75, 75);
+      this.previewElement.size(50);
       this.previewElement.transform({rotation: this.elementRotation});
     },
 
@@ -320,27 +322,36 @@ define([
       for (i=0; i < params.length; i++) {
         var attribute = params[i].attributeName;
         var attributeValue = params[i].value;
-        this.attributes[attribute] = attributeValue;
+        if (attribute !== "stroke-width") {
+          this.attributes[attribute] = attributeValue;
+        }
       }
-      this.previewElement = this.preview.line(20, 20, 130, 130).stroke({width: 1});
+      this.previewElement = this.preview.line(20, 20, 130, 130).stroke({width: 8});
       this.previewElement.attr(this.attributes);
     },
 
     renderPolygon: function (params) {
       this.preview.clear();
+      var strokeWidth = false;
       for (i=0; i < params.length; i++) {
         var attribute = params[i].attributeName;
         var attributeValue = params[i].value;
-        this.attributes[attribute] = attributeValue;
+        if (attribute === "stroke-width") {
+          strokeWidth = true
+        } else {
+          this.attributes[attribute] = attributeValue;
+        }
       }
       this.previewElement = this.preview.polygon('20,50 100,40 80,130 20,100').fill('none');
       this.previewElement.attr(this.attributes);
+      if (strokeWidth === true) {
+        this.previewElement.attr({"stroke-width": 4});
+      }
     },
 
     updatePreview: function () {
       this.previewElement.attr(this.attributes);
     }
-	});
-
+  });
 	return SLDEditorView;
 });
