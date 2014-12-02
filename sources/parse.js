@@ -727,10 +727,10 @@ exports.parse = function (inFileName, fname, tname, rfields, cb) {
             symbolizerSpecList.forEach(function (symb) {
                 if (child[i].localName === symb) {
                     var uom = 'pixel';
-                    if(node.attributes) {
+                    if(child[i].node.attributes) {
                         var suom;
-                        if(node.attributes['uom']) {
-                            suom = node.attributes['uom'].split('/');
+                        if(child[i].node.attributes['uom']) {
+                            suom = child[i].node.attributes['uom'].split('/');
                             if( suom.length > 0) uom = suom[suom.length-1];
                         }
                     }
