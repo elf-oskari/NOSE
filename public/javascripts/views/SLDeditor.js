@@ -102,10 +102,13 @@ define([
       // if shape is changed
       var element,
           newvalue;
+
       if (event.currentTarget.innerText === "Symbol") {
         element = $(event.currentTarget).find("#graphic-symbol");
         newvalue = element[0].value.toLowerCase();
+        // Update map style
         this.renderWellKnownName(newvalue)
+        this.dispatcher.trigger("updateMapStyle",{'name':'wellknownname','value': newvalue} );
       } else {
         element = $(event.currentTarget).find(".symbolizer-attribute-value");
         var param_id = "" + element.data('param-id');
@@ -121,6 +124,8 @@ define([
           this.attributes[param_css_parameter] = newvalue;
           this.updatePreview();
         }
+          // Update map style
+          this.dispatcher.trigger("updateMapStyle",[{'name':param_css_parameter,'value': newvalue}] );
       }
       var sld_values = this.SLDconfigmodel.get('sld_values');
       // we assume the changed param_id is always found
@@ -129,6 +134,7 @@ define([
       param.value = newvalue;
 
       this.SLDconfigmodel.set('sld_values', sld_values);
+
     },
 
     invalidValue: function(event) {
