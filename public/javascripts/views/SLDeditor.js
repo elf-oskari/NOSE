@@ -65,6 +65,7 @@ define([
                                 if (attrKey === params[i].attributeName) {
                                     data[typeKey].values[attrKey].param_id = params[i].param_id;
                                     data[typeKey].values[attrKey].value = params[i].value;
+                                    data[typeKey].values[attrKey].name = params[i].attributeName;
                                     data[typeKey].values[attrKey].class = "";
                                     break;
                                 }
@@ -116,7 +117,7 @@ define([
       } else {
         element = $(event.currentTarget).find(".symbolizer-attribute-value");
         var param_id = "" + element.data('param-id');
-        var param_css_parameter = element[0].id;
+        var param_css_parameter = element[0].name;
         newvalue = element.val();
         if (param_css_parameter === "rotation") {
           this.elementRotation = newvalue;
@@ -254,6 +255,8 @@ define([
         this.renderLine(params);
       } else if (symbolType === "polygonsymbolizer") {
         this.renderPolygon(params);
+      } else if (symbolType === "text") {
+        this.renderText(params);
       } else {
         alert("geometryType of params is not defined");
       }
@@ -347,6 +350,11 @@ define([
         this.previewElement.attr({"stroke-width": 4});
       }
     },
+
+    renderText: function (params) {
+      this.preview.clear();
+      console.log('render text');
+    }
 
     updatePreview: function () {
       this.previewElement.attr(this.attributes);
