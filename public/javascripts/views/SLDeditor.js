@@ -122,7 +122,7 @@ define([
       } else {
         element = $(event.currentTarget).find(".symbolizer-attribute-value");
         var param_id = "" + element.data('param-id');
-        var param_css_parameter = element[0].name;
+        var param_css_parameter = element.data('css-parameter');
         newvalue = element.val();
         if (param_css_parameter === "rotation") {
           this.elementRotation = newvalue;
@@ -133,6 +133,9 @@ define([
         // we don't want preview to update stroke-width
         } else if (param_css_parameter === "stroke-width") {
           this.strokeWidth = parseInt(newvalue);
+        } else if (param_css_parameter === "font-size") {
+          //in case we need this later
+          this.textSize = parseInt(newvalue);
         } else {
           this.attributes[param_css_parameter] = newvalue;
           this.updatePreview();
@@ -174,7 +177,7 @@ define([
                 }
             },
             line: {
-                pointsymbolizer: "hidden",
+                pointsymbolizer: "",
                 linesymbolizer: "",
                 polygonsymbolizer: "",
                 textsymbolizer: "hidden",
@@ -260,10 +263,10 @@ define([
         this.renderLine(params);
       } else if (symbolType === "polygonsymbolizer") {
         this.renderPolygon(params);
-      } else if (symbolType === "text") {
+      } else if (symbolType === "textsymbolizer") {
         this.renderText(params);
       } else {
-        alert("geometryType of params is not defined");
+        console.log("geometryType of params is not defined");
       }
     },
 
@@ -358,8 +361,16 @@ define([
 
     renderText: function (params) {
       this.preview.clear();
-      console.log('render text');
-    }
+      for (i=0; i < params.length; i++) {
+        var attribute = params[i].attributeName;
+        var attributeValue = params[i].value;
+        if (attribute === "font-family" || attribute === "font-style" || attribute === "font-weight" || attribute === "fill" || attribute === "halo-color" || attribute === "halo-radius") {
+          this.attributes[attribute] = attributeValue;
+        }
+      }
+      this.previewElement = this.preview.text("Text!").font({size: 30});
+      this.previewElement.attr(this.attributes);
+    },
 
     updatePreview: function () {
       this.previewElement.attr(this.attributes);

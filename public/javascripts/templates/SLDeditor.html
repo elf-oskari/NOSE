@@ -18,7 +18,7 @@ var updateExternalGraphic = function(target) {
 <div class="view" id="edit-sld">
     <div class="panel panel-primary">
         <div class="panel-heading"><%= editSLD.common['SLDeditor-heading'] %></div>
-        <div class="panel-body sld-editor-page" style="height:800px">
+        <div class="panel-body sld-editor-page">
             <form role="form" class="edit-sld-form form-horizontal">
                 <label><%= editSLD.common['SLDeditor-name'] %></label>
                 <p><input name="Name" type="text" class="name" data-attribute="name" value="<%= SLDmodel.name %>"></p>
@@ -186,10 +186,10 @@ var updateExternalGraphic = function(target) {
                                         <label class="control-label symbolizer-attribute-label col-sm-2" for="font-family"><%= editSLD.text['font'] %></label>
                                         <div class="col-sm-10 symbolizer">
                                             <select id="font-family" data-css-parameter="<%= attrData.text.values['font-family'].name %>" class="form-control symbolizer-attribute-value">
-                                                <option <%= generateOptionValue("arial",attrData.text.values['font-family'].value) %>>Arial</option>
-                                                <option <%= generateOptionValue("leveltica",attrData.text.values['font-family'].value) %>>Helvetica</option>
-                                                <option <%= generateOptionValue("sans-serif",attrData.text.values['font-family'].value) %>>Sand-Serif</option>
-                                                <option <%= generateOptionValue("verdana",attrData.text.values['font-family'].value) %>>Verdana</option>
+                                                <option <%= generateOptionValue("Arial",attrData.text.values['font-family'].value) %>>Arial</option>
+                                                <option <%= generateOptionValue("Helvetica",attrData.text.values['font-family'].value) %>>Helvetica</option>
+                                                <option <%= generateOptionValue("Sans-serif",attrData.text.values['font-family'].value) %>>Sans-Serif</option>
+                                                <option <%= generateOptionValue("Verdana",attrData.text.values['font-family'].value) %>>Verdana</option>
                                             </select>
                                         </div>
                                     </div>
@@ -225,7 +225,7 @@ var updateExternalGraphic = function(target) {
                                         <label class="control-label symbolizer-attribute-label col-sm-2" for="text-fill"><%= editSLD.text['color'] %></label>
                                         <div class="col-sm-10 symbolizer">
                                             <input type="color" class="form-control symbolizer-attribute-value"
-                                                    id="text-fill" data-css-parameter="<%= attrData.text.values['text-fill'].name %>"
+                                                    id="text-fill" data-css-parameter="fill"
                                                     data-param-id="<%= attrData.text.values['text-fill'].param_id %>"
                                                     value="<%= attrData.text.values['text-fill'].value %>">
                                         </div>
