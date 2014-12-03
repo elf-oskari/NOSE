@@ -53,6 +53,7 @@ define([
         // Generate attribute data
         this.initAttrData();
         data = this.attrData;
+        this.symbolType = symbolType;
 
         // Visit all types
         if (type) {
@@ -132,13 +133,13 @@ define([
           this.updatePreview();
         }
           // Update map style
-          this.dispatcher.trigger("updateMapStyle",[{'name':param_css_parameter,'value': newvalue}] );
+          this.dispatcher.trigger("updateMapStyle",[{'name':param_css_parameter,'value': newvalue}], this.symbolType );
       }
       var sld_values = this.SLDconfigmodel.get('sld_values');
       // we assume the changed param_id is always found
       var paramIndex = _.findIndex(sld_values, {'param_id': param_id});
       var param = sld_values[paramIndex];
-      param.value = newvalue;
+      if(param) param.value = newvalue;
 
       this.SLDconfigmodel.set('sld_values', sld_values);
 
@@ -349,7 +350,7 @@ define([
     },
 
     updatePreview: function () {
-      this.previewElement.attr(this.attributes);
+      if(this.previewElement) this.previewElement.attr(this.attributes);
     }
   });
 	return SLDEditorView;
