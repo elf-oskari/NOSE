@@ -74,13 +74,13 @@ var getSplitArrayComponent = function(line,index) {
                                         <label class="control-label symbolizer-attribute-label col-sm-2" for="size"><%= editSLD.point['size'] %></label>
                                         <div class="col-sm-10 symbolizer">
                                             <input type="number" class="form-control symbolizer-attribute-value"
-                                                    id="size" data-css-parameter="<%= attrData.graphic.values['size'].name %>" data-param-id="<%= attrData.graphic.values['size'].param_id %>" value="<%= attrData.graphic.values['size'].value %>">
+                                                    min="0" id="size" data-css-parameter="<%= attrData.graphic.values['size'].name %>" data-param-id="<%= attrData.graphic.values['size'].param_id %>" value="<%= attrData.graphic.values['size'].value %>">
                                         </div>
                                     </div>
                                     <div class="form-group symbolizer-form-group param <%= attrData.graphic.values['rotation'].class %>">
                                         <label class="control-label symbolizer-attribute-label col-sm-2" for="rotation"><%= editSLD.point['rotation'] %></label>
                                         <div class=" col-sm-10 symbolizer">
-                                            <input type="number" class="form-control symbolizer-attribute-value" id="rotation" data-css-parameter="<%= attrData.graphic.values['rotation'].name %>" data-param-id="<%= attrData.graphic.values['rotation'].param_id %>" value="<%= attrData.graphic.values['rotation'].value %>">
+                                            <input type="number" class="form-control symbolizer-attribute-value" min="0" max="360" id="rotation" data-css-parameter="<%= attrData.graphic.values['rotation'].name %>" data-param-id="<%= attrData.graphic.values['rotation'].param_id %>" value="<%= attrData.graphic.values['rotation'].value %>">
                                         </div>
                                     </div>
                                     <div class="form-group symbolizer-form-group param <%=
@@ -88,6 +88,7 @@ var getSplitArrayComponent = function(line,index) {
                                         <label class="control-label symbolizer-attribute-label col-sm-2" for="opacity"><%= editSLD.point['opacity'] %></label>
                                         <div class="col-sm-10 symbolizer">
                                             <input type="number" class="form-control symbolizer-attribute-value"
+                                                   min="0" max="1" step="0.1"
                                                    id="opacity" data-css-parameter="<%= attrData.graphic.values['opacity'].name%>"
                                                    data-param-id="<%= attrData.graphic.values['opacity'].param_id %>" value="<%= attrData.graphic.values['opacity'].value %>">
                                         </div>
@@ -135,7 +136,7 @@ var getSplitArrayComponent = function(line,index) {
                                                 for="stroke-dasharray-length"><%= editSLD.line['dasharray-length'] %></label>
                                         <div class="col-sm-10 symbolizer">
                                             <input type="number" class="form-control symbolizer-attribute-value"
-                                                    id="stroke-dasharray-length" data-css-parameter="stroke-dasharray-part"
+                                                    min="0" id="stroke-dasharray-length" data-css-parameter="stroke-dasharray-part"
                                                     data-param-id="<%= attrData.line.values['stroke-dasharray'].param_id %>" value="<%= getSplitArrayComponent(attrData.line.values['stroke-dasharray'].value,0) %>">
                                         </div>
                                     </div>
@@ -144,7 +145,7 @@ var getSplitArrayComponent = function(line,index) {
                                                 for="stroke-dasharray-space"><%= editSLD.line['dasharray-space'] %></label>
                                         <div class="col-sm-10 symbolizer">
                                             <input type="number" class="form-control symbolizer-attribute-value"
-                                                    id="stroke-dasharray-space" data-css-parameter="stroke-dasharray-part"
+                                                    min="0" id="stroke-dasharray-space" data-css-parameter="stroke-dasharray-part"
                                                     data-param-id="<%= attrData.line.values['stroke-dasharray'].param_id %>" value="<%= getSplitArrayComponent(attrData.line.values['stroke-dasharray'].value,1) %>">
                                         </div>
                                     </div>
@@ -153,7 +154,7 @@ var getSplitArrayComponent = function(line,index) {
                                                 for="stroke-dashoffset"><%= editSLD.line['dash-offset'] %></label>
                                         <div class="col-sm-10 symbolizer">
                                             <input type="number" class="form-control symbolizer-attribute-value"
-                                                    id="stroke-dashoffset" data-css-parameter="<%= attrData.line.values['stroke-dashoffset'].name %>"
+                                                    min="0" id="stroke-dashoffset" data-css-parameter="<%= attrData.line.values['stroke-dashoffset'].name %>"
                                                     data-param-id="<%= attrData.line.values['stroke-dashoffset'].param_id %>" value="<%= attrData.line.values['stroke-dashoffset'].value %>">
                                         </div>
                                     </div>
@@ -162,7 +163,7 @@ var getSplitArrayComponent = function(line,index) {
                                         <label class="control-label symbolizer-attribute-label col-sm-2" for="stroke-opacity"><%= editSLD.line['opacity'] %></label>
                                         <div class="col-sm-10 symbolizer">
                                             <input type="number" class="form-control symbolizer-attribute-value"
-                                                    id="stroke-opacity" data-css-parameter="<%= attrData.line.values['stroke-opacity'].name %>"
+                                                    min="0" max="1" step="0.1" id="stroke-opacity" data-css-parameter="<%= attrData.line.values['stroke-opacity'].name %>"
                                                     data-param-id="<%= attrData.line.values['stroke-opacity'].param_id %>"
                                                     value="<%= attrData.line.values['stroke-opacity'].value %>">
                                         </div>
@@ -182,7 +183,7 @@ var getSplitArrayComponent = function(line,index) {
                                         <label class="control-label symbolizer-attribute-label col-sm-2" for="stroke-width"><%= editSLD.line['width'] %></label>
                                         <div class="col-sm-10 symbolizer">
                                             <input type="number" class="form-control symbolizer-attribute-value"
-                                                    id="stroke-width" data-css-parameter="<%= attrData.line.values['stroke-width'].name %>"
+                                                    min="0" id="stroke-width" data-css-parameter="<%= attrData.line.values['stroke-width'].name %>"
                                                     data-param-id="<%= attrData.line.values['stroke-width'].param_id %>"
                                                     value="<%= attrData.line.values['stroke-width'].value %>">
                                         </div>
@@ -194,7 +195,7 @@ var getSplitArrayComponent = function(line,index) {
                                         <label class="control-label symbolizer-attribute-label col-sm-2" for="fill-opacity"><%= editSLD.fill['opacity'] %></label>
                                         <div class="col-sm-10 symbolizer">
                                             <input type="number" class="form-control symbolizer-attribute-value"
-                                                    id="fill-opacity" data-css-parameter="<%= attrData.polygon.values['fill-opacity'].name %>"
+                                                    min="0" max="1" step="0.1" id="fill-opacity" data-css-parameter="<%= attrData.polygon.values['fill-opacity'].name %>"
                                                     data-param-id="<%= attrData.polygon.values['fill-opacity'].param_id %>"
                                                     value="<%= attrData.polygon.values['fill-opacity'].value %>">
                                         </div>
@@ -247,7 +248,7 @@ var getSplitArrayComponent = function(line,index) {
                                         <label class="control-label symbolizer-attribute-label col-sm-2" for="font-size"><%= editSLD.text['size'] %></label>
                                         <div class="col-sm-10 symbolizer">
                                             <input type="number" class="form-control symbolizer-attribute-value"
-                                                    id="font-size" data-css-parameter="<%= attrData.text.values['font-size'].name %>"
+                                                    min="0" id="font-size" data-css-parameter="<%= attrData.text.values['font-size'].name %>"
                                                     data-param-id="<%= attrData.text.values['font-size'].param_id %>"
                                                     value="<%= attrData.text.values['font-size'].value %>">
                                         </div>
@@ -275,7 +276,7 @@ var getSplitArrayComponent = function(line,index) {
                                         <label class="control-label symbolizer-attribute-label col-sm-2" for="halo-radius"><%= editSLD.text['radius'] %></label>
                                         <div class="col-sm-10 symbolizer">
                                             <input type="number" class="form-control symbolizer-attribute-value"
-                                                    id="halo-radius" data-css-parameter="<%= attrData.text.values['halo-radius'].name %>"
+                                                    min="0" id="halo-radius" data-css-parameter="<%= attrData.text.values['halo-radius'].name %>"
                                                     data-param-id="<%= attrData.text.values['halo-radius'].param_id %>"
                                                     value="<%= attrData.text.values['halo-radius'].value %>">
                                         </div>
