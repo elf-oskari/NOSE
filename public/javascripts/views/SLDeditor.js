@@ -54,7 +54,8 @@ define([
         // Generate attribute data
         this.initAttrData();
         data = this.attrData;
-        this.symbolType = symbol;
+
+        this.symbolType = type;
 
         // Visit all types
         if (type) {
@@ -119,7 +120,7 @@ define([
         newvalue = element[0].value.toLowerCase();
         // Update map style
         this.renderWellKnownName(newvalue);
-        this.dispatcher.trigger("updateMapStyle",{'name':'wellknownname','value': newvalue} );
+        this.dispatcher.trigger("updateMapStyle",{'name':'wellknownname','value': newvalue},this.symbolType );
       } else {
         element = $(event.currentTarget).find(".symbolizer-attribute-value");
         var param_id = "" + element.data('param-id');
