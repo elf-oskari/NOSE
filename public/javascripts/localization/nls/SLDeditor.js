@@ -7,11 +7,15 @@ define({
 			"download": "Download",
 			"upload": "Upload",
 			"cancel": "Cancel",
-			"update": "Update"
+			"update": "Update",
+			"backToSLDlist": "Back to SLDlist"
 		},
 		"common": {
-			"heading": "SLD Editor",
-			"name": "Name"
+			"SLDeditor-heading": "SLD Editor",
+			"SLDtree-heading": "SLD Featuretypes",
+			"SLDeditor-name": "Config name:",
+			"SLDtree-name": "name",
+			"featuretype_id": "Featuretype id"
 		},
 		"point": {
 			"label": "Point",
