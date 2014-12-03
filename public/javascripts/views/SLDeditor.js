@@ -54,7 +54,7 @@ define([
         // Generate attribute data
         this.initAttrData();
         data = this.attrData;
-        this.symbolType = symbolType;
+        this.symbolType = symbol;
 
         // Visit all types
         if (type) {
