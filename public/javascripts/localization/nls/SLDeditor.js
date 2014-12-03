@@ -38,7 +38,7 @@ define({
 			"color": "Color"
 		},
 		"line": {
-			"label": "Line",
+			"label": "Stroke",
 			"line-join": "Line join",
 			"join-miter": "Miter",
 			"join-round": "Round",
@@ -47,7 +47,9 @@ define({
 			"cap-butt": "Butt",
 			"cap-round": "Round",
 			"cap-square": "Square",
-			"dash-array": "Dash array",
+			"dasharray": "Dash array",
+			"dasharray-length": "Dash length",
+			"dasharray-space": "Dash space",
 			"dash-offset": "Dash offset",
 			"opacity": "Opacity",
 			"color": "Color",
