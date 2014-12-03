@@ -168,7 +168,10 @@ body
 {
     overflow: auto;
 }
-
+.sld-editor-page
+{
+    min-height: 800px;
+}
 .parameter-form
 {
     padding-left: 0;
@@ -190,7 +193,7 @@ body
     margin-left: 0;
 }
 
-.preview
+#preview
 {
     margin-top: 30px;
     min-width: 150px;
