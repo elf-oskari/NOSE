@@ -2,7 +2,7 @@ define([
   'lodash',
   'backbone',
   'jquery',
-  'i18n!localization/nls/SLDlist',
+  'i18n!localization/nls/SLDeditor',
   'text!templates/SLDtree.html',
   'models/sld_config',
   'models/sld_template',
@@ -30,7 +30,8 @@ define([
     },
 
     render: function() {
-      this.$el.html(this.template({SLDfeaturetypeTree: this.SLDfeaturetypeTree, locale: locale}));
+      this.locale = locale;
+      this.$el.html(this.template({SLDfeaturetypeTree: this.SLDfeaturetypeTree, locale: this.locale}));
       return this;
     },
 

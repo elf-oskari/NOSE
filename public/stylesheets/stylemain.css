@@ -149,7 +149,7 @@ body
 .symbolizer-attribute-label
 {
     width: 100px;
-    padding: 0px;
+    padding: 0;
 }
 
 .symbolizer-column
@@ -171,7 +171,7 @@ body
 
 .parameter-form
 {
-    padding-left: 0px;
+    padding-left: 0;
 }
 
 .symbolizer
