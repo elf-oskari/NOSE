@@ -27,10 +27,6 @@ var getSplitArrayComponent = function(line,index) {
     }
 };
 
-var updateDasharray = function() {
-    jQuery('input#stroke-dasharray').val(jQuery('input#stroke-dasharray-length').val()+' '+jQuery('input#stroke-dasharray-space').val());
-};
-
 %>
 <div class="view" id="edit-sld">
     <div class="panel panel-primary">
@@ -139,8 +135,7 @@ var updateDasharray = function() {
                                                 for="stroke-dasharray-length"><%= editSLD.line['dasharray-length'] %></label>
                                         <div class="col-sm-10 symbolizer">
                                             <input type="number" class="form-control symbolizer-attribute-value"
-                                                    onChange="(<%= updateDasharray %>)()"
-                                                    id="stroke-dasharray-length"
+                                                    id="stroke-dasharray-length" data-css-parameter="stroke-dasharray-part"
                                                     data-param-id="<%= attrData.line.values['stroke-dasharray'].param_id %>" value="<%= getSplitArrayComponent(attrData.line.values['stroke-dasharray'].value,0) %>">
                                         </div>
                                     </div>
@@ -149,8 +144,7 @@ var updateDasharray = function() {
                                                 for="stroke-dasharray-space"><%= editSLD.line['dasharray-space'] %></label>
                                         <div class="col-sm-10 symbolizer">
                                             <input type="number" class="form-control symbolizer-attribute-value"
-                                                    onChange="(<%= updateDasharray %>)()"
-                                                    id="stroke-dasharray-space"
+                                                    id="stroke-dasharray-space" data-css-parameter="stroke-dasharray-part"
                                                     data-param-id="<%= attrData.line.values['stroke-dasharray'].param_id %>" value="<%= getSplitArrayComponent(attrData.line.values['stroke-dasharray'].value,1) %>">
                                         </div>
                                     </div>

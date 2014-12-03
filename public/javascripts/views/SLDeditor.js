@@ -137,6 +137,8 @@ define([
         } else if (param_css_parameter === "font-size") {
           //in case we need this later
           this.textSize = parseInt(newvalue);
+        } else if (param_css_parameter === "stroke-dasharray-part") {
+          newvalue = jQuery('input#stroke-dasharray-length').val()+' '+jQuery('input#stroke-dasharray-space').val();
         } else {
           this.attributes[param_css_parameter] = newvalue;
           this.updatePreview();
