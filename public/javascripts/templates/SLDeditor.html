@@ -22,6 +22,12 @@ var updateExternalGraphic = function(target) {
             <form role="form" class="edit-sld-form form-horizontal">
                 <label><%= editSLD.common['SLDeditor-name'] %></label>
                 <p><input name="Name" type="text" class="name" data-attribute="name" value="<%= SLDmodel.name %>"></p>
+                <label for="unit"><%= editSLD.common['unit'] %></label>
+                <select id="unit" class="form-control symbolizer-attribute-value">
+                    <option <%= generateOptionValue("pixel",symbolUnit) %>><%= editSLD.common['pixel'] %></option>
+                    <option <%= generateOptionValue("metre",symbolUnit) %>><%= editSLD.common['metre'] %></option>
+                    <option <%= generateOptionValue("foot",symbolUnit) %>><%= editSLD.common['foot'] %></option>
+                </select>
                 <br>
                 <div class="row-fluid">
                     <div class="col-sm-12 col-md-7 col-lg-7 parameter-form">

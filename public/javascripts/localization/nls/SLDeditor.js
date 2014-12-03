@@ -15,7 +15,11 @@ define({
 			"SLDtree-heading": "SLD Featuretypes",
 			"SLDeditor-name": "Config name:",
 			"SLDtree-name": "name",
-			"featuretype_id": "Featuretype id"
+			"featuretype_id": "Featuretype id",
+			"unit": "Unit",
+			"foot": "Foot",
+			"metre": "Metre",
+			"pixel": "Pixel"
 		},
 		"point": {
 			"label": "Point",

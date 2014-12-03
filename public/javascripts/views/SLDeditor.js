@@ -41,11 +41,12 @@ define([
       self.listenTo(self.SLDconfigmodel, "all", self.logger);
       self.listenTo(self.SLDconfigmodel, "sync", function () { self.render();});
     },
-    render: function(paramlist,symbolType) {
+    render: function(paramlist,symbol) {
         var localization = locale;
         var model = this.SLDconfigmodel.pick('id', 'name');
         var params = _.isUndefined(paramlist) ? false : paramlist;
-        var type = _.isUndefined(symbolType) ? "none" : symbolType;
+        var uom = _.isUndefined(symbol) ? false : symbol.uom;
+        var type = _.isUndefined(symbol) ? "none" : symbol.type.toLowerCase();
         var data;
         var typeKey;
         var attrKey;
@@ -80,9 +81,9 @@ define([
             data.graphic.values["external-graphic"].class = ""; // Not hidden
             data.graphic.values["wellknownname"] = "external";  // Drop-down value
         }
-        this.$el.html(this.template({SLDmodel: model, editSLD: localization, attrData: data, symbolType: type}));
+        this.$el.html(this.template({SLDmodel: model, editSLD: localization, attrData: data, symbolType: type, symbolUnit: uom}));
         if (paramlist) {
-          this.renderPreview(paramlist, symbolType);
+          this.renderPreview(paramlist, type);
         }
         return this;
     },
@@ -93,7 +94,11 @@ define([
     updateEditParams: function(params,symbolizer) {
       console.log('updateEditParams', params);
       var paramlist = this.SLDconfigmodel.getSLDValuesByParams(params);
-      this.render(paramlist,symbolizer.type.toLowerCase());
+      var symbol = {
+          type: symbolizer.type,
+          uom: symbolizer.uom
+      };
+      this.render(paramlist,symbol);
     },
 
     setAttribute: function(event) {
