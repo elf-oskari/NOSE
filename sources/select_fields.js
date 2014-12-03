@@ -116,7 +116,7 @@ FieldSelector.prototype.connect = function (client) {
  */
 FieldSelector.prototype.readFields = function() {
     var self = this,
-        sql = 'SELECT search_tag FROM sld_type';
+        sql = 'SELECT search_tag FROM sld_type ORDER BY id';
     console.log("readFields SQL: ", sql);
     return (self.db.queryResult(sql));
 };

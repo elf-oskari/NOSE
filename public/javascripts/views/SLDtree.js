@@ -2,7 +2,7 @@ define([
   'lodash',
   'backbone',
   'jquery',
-  'i18n!localization/nls/SLDlist',
+  'i18n!localization/nls/SLDeditor',
   'text!templates/SLDtree.html',
   'models/sld_config',
   'models/sld_template',
@@ -30,7 +30,8 @@ define([
     },
 
     render: function() {
-      this.$el.html(this.template({SLDfeaturetypeTree: this.SLDfeaturetypeTree, locale: locale}));
+      this.locale = locale;
+      this.$el.html(this.template({SLDfeaturetypeTree: this.SLDfeaturetypeTree, locale: this.locale}));
       return this;
     },
 
@@ -39,8 +40,9 @@ define([
       var symbolizer_id = "" + $(event.currentTarget).data('symbolizerid');
       var symbolizer_type = String($(event.currentTarget).data('symbolizertype')).toLowerCase();
       var params = this.SLDtemplatemodel.getParamsBySymbolizerId(symbolizer_id);
+      var symbolizer = this.SLDtemplatemodel.getSymbolizerById(symbolizer_id);
       console.log('sid', symbolizer_id, 'params', params, 'model', this.SLDtemplatemodel);
-      this.dispatcher.trigger("selectSymbolizer", params, symbolizer_type);
+      this.dispatcher.trigger("selectSymbolizer", params, symbolizer[0]);
     }
   });
   return SLDTreeView;

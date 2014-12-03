@@ -16,9 +16,7 @@ define([
     var SLDEditorPageView = Backbone.View.extend({
         el: '.container-main',
         template: _.template(editorTemplate),
-        events: {
-            'click .btn.back': 'back'
-        },
+
         initialize: function(params) {
             this.dispatcher = params.dispatcher;
             this.SLDtemplatemodel = params.SLDtemplatemodel;
@@ -28,9 +26,12 @@ define([
             this.treeView = new SLDTreeView({'SLDconfigmodel': this.SLDconfigmodel, 'SLDtemplatemodel': this.SLDtemplatemodel, 'dispatcher': this.dispatcher});
             this.mapView = new SLDMapView({'dispatcher': this.dispatcher});
             _.bindAll(this, 'render');
+            $(".btn.back-to-list").on('click', this.back);
         },
+
         back: function (event) {
             event.preventDefault();
+            $(event.currentTarget).addClass("hidden");
             Backbone.history.navigate('/', true);
         },
         setModels: function(models) {
@@ -42,6 +43,7 @@ define([
             return this;
         },
         render: function() {
+            $(".btn.back-to-list").removeClass("hidden");
             this.$el.html(this.template());
             this.assign(this.treeView, '.tree');
             this.assign(this.editorView, '.page');

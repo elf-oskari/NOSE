@@ -15,9 +15,9 @@ define([
 		events: {
 	      'click .delete': 'deleteConfig',
 	      'click .upload': 'showUpload',
-          'click .save': 'saveConfig',
-          'change .name': 'setAttribute',
-          'change .param': 'setParam'
+        'click .save': 'saveConfig',
+        'change .name': 'setAttribute',
+        'change .param': 'setParam'
     },
 		initialize: function(params) {
       this.dispatcher = params.dispatcher;
@@ -47,25 +47,37 @@ define([
         var params = _.isUndefined(paramlist) ? false : paramlist;
         var type = _.isUndefined(symbolType) ? "none" : symbolType;
         var data;
-        var key;
+        var typeKey;
+        var attrKey;
         var i;
         // Generate attribute data
         this.initAttrData();
         data = this.attrData;
-        for (key in data.graphic.values) {
-            if (!type) {
-                break; // return in the future
-            }
-            if (data.graphic.values.hasOwnProperty(key)) {
-                for (i=0; i<params.length; i++) {
-                    if (key === params[i].attributeName) {
-                        data.graphic.values[key].param_id = params[i].param_id;
-                        data.graphic.values[key].value = params[i].value;
-                        data.graphic.values[key].class = "";
-                        break;
+
+        // Visit all types
+        if (type) {
+            for (typeKey in data) {
+                if (data.hasOwnProperty(typeKey)) {
+                    // Visit all supported type attributes
+                    for (attrKey in data[typeKey].values) {
+                        if (data[typeKey].values.hasOwnProperty(attrKey)) {
+                            for (i = 0; i < params.length; i++) {
+                                if (attrKey === params[i].attributeName) {
+                                    data[typeKey].values[attrKey].param_id = params[i].param_id;
+                                    data[typeKey].values[attrKey].value = params[i].value;
+                                    data[typeKey].values[attrKey].class = "";
+                                    break;
+                                }
+                            }
+                        }
                     }
                 }
             }
+        }
+        // Handle external graphic
+        if (typeof data.graphic.values["external-graphic"].value !== "undefined"){
+            data.graphic.values["external-graphic"].class = ""; // Not hidden
+            data.graphic.values["wellknownname"] = "external";  // Drop-down value
         }
         this.$el.html(this.template({SLDmodel: model, editSLD: localization, attrData: data, symbolType: type}));
         if (paramlist) {
@@ -73,15 +85,14 @@ define([
         }
         return this;
     },
-
     /**
      * @method updateEditParams
      * Updates SLDeditor view with editable params
      */
-    updateEditParams: function(params,type) {
+    updateEditParams: function(params,symbolizer) {
       console.log('updateEditParams', params);
       var paramlist = this.SLDconfigmodel.getSLDValuesByParams(params);
-      this.render(paramlist,type);
+      this.render(paramlist,symbolizer.type.toLowerCase());
     },
 
     setAttribute: function(event) {
@@ -93,25 +104,35 @@ define([
     },
     setParam: function(event) {
       // if shape is changed
+      var element,
+          newvalue;
+
       if (event.currentTarget.innerText === "Symbol") {
-        var element = $(event.currentTarget).find("#graphic-symbol");
-        var newvalue = element[0].value.toLowerCase();
-        this.renderWellKnownName(newvalue)
+        element = $(event.currentTarget).find("#graphic-symbol");
+        newvalue = element[0].value.toLowerCase();
+        // Update map style
+        this.renderWellKnownName(newvalue);
+        this.dispatcher.trigger("updateMapStyle",{'name':'wellknownname','value': newvalue} );
       } else {
-        var element = $(event.currentTarget).find("input.symbolizer-attribute-value");
+        element = $(event.currentTarget).find(".symbolizer-attribute-value");
         var param_id = "" + element.data('param-id');
-        var param_css_parameter = element.data('css-parameter');
-        var newvalue = element.val();
+        var param_css_parameter = element[0].id;
+        newvalue = element.val();
         if (param_css_parameter === "rotation") {
           this.elementRotation = newvalue;
           this.previewElement.transform({rotation: this.elementRotation});
+        // we don't want preview to update size
         } else if (param_css_parameter === "size") {
           this.elementSize = parseInt(newvalue);
-          this.previewElement.size(this.elementSize);
+        // we don't want preview to update stroke-width
+        } else if (param_css_parameter === "stroke-width") {
+          this.strokeWidth = parseInt(newvalue);
         } else {
           this.attributes[param_css_parameter] = newvalue;
           this.updatePreview();
         }
+          // Update map style
+          this.dispatcher.trigger("updateMapStyle",[{'name':param_css_parameter,'value': newvalue}] );
       }
       var sld_values = this.SLDconfigmodel.get('sld_values');
       // we assume the changed param_id is always found
@@ -120,6 +141,7 @@ define([
       param.value = newvalue;
 
       this.SLDconfigmodel.set('sld_values', sld_values);
+
     },
 
     invalidValue: function(event) {
@@ -132,51 +154,69 @@ define([
                 pointsymbolizer: "",
                 linesymbolizer: "hidden",
                 polygonsymbolizer: "hidden",
+                textsymbolizer: "hidden",
                 none: "hidden",
                 values: {
-                    "size": { class: "" },
-                    //"opacity": { class: "" },
-                    "rotation": { class: "" },
-
-                    "wellknownname": { class: "" },
-                    "fill": { class: "" },
-                    "fill-opacity": { class: "" },
-
-                    "stroke": { class: "" },
-                    "stroke-opacity": { class: "" },
-                    "stroke-width": { class: "" },
-                    "stroke-linejoin": { class: "" },
-                    "stroke-linecap": { class: "" },
-                    "stroke-dasharray": { class: "" },
-                    "stroke-dashoffset": { class: "" }
+                    "size": {class: ""},
+                    "opacity": {class: ""},
+                    "rotation": {class: ""},
+                    "onlineresource": {class: ""},
+                    "wellknownname": {class: ""},
+                    "fill": {class: ""},
+                    "fill-opacity": {class: ""},
+                    "external-graphic": {class: "hidden"}
                 }
             },
             line: {
-                pointsymbolizer: "",
+                pointsymbolizer: "hidden",
                 linesymbolizer: "",
                 polygonsymbolizer: "",
+                textsymbolizer: "hidden",
                 none: "hidden",
                 values: {
-                    "stroke": {class: "hidden"},
-                    "stroke-opacity": {class: "hidden"},
-                    "stroke-width": {class: "hidden"},
-                    "stroke-linejoin": {class: "hidden"},
-                    "stroke-linecap": {class: "hidden"},
-                    "stroke-dasharray": {class: "hidden"},
-                    "stroke-dashoffset": {class: "hidden"}
+                    "stroke": {class: ""},
+                    "stroke-opacity": {class: ""},
+                    "stroke-width": {class: ""},
+                    "stroke-linejoin": {class: ""},
+                    "stroke-linecap": {class: ""},
+                    "stroke-dasharray": {class: ""},
+                    "stroke-dashoffset": {class: ""}
                 }
             },
             polygon: {
                 pointsymbolizer: "hidden",
                 linesymbolizer: "hidden",
                 polygonsymbolizer: "",
-                none: "hidden"
+                textsymbolizer: "hidden",
+                none: "hidden",
+                values: {
+                    "fill": {class: ""},
+                    "fill-opacity": {class: ""}
+                }
             },
             text: {
                 pointsymbolizer: "hidden",
                 linesymbolizer: "hidden",
                 polygonsymbolizer: "hidden",
-                none: "hidden"
+                textsymbolizer: "",
+                none: "hidden",
+                values: {
+                    "label": {class: ""},
+                    "font-family": {class: ""},
+                    "font-style": {class: ""},
+                    "font-weight": {class: ""},
+                    "font-size": {class: ""},
+                    "pointplacement-anchorpointx": {class: ""},
+                    "pointplacement-anchorpointy": {class: ""},
+                    "pointplacement-displacementx": {class: ""},
+                    "pointplacement-displacementy": {class: ""},
+                    "pointplacement-rotation": {class: ""},
+                    "lineplacement-perpendicularoffset": {class: ""},
+                    "text-fill": {},
+                    "text-fill-opacity": {},
+                    "halo-color": {class: ""},
+                    "halo-radius": {class: ""}
+                }
             }
         }
     },
@@ -207,13 +247,13 @@ define([
 
     renderPreview: function (params, symbolType) {
       this.attributes = {};
-      this.preview = SVG('preview').size(150,150);
+      this.preview = SVG('preview');
       if (symbolType === "pointsymbolizer") {
         this.renderPoint(params);
       } else if (symbolType === "linesymbolizer") {
         this.renderLine(params);
       } else if (symbolType === "polygonsymbolizer") {
-        this.renderArea(params);
+        this.renderPolygon(params);
       } else {
         alert("geometryType of params is not defined");
       }
@@ -227,11 +267,11 @@ define([
         "cross": "M25.979,12.896 19.312,12.896 19.312,6.229 12.647,6.229 12.647,12.896 5.979,12.896 5.979,19.562 12.647,19.562 12.647,26.229 19.312,26.229 19.312,19.562 25.979,19.562z",
         "x": "M24.778,21.419 19.276,15.917 24.777,10.415 21.949,7.585 16.447,13.087 10.945,7.585 8.117,10.415 13.618,15.917 8.116,21.419 10.946,24.248 16.447,18.746 21.948,24.248z",
         "square": "M5.5,5.5h20v20h-20z"
-      }
+      };
 
       //parse attributes and check if the element is Mark or ExternalGraphic
       var hasWellKnownName = false;
-      for (i=0; i < params.length; i++) {
+      for (var i=0; i < params.length; i++) {
         if (params[i].attributeName === "wellknownname") {
           hasWellKnownName = true;
           var wellknownname = params[i].value
@@ -259,19 +299,21 @@ define([
     renderWellKnownName: function(wellknownname) {
       this.preview.clear();
       if (!_.has(this.graphicPaths, wellknownname)) {
-        this.previewElement = this.preview.circle(this.elementSize);
+        this.previewElement = this.preview.circle(50);
       } else {
         var path = this.graphicPaths[wellknownname];
         this.previewElement = this.preview.path(path);
       }
       this.previewElement.attr(this.attributes);
-      this.previewElement.size(this.elementSize);
-      this.previewElement.move(75, 75);
+      this.previewElement.size(50);
       this.previewElement.transform({rotation: this.elementRotation});
     },
 
     renderExternalGraphics: function () {
-      console.log("external graphics are not yet supported");
+      console.log('External graphics are not yet supported');
+      //this.previewElement = this.preview.image(this.xlink, this.elementSize);
+      //this.previewElement.center(75, 75);
+      //this.previewElement.transform({rotation: this.elementRotation});
     },
 
     renderLine: function (params) {
@@ -279,20 +321,36 @@ define([
       for (i=0; i < params.length; i++) {
         var attribute = params[i].attributeName;
         var attributeValue = params[i].value;
-        this.attributes[attribute] = attributeValue;
+        if (attribute !== "stroke-width") {
+          this.attributes[attribute] = attributeValue;
+        }
       }
-      this.previewElement = this.preview.line(20, 20, 130, 130).stroke({width: 1});
+      this.previewElement = this.preview.line(20, 20, 130, 130).stroke({width: 8});
       this.previewElement.attr(this.attributes);
     },
 
-    renderArea: function (params) {
-      console.log("rendering area is not yet supported");
+    renderPolygon: function (params) {
+      this.preview.clear();
+      var strokeWidth = false;
+      for (i=0; i < params.length; i++) {
+        var attribute = params[i].attributeName;
+        var attributeValue = params[i].value;
+        if (attribute === "stroke-width") {
+          strokeWidth = true
+        } else {
+          this.attributes[attribute] = attributeValue;
+        }
+      }
+      this.previewElement = this.preview.polygon('20,50 100,40 80,130 20,100').fill('none');
+      this.previewElement.attr(this.attributes);
+      if (strokeWidth === true) {
+        this.previewElement.attr({"stroke-width": 4});
+      }
     },
 
     updatePreview: function () {
       this.previewElement.attr(this.attributes);
     }
-	});
-
+  });
 	return SLDEditorView;
 });

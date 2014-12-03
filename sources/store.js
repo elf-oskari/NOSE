@@ -30,7 +30,11 @@ var Deferred=function() {
 
 	this.promise=new Promise(function(resolve,reject) {
 		self.resolve=resolve;
-		self.reject=reject;
+		self.reject=function(err, arg ) {
+            console.log(err);
+            if(arg) console.log(arg[0]);
+
+        }
 	});
 };
 
@@ -100,7 +104,7 @@ PgDatabase.prototype.querySingle=function() {
 	});
 
 	query.on('end',function(state) {
-		if(!result) return(defer.reject('Not found'));
+		if(!result) return(defer.reject('Not found: ',arguments));
 		defer.resolve(result);
 	});
 
@@ -218,9 +222,9 @@ SldInserter.prototype.insertSymbolizer=function(ruleInserted,fieldList) {
 
     return(ruleInserted.then(function(ruleId) {
         return(self.db.querySingle(
-                'INSERT INTO sld_symbolizer (rule_id,symbolizer_type, symbolizer_order)'+
-                ' VALUES ($1,$2,$3)'+
-                ' RETURNING id',[ruleId.id,fieldList[1],fieldList[2]]
+                'INSERT INTO sld_symbolizer (rule_id,symbolizer_type, symbolizer_order, uom)'+
+                ' VALUES ($1,$2,$3,$4)'+
+                ' RETURNING id',[ruleId.id,fieldList[1],fieldList[2],fieldList[3]]
         ));
     }));
 };
@@ -238,9 +242,10 @@ SldInserter.prototype.insertParam=function(symbolizerInserted,fieldList) {
 			'SELECT id,name,symbolizer_parameter'+
 			' FROM sld_type'+
 			' WHERE symbolizer_parameter=$1',[fieldList[4]]
-		);
+        );
 //TODO: insert only parameters, which are in sld_type table
 		typeFound.then(function(typeRow) {
+            if(!typeRow) return defer.resolve();
 			self.db.querySingle(
 				'INSERT INTO sld_param (symbolizer_id,template_offset,type_id,default_value)'+
 				' VALUES ($1,$2,$3,$4)'+

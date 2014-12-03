@@ -153,7 +153,7 @@ SldSelecter.prototype.selectRules=function(id) {
  * @return {Promise} */
 SldSelecter.prototype.selectSymbolizers=function(id) {
     var self=this;
-    return(self.db.queryResult('SELECT ID, RULE_ID, SYMBOLIZER_ORDER AS ORDER, SYMBOLIZER_TYPE AS TYPE ' +
+    return(self.db.queryResult('SELECT ID, RULE_ID, SYMBOLIZER_ORDER AS ORDER, SYMBOLIZER_TYPE AS TYPE, UOM ' +
         'FROM SLD_SYMBOLIZER_VIEW WHERE TEMPLATE_ID='+id));
 };
 
