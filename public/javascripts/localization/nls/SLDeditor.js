@@ -23,6 +23,7 @@ define({
 		},
 		"point": {
 			"label": "Point",
+			"advanced": "Point: Advanced",
 			"symbol": "Symbol",
 			"circle": "Circle",
 			"cross": "Cross",
@@ -39,6 +40,7 @@ define({
 		},
 		"line": {
 			"label": "Stroke",
+			"advanced": "Stroke: Advanced",
 			"line-join": "Line join",
 			"join-miter": "Miter",
 			"join-round": "Round",
@@ -57,11 +59,13 @@ define({
 		},
 		"fill": {
 			"label": "Fill",
+			"advanced": "Fill: Advanced",
 			"opacity": "Opacity",
 			"color": "Color"
 		},
 		"text": {
 			"label": "Text",
+			"advanced": "Text: Advanced",
 			"font": "Font",
 			"style": "Style",
 			"style-normal": "Normal",
@@ -73,7 +77,14 @@ define({
 			"size": "Size",
 			"color": "Color",
 			"halo-color": "Halo color",
-			"radius": "Radius"
+			"radius": "Radius",
+			"pointplacement-anchorpointx": "X Anchor",
+			"pointplacement-anchorpointy": "Y Anchor",
+			"pointplacement-displacementx": "X Displ.",
+			"pointplacement-displacementy": "Y Displ.",
+			"pointplacement-rotation": "Rotation",
+			"lineplacement-perpendicularoffset": "Perpendicular"
+
 		}
 	}
 });

@@ -159,9 +159,9 @@ body
     width: 100%;
 }
 
-.hidden
+.hidden-advanced
 {
-    background-color: #543737;
+    display: none;
 }
 
 .sld-tree
