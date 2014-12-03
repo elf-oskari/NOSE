@@ -11,7 +11,11 @@ define({
 		},
 		"common": {
 			"heading": "SLD Editor",
-			"name": "Name"
+			"name": "Name",
+			"unit": "Unit",
+			"foot": "Foot",
+			"metre": "Metre",
+			"pixel": "Pixel"
 		},
 		"point": {
 			"label": "Point",

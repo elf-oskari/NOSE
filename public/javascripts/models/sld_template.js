@@ -61,7 +61,7 @@ define(['lodash','backbone'], function(_, Backbone) {
 	     */
 		getParamsBySymbolizerId: function(symbolizer_id) {
 			var SLDparams = this.get('sld_params');
-			paramlist = _.where(SLDparams, {'symbolizer_id': symbolizer_id});
+			var paramlist = _.where(SLDparams, {'symbolizer_id': symbolizer_id});
 			return paramlist;
 		},
         /**
@@ -70,7 +70,7 @@ define(['lodash','backbone'], function(_, Backbone) {
          */
         getSymbolizerById: function(id) {
             var SLDsymbolizers = this.get('sld_symbolizers');
-            symbolizerlist = _.where(SLDsymbolizers, {'id': id});
+            var symbolizerlist = _.where(SLDsymbolizers, {'id': id});
             return symbolizerlist;
         }
 	});
