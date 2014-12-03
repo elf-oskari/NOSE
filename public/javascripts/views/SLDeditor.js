@@ -3,7 +3,7 @@ define([
 	'backbone',
 	'jquery',
 	'bootstrap',
-  'svg',
+    'svg',
 	'i18n!localization/nls/SLDeditor',
 	'text!templates/SLDeditor.html'
 ], function(_, Backbone, $, Bootstrap, SVG, locale, editSLDTemplate) {
@@ -173,7 +173,7 @@ define([
                 }
             },
             line: {
-                pointsymbolizer: "hidden",
+                pointsymbolizer: "",
                 linesymbolizer: "",
                 polygonsymbolizer: "",
                 textsymbolizer: "hidden",
@@ -323,7 +323,7 @@ define([
 
     renderLine: function (params) {
       this.preview.clear();
-      for (i=0; i < params.length; i++) {
+      for (var i=0; i < params.length; i++) {
         var attribute = params[i].attributeName;
         var attributeValue = params[i].value;
         if (attribute !== "stroke-width") {
@@ -337,7 +337,7 @@ define([
     renderPolygon: function (params) {
       this.preview.clear();
       var strokeWidth = false;
-      for (i=0; i < params.length; i++) {
+      for (var i=0; i < params.length; i++) {
         var attribute = params[i].attributeName;
         var attributeValue = params[i].value;
         if (attribute === "stroke-width") {

@@ -5,7 +5,7 @@ var generateOptionValue = function(itemValue,selectedValue) {
         optionValue = optionValue+' selected';
     }
     return optionValue;
-}
+};
 
 var updateExternalGraphic = function(target) {
     if (target.value !== 'external') {
@@ -13,7 +13,24 @@ var updateExternalGraphic = function(target) {
     } else {
         jQuery('div.external-graphic').removeClass('hidden');;
     }
-}
+};
+
+var getSplitArrayComponent = function(line,index) {
+    if (typeof line === "undefined") {
+        return "";
+    }
+    var parts = line.split(" ");
+    if (parts.length > index) {
+        return parts[index];
+    } else {
+        return parts.length;
+    }
+};
+
+var updateDasharray = function() {
+    jQuery('input#stroke-dasharray').val(jQuery('input#stroke-dasharray-length').val()+' '+jQuery('input#stroke-dasharray-space').val());
+};
+
 %>
 <div class="view" id="edit-sld">
     <div class="panel panel-primary">
@@ -108,13 +125,33 @@ var updateExternalGraphic = function(target) {
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="form-group symbolizer-form-group param <%= attrData.line.values['stroke-dasharray'].class %>">
+                                    <div class="form-group symbolizer-form-group param hidden">
                                         <label class="control-label symbolizer-attribute-label col-sm-2"
-                                                for="stroke-dasharray"><%= editSLD.line['dash-array'] %></label>
+                                                for="stroke-dasharray"><%= editSLD.line['dasharray'] %></label>
                                         <div class="col-sm-10 symbolizer">
                                             <input type="text" class="form-control symbolizer-attribute-value"
                                                     id="stroke-dasharray"
                                                     data-param-id="<%= attrData.line.values['stroke-dasharray'].param_id %>" value="<%= attrData.line.values['stroke-dasharray'].value %>">
+                                        </div>
+                                    </div>
+                                    <div class="form-group symbolizer-form-group param <%= attrData.line.values['stroke-dasharray'].class %>">
+                                        <label class="control-label symbolizer-attribute-label col-sm-2"
+                                                for="stroke-dasharray-length"><%= editSLD.line['dasharray-length'] %></label>
+                                        <div class="col-sm-10 symbolizer">
+                                            <input type="number" class="form-control symbolizer-attribute-value"
+                                                    onChange="(<%= updateDasharray %>)()"
+                                                    id="stroke-dasharray-length"
+                                                    data-param-id="<%= attrData.line.values['stroke-dasharray'].param_id %>" value="<%= getSplitArrayComponent(attrData.line.values['stroke-dasharray'].value,0) %>">
+                                        </div>
+                                    </div>
+                                    <div class="form-group symbolizer-form-group param <%= attrData.line.values['stroke-dasharray'].class %>">
+                                        <label class="control-label symbolizer-attribute-label col-sm-2"
+                                                for="stroke-dasharray-space"><%= editSLD.line['dasharray-space'] %></label>
+                                        <div class="col-sm-10 symbolizer">
+                                            <input type="number" class="form-control symbolizer-attribute-value"
+                                                    onChange="(<%= updateDasharray %>)()"
+                                                    id="stroke-dasharray-space"
+                                                    data-param-id="<%= attrData.line.values['stroke-dasharray'].param_id %>" value="<%= getSplitArrayComponent(attrData.line.values['stroke-dasharray'].value,1) %>">
                                         </div>
                                     </div>
                                     <div class="form-group symbolizer-form-group param <%= attrData.line.values['stroke-dashoffset'].class %>">
