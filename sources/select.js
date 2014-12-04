@@ -254,7 +254,7 @@ exports.select = function(id, client, cb) {
 
     ready.catch(function(err) {
         // TODO: better management for empty result
-        if(result){
+        if(result.length === 0){
             // Empty select
             cb(false,result);
         }
