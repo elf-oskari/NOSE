@@ -253,9 +253,16 @@ exports.select = function(id, client, cb) {
     }
 
     ready.catch(function(err) {
-       // selecter.abort();
-        console.error(err);
-        return;
+        // TODO: better management for empty result
+        if(result.length === 0){
+            // Empty select
+            cb(false,result);
+        }
+        else {
+            cb(err, 0);
+            console.error(err);
+            return;
+        }
     });
 
     ready.then(function() {

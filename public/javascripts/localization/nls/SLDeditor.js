@@ -77,7 +77,7 @@ define({
 			"size": "Size",
 			"color": "Color",
 			"halo-color": "Halo color",
-			"radius": "Radius",
+			"radius": "Halo radius",
 			"pointplacement-anchorpointx": "X Anchor",
 			"pointplacement-anchorpointy": "Y Anchor",
 			"pointplacement-displacementx": "X Displ.",
