@@ -3,7 +3,7 @@ define([
 	'backbone',
 	'jquery',
 	'bootstrap',
-    'svg',
+  'svg',
 	'i18n!localization/nls/SLDeditor',
 	'text!templates/SLDeditor.html'
 ], function(_, Backbone, $, Bootstrap, SVG, locale, editSLDTemplate) {
@@ -140,6 +140,8 @@ define([
           this.textSize = parseInt(newvalue);
         } else if (param_css_parameter === "stroke-dasharray-part") {
           newvalue = jQuery('input#stroke-dasharray-length').val()+' '+jQuery('input#stroke-dasharray-space').val();
+          this.attributes["stroke-dasharray"] = newvalue;
+          this.updatePreview();
         } else {
           this.attributes[param_css_parameter] = newvalue;
           this.updatePreview();
@@ -295,14 +297,16 @@ define([
         } else if (params[i].attributeName === "rotation") {
           this.elementRotation = params[i].value;
         } else {
-          this.elementSize = 20;
-          this.elementRotation = 0;
           var attribute = params[i].attributeName;
           var attributeValue = params[i].value;
           this.attributes[attribute] = attributeValue;
         }
       }
-
+      this.elementSize = 20;
+      this.elementRotation = 0;
+      if (_.has(this.attributes, "stroke")) {
+        this.attributes["stroke-width"] = 3;
+      }
       //create preview element
       if (hasWellKnownName === true) {
         this.renderWellKnownName(wellknownname);
@@ -322,6 +326,7 @@ define([
       this.previewElement.attr(this.attributes);
       this.previewElement.size(50);
       this.previewElement.transform({rotation: this.elementRotation});
+      this.previewElement.center(30,30);
     },
 
     renderExternalGraphics: function () {
@@ -377,7 +382,10 @@ define([
     },
 
     updatePreview: function () {
-      if(this.previewElement) this.previewElement.attr(this.attributes);
+      if (_.has(this.attributes, "stroke") & this.symbolType === "pointsymbolizer" || this.symbolType === "polygonsymbolizer") {
+        this.attributes["stroke-width"] = 3;
+      }
+      this.previewElement.attr(this.attributes);
     }
   });
 	return SLDEditorView;
