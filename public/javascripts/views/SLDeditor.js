@@ -3,7 +3,7 @@ define([
 	'backbone',
 	'jquery',
 	'bootstrap',
-  'svg',
+    'svg',
 	'i18n!localization/nls/SLDeditor',
 	'text!templates/SLDeditor.html'
 ], function(_, Backbone, $, Bootstrap, SVG, locale, editSLDTemplate) {
@@ -54,7 +54,8 @@ define([
         // Generate attribute data
         this.initAttrData();
         data = this.attrData;
-        this.symbolType = symbol;
+
+        this.symbolType = type;
 
         // Visit all types
         if (type) {
@@ -119,7 +120,7 @@ define([
         newvalue = element[0].value.toLowerCase();
         // Update map style
         this.renderWellKnownName(newvalue);
-        this.dispatcher.trigger("updateMapStyle",{'name':'wellknownname','value': newvalue} );
+        this.dispatcher.trigger("updateMapStyle",{'name':'wellknownname','value': newvalue},this.symbolType );
       } else {
         element = $(event.currentTarget).find(".symbolizer-attribute-value");
         var param_id = "" + element.data('param-id');
@@ -137,6 +138,8 @@ define([
         } else if (param_css_parameter === "font-size") {
           //in case we need this later
           this.textSize = parseInt(newvalue);
+        } else if (param_css_parameter === "stroke-dasharray-part") {
+          newvalue = jQuery('input#stroke-dasharray-length').val()+' '+jQuery('input#stroke-dasharray-space').val();
         } else {
           this.attributes[param_css_parameter] = newvalue;
           this.updatePreview();
@@ -330,7 +333,7 @@ define([
 
     renderLine: function (params) {
       this.preview.clear();
-      for (i=0; i < params.length; i++) {
+      for (var i=0; i < params.length; i++) {
         var attribute = params[i].attributeName;
         var attributeValue = params[i].value;
         if (attribute !== "stroke-width") {
@@ -344,7 +347,7 @@ define([
     renderPolygon: function (params) {
       this.preview.clear();
       var strokeWidth = false;
-      for (i=0; i < params.length; i++) {
+      for (var i=0; i < params.length; i++) {
         var attribute = params[i].attributeName;
         var attributeValue = params[i].value;
         if (attribute === "stroke-width") {
