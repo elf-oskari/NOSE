@@ -68,7 +68,7 @@ define([
         },
         downloadConfig: function (event) {
             event.preventDefault();
-            var apiUrl = "/api/v1/configs/";
+            var apiUrl = "./api/v1/configs/";
             window.open(apiUrl + $(event.currentTarget).data('id') + "/download");
         },
         deleteTemplate: function (event) {
@@ -96,7 +96,7 @@ define([
             var fd = new FormData(document.getElementById("fileinfo"));
             fd.append("CustomField", "This is some extra data");
             $.ajax({
-                url: "/api/v1/templates/",
+                url: "./api/v1/templates/",
                 type: "POST",
                 data: fd,
                 cache: false,
