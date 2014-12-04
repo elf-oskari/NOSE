@@ -195,6 +195,13 @@ body
     margin-left: 0;
 }
 
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.label-info {
+    cursor: pointer;
+}
 #preview
 {
     margin-top: 30px;
