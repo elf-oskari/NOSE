@@ -1,5 +1,5 @@
 requirejs.config({
-	baseUrl: "/javascripts/",
+	baseUrl: "./javascripts/",
 	paths: {
 		backbone: 'lib/backbone',
 		jquery: 'lib/jquery-1.10.2.min',
@@ -49,6 +49,18 @@ require([
 	var templates = new SLDTemplatesCollection();
 	var configs = new SLDConfigsCollection();
 
+	var forceStart = function() {
+		if (!WebApp.collections.SLDTemplatesCollection) {
+			WebApp.collections.SLDTemplatesCollection = templates;
+		} else if (!WebApp.collections.SLDConfigsCollection) {
+			WebApp.collections.SLDConfigsCollection = configs;
+		}
+
+		// Everything is setup, so we can start
+		WebApp.start({url: "forced"});
+	}
+	var forceTimer = window.setTimeout(forceStart, 10000);
+
 	WebApp.start = function (event) {
 		if (_.contains(event.url, "templates")) {
 			WebApp.collections.SLDTemplatesCollection = event;
@@ -61,6 +73,10 @@ require([
 		// http://backbonejs.org/#Collection-fetch
 		if (_.isObject(WebApp.collections.SLDTemplatesCollection) &&
 			_.isObject(WebApp.collections.SLDConfigsCollection)) {
+
+			// Everything is setup, so we can cancel the forceTimer
+			window.clearTimeout(forceTimer);
+
 			WebApp.Router = new Router(WebApp);
 
 			if (Backbone.history !== null) {
@@ -72,4 +88,5 @@ require([
 	// We wait until the collections are ready
 	WebApp.listenToOnce(templates, "reset", WebApp.start);
 	WebApp.listenToOnce(configs, "reset", WebApp.start);
+
 });
