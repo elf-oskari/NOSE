@@ -5,7 +5,7 @@ var generateOptionValue = function(itemValue,selectedValue) {
         optionValue = optionValue+' selected';
     }
     return optionValue;
-}
+};
 
 var updateExternalGraphic = function(target) {
     if (target.value !== 'external') {
@@ -13,15 +13,38 @@ var updateExternalGraphic = function(target) {
     } else {
         jQuery('div.external-graphic').removeClass('hidden');;
     }
+};
+
+var getSplitArrayComponent = function(line,index) {
+    if (typeof line === "undefined") {
+        return "";
+    }
+    var parts = line.split(" ");
+    if (parts.length > index) {
+        return parts[index];
+    } else {
+        return parts.length;
+    }
+};
+
+var toggleAdvanced = function(divClass) {
+    jQuery('div.'+divClass).toggleClass('hidden-advanced');
 }
+
 %>
 <div class="view" id="edit-sld">
     <div class="panel panel-primary">
         <div class="panel-heading"><%= editSLD.common['SLDeditor-heading'] %></div>
-        <div class="panel-body sld-editor-page" style="height:800px">
+        <div class="panel-body sld-editor-page">
             <form role="form" class="edit-sld-form form-horizontal">
                 <label><%= editSLD.common['SLDeditor-name'] %></label>
                 <p><input name="Name" type="text" class="name" data-attribute="name" value="<%= SLDmodel.name %>"></p>
+                <label for="unit"><%= editSLD.common['unit'] %></label>
+                <select id="unit" class="form-control symbolizer-attribute-value">
+                    <option <%= generateOptionValue("pixel",symbolUnit) %>><%= editSLD.common['pixel'] %></option>
+                    <option <%= generateOptionValue("metre",symbolUnit) %>><%= editSLD.common['metre'] %></option>
+                    <option <%= generateOptionValue("foot",symbolUnit) %>><%= editSLD.common['foot'] %></option>
+                </select>
                 <br>
                 <div class="row-fluid">
                     <div class="col-sm-12 col-md-7 col-lg-7 parameter-form">
@@ -48,35 +71,32 @@ var updateExternalGraphic = function(target) {
                                         <label class="control-label symbolizer-attribute-label col-sm-2" for="external-graphic"><%= editSLD.point['url'] %></label>
                                         <div class="col-sm-10 symbolizer">
                                             <input type="text" class="form-control symbolizer-attribute-value"
-                                                    id="external-graphic" data-param-id="<%= attrData.graphic.values['external-graphic'].param_id %>" value="<%= attrData.graphic.values['external-graphic'].value %>">
+                                                    id="external-graphic" data-css-parameter="external-graphic" data-param-id="<%= attrData.graphic.values['external-graphic'].param_id %>" value="<%= attrData.graphic.values['external-graphic'].value %>">
                                         </div>
                                     </div>
                                     <div class="form-group symbolizer-form-group param <%= attrData.graphic.values['size'].class %>">
                                         <label class="control-label symbolizer-attribute-label col-sm-2" for="size"><%= editSLD.point['size'] %></label>
                                         <div class="col-sm-10 symbolizer">
-                                            <input type="number" class="form-control symbolizer-attribute-value"
-                                                    id="size" data-param-id="<%= attrData.graphic.values['size'].param_id %>" value="<%= attrData.graphic.values['size'].value %>">
+                                            <input type="number" class="form-control symbolizer-attribute-value" min="0" id="size" data-css-parameter="size" data-param-id="<%= attrData.graphic.values['size'].param_id %>" value="<%= attrData.graphic.values['size'].value %>">
                                         </div>
                                     </div>
                                     <div class="form-group symbolizer-form-group param <%= attrData.graphic.values['rotation'].class %>">
                                         <label class="control-label symbolizer-attribute-label col-sm-2" for="rotation"><%= editSLD.point['rotation'] %></label>
                                         <div class=" col-sm-10 symbolizer">
-                                            <input type="number" class="form-control symbolizer-attribute-value" id="rotation" data-param-id="<%= attrData.graphic.values['rotation'].param_id %>" value="<%= attrData.graphic.values['rotation'].value %>">
+                                            <input type="number" class="form-control symbolizer-attribute-value" min="0" max="360" id="rotation" data-css-parameter="rotation" data-param-id="<%= attrData.graphic.values['rotation'].param_id %>" value="<%= attrData.graphic.values['rotation'].value %>">
                                         </div>
                                     </div>
                                     <div class="form-group symbolizer-form-group param <%=
                                      attrData.graphic.values['opacity'].class %>">
                                         <label class="control-label symbolizer-attribute-label col-sm-2" for="opacity"><%= editSLD.point['opacity'] %></label>
                                         <div class="col-sm-10 symbolizer">
-                                            <input type="number" class="form-control symbolizer-attribute-value"
-                                                   id="opacity"
-                                                   data-param-id="<%= attrData.graphic.values['opacity'].param_id %>" value="<%= attrData.graphic.values['opacity'].value %>">
+                                            <input type="number" class="form-control symbolizer-attribute-value" min="0" max="1" step="0.1" id="opacity" data-css-parameter="opacity" data-param-id="<%= attrData.graphic.values['opacity'].param_id %>" value="<%= attrData.graphic.values['opacity'].value %>">
                                         </div>
                                     </div>
                                     <div class="form-group symbolizer-form-group param <%= attrData.graphic.values['fill'].class %>">
                                         <label class="control-label symbolizer-attribute-label col-sm-2" for="point-fill"><%= editSLD.point['color'] %></label>
                                         <div class="col-sm-10 symbolizer">
-                                            <input type="color" class="form-control symbolizer-attribute-value" id="point-fill" data-param-id="<%= attrData.graphic.values['fill'].param_id %>" value="<%= attrData.graphic.values['fill'].value %>">
+                                            <input type="color" class="form-control symbolizer-attribute-value" id="point-fill" data-css-parameter="fill" data-param-id="<%= attrData.graphic.values['fill'].param_id %>" value="<%= attrData.graphic.values['fill'].value %>">
                                         </div>
                                     </div>
                                 </div>
@@ -85,7 +105,7 @@ var updateExternalGraphic = function(target) {
                                     <div class="form-group symbolizer-form-group param">
                                         <label class="control-label  symbolizer-attribute-label col-sm-2" for="stroke-linejoin"><%= editSLD.line['line-join'] %></label>
                                         <div class="col-sm-10 symbolizer">
-                                            <select id="stroke-linejoin" class="form-control symbolizer-attribute-value">
+                                            <select id="stroke-linejoin" data-css-parameter="stroke-linejoin" class="form-control symbolizer-attribute-value">
                                                 <option <%= generateOptionValue("miter",attrData.line.values['stroke-linejoin'].value) %>><%= editSLD.line['join-miter'] %></option>
                                                 <option <%= generateOptionValue("round",attrData.line.values['stroke-linejoin'].value) %>><%= editSLD.line['join-round'] %></option>
                                                 <option <%= generateOptionValue("bevel",attrData.line.values['stroke-linejoin'].value) %>><%= editSLD.line['join-bevel'] %></option>
@@ -95,37 +115,54 @@ var updateExternalGraphic = function(target) {
                                     <div class="form-group symbolizer-form-group param">
                                         <label class="control-label symbolizer-attribute-label col-sm-2" for="stroke-linecap"><%= editSLD.line['line-cap'] %></label>
                                         <div class="col-sm-10 symbolizer">
-                                            <select id="stroke-linecap" class="form-control symbolizer-attribute-value">
+                                            <select id="stroke-linecap" data-css-parameter="stroke-linecap" class="form-control symbolizer-attribute-value">
                                                 <option <%= generateOptionValue("butt",attrData.line.values['stroke-linecap'].value) %>><%= editSLD.line['cap-butt'] %></option>
                                                 <option <%= generateOptionValue("round",attrData.line.values['stroke-linecap'].value) %>><%= editSLD.line['cap-round'] %></option>
                                                 <option <%= generateOptionValue("square",attrData.line.values['stroke-linecap'].value) %>><%= editSLD.line['cap-square'] %></option>
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="form-group symbolizer-form-group param <%= attrData.line.values['stroke-dasharray'].class %>">
+                                    <div class="form-group symbolizer-form-group param hidden">
                                         <label class="control-label symbolizer-attribute-label col-sm-2"
-                                                for="stroke-dasharray"><%= editSLD.line['dash-array'] %></label>
+                                                for="stroke-dasharray"><%= editSLD.line['dasharray'] %></label>
                                         <div class="col-sm-10 symbolizer">
                                             <input type="text" class="form-control symbolizer-attribute-value"
-                                                    id="stroke-dasharray"
+                                                    id="stroke-dasharray" data-css-parameter="stroke-dasharray"
                                                     data-param-id="<%= attrData.line.values['stroke-dasharray'].param_id %>" value="<%= attrData.line.values['stroke-dasharray'].value %>">
+                                        </div>
+                                    </div>
+                                    <div class="form-group symbolizer-form-group param <%= attrData.line.values['stroke-dasharray'].class %>">
+                                        <label class="control-label symbolizer-attribute-label col-sm-2"
+                                                for="stroke-dasharray-length"><%= editSLD.line['dasharray-length'] %></label>
+                                        <div class="col-sm-10 symbolizer">
+                                            <input type="number" class="form-control symbolizer-attribute-value"
+                                                    min="0" id="stroke-dasharray-length" data-css-parameter="stroke-dasharray-part"
+                                                    data-param-id="<%= attrData.line.values['stroke-dasharray'].param_id %>" value="<%= getSplitArrayComponent(attrData.line.values['stroke-dasharray'].value,0) %>">
+                                        </div>
+                                    </div>
+                                    <div class="form-group symbolizer-form-group param <%= attrData.line.values['stroke-dasharray'].class %>">
+                                        <label class="control-label symbolizer-attribute-label col-sm-2"
+                                                for="stroke-dasharray-space"><%= editSLD.line['dasharray-space'] %></label>
+                                        <div class="col-sm-10 symbolizer">
+                                            <input type="number" class="form-control symbolizer-attribute-value"
+                                                    min="0" id="stroke-dasharray-space" data-css-parameter="stroke-dasharray-part"
+                                                    data-param-id="<%= attrData.line.values['stroke-dasharray'].param_id %>" value="<%= getSplitArrayComponent(attrData.line.values['stroke-dasharray'].value,1) %>">
                                         </div>
                                     </div>
                                     <div class="form-group symbolizer-form-group param <%= attrData.line.values['stroke-dashoffset'].class %>">
                                         <label class="control-label symbolizer-attribute-label col-sm-2"
                                                 for="stroke-dashoffset"><%= editSLD.line['dash-offset'] %></label>
                                         <div class="col-sm-10 symbolizer">
-                                            <input type="number" class="form-control symbolizer-attribute-value"
-                                                    id="stroke-dashoffset"
-                                                    data-param-id="<%= attrData.line.values['stroke-dashoffset'].param_id %>" value="<%= attrData.line.values['stroke-dashoffset'].value %>">
+                                            <input type="number" class="form-control symbolizer-attribute-value" min="0"
+                                                    id="stroke-dashoffset" data-css-parameter="stroke-dashoffset" data-param-id="<%= attrData.line.values['stroke-dashoffset'].param_id %>" value="<%= attrData.line.values['stroke-dashoffset'].value %>">
                                         </div>
                                     </div>
                                     <div
                                             class="form-group symbolizer-form-group param <%= attrData.line.values['stroke-opacity'].class %>">
                                         <label class="control-label symbolizer-attribute-label col-sm-2" for="stroke-opacity"><%= editSLD.line['opacity'] %></label>
                                         <div class="col-sm-10 symbolizer">
-                                            <input type="number" class="form-control symbolizer-attribute-value"
-                                                    id="stroke-opacity"
+                                            <input type="number" class="form-control symbolizer-attribute-value" min="0" max="1" step="0.1"
+                                                    id="stroke-opacity" data-css-parameter="stroke-opacity"
                                                     data-param-id="<%= attrData.line.values['stroke-opacity'].param_id %>"
                                                     value="<%= attrData.line.values['stroke-opacity'].value %>">
                                         </div>
@@ -136,7 +173,7 @@ var updateExternalGraphic = function(target) {
                                                for="stroke"><%= editSLD.line['color'] %></label>
                                         <div class="col-sm-10 symbolizer">
                                             <input type="color" class="form-control symbolizer-attribute-value"
-                                                    id="stroke"
+                                                    id="stroke" data-css-parameter="stroke"
                                                     data-param-id="<%= attrData.line.values['stroke'].param_id %>"
                                                     value="<%= attrData.line.values['stroke'].value %>">
                                         </div>
@@ -144,9 +181,8 @@ var updateExternalGraphic = function(target) {
                                     <div class="form-group symbolizer-form-group param <%=attrData.line.values['stroke-width'].class %>">
                                         <label class="control-label symbolizer-attribute-label col-sm-2" for="stroke-width"><%= editSLD.line['width'] %></label>
                                         <div class="col-sm-10 symbolizer">
-                                            <input type="number" class="form-control symbolizer-attribute-value"
-                                                    id="stroke-width"
-                                                    data-param-id="<%= attrData.line.values['stroke-width'].param_id %>"
+                                            <input type="number" class="form-control symbolizer-attribute-value" min="0"
+                                                    id="stroke-width" data-css-parameter="stroke-width" data-param-id="<%= attrData.line.values['stroke-width'].param_id %>"
                                                     value="<%= attrData.line.values['stroke-width'].value %>">
                                         </div>
                                     </div>
@@ -156,9 +192,8 @@ var updateExternalGraphic = function(target) {
                                     <div class="form-group symbolizer-form-group param <%= attrData.polygon.values['fill-opacity'].class %>">
                                         <label class="control-label symbolizer-attribute-label col-sm-2" for="fill-opacity"><%= editSLD.fill['opacity'] %></label>
                                         <div class="col-sm-10 symbolizer">
-                                            <input type="number" class="form-control symbolizer-attribute-value"
-                                                    id="fill-opacity"
-                                                    data-param-id="<%= attrData.polygon.values['fill-opacity'].param_id %>"
+                                            <input type="number" class="form-control symbolizer-attribute-value" min="0" max="1" step="0.1"
+                                                    id="fill-opacity" data-css-parameter="fill-opacity" data-param-id="<%= attrData.polygon.values['fill-opacity'].param_id %>"
                                                     value="<%= attrData.polygon.values['fill-opacity'].value %>">
                                         </div>
                                     </div>
@@ -168,7 +203,7 @@ var updateExternalGraphic = function(target) {
                                                 for="fill"><%= editSLD.fill['color'] %></label>
                                         <div class="col-sm-10 symbolizer">
                                             <input type="color" class="form-control symbolizer-attribute-value"
-                                                    id="fill"
+                                                    id="fill" data-css-parameter="fill"
                                                     data-param-id="<%= attrData.polygon.values['fill'].param_id %>"
                                                     value="<%= attrData.polygon.values['fill'].value %>">
                                         </div>
@@ -179,18 +214,18 @@ var updateExternalGraphic = function(target) {
                                     <div class="form-group symbolizer-form-group param">
                                         <label class="control-label symbolizer-attribute-label col-sm-2" for="font-family"><%= editSLD.text['font'] %></label>
                                         <div class="col-sm-10 symbolizer">
-                                            <select id="font-family" class="form-control symbolizer-attribute-value">
-                                                <option <%= generateOptionValue("arial",attrData.text.values['font-family'].value) %>>Arial</option>
-                                                <option <%= generateOptionValue("leveltica",attrData.text.values['font-family'].value) %>>Helvetica</option>
-                                                <option <%= generateOptionValue("sans-serif",attrData.text.values['font-family'].value) %>>Sand-Serif</option>
-                                                <option <%= generateOptionValue("verdana",attrData.text.values['font-family'].value) %>>Verdana</option>
+                                            <select id="font-family" data-css-parameter="font-family" class="form-control symbolizer-attribute-value">
+                                                <option <%= generateOptionValue("Arial",attrData.text.values['font-family'].value) %>>Arial</option>
+                                                <option <%= generateOptionValue("Helvetica",attrData.text.values['font-family'].value) %>>Helvetica</option>
+                                                <option <%= generateOptionValue("Sans-serif",attrData.text.values['font-family'].value) %>>Sans-Serif</option>
+                                                <option <%= generateOptionValue("Verdana",attrData.text.values['font-family'].value) %>>Verdana</option>
                                             </select>
                                         </div>
                                     </div>
                                     <div class="form-group symbolizer-form-group param">
                                         <label class="control-label symbolizer-attribute-label col-sm-2" for="font-style"><%= editSLD.text['style'] %></label>
                                         <div class="col-sm-10 symbolizer">
-                                            <select id="font-style" class="form-control symbolizer-attribute-value">
+                                            <select id="font-style" data-css-parameter="font-style" class="form-control symbolizer-attribute-value">
                                                 <option <%= generateOptionValue("normal",attrData.text.values['font-style'].value) %>><%= editSLD.text['style-normal'] %></option>
                                                 <option <%= generateOptionValue("italic",attrData.text.values['font-style'].value) %>><%= editSLD.text['style-italic'] %></option>
                                                 <option <%= generateOptionValue("oblique",attrData.text.values['font-style'].value) %>><%= editSLD.text['style-oblique'] %></option>
@@ -200,7 +235,7 @@ var updateExternalGraphic = function(target) {
                                     <div class="form-group symbolizer-form-group param">
                                         <label class="control-label symbolizer-attribute-label col-sm-2" for="font-weight"><%= editSLD.text['weight'] %></label>
                                         <div class="col-sm-10 symbolizer">
-                                            <select id="font-weight" class="form-control symbolizer-attribute-value">
+                                            <select id="font-weight" data-css-parameter="font-weight" class="form-control symbolizer-attribute-value">
                                                 <option <%= generateOptionValue("normal",attrData.text.values['font-weight'].value) %>><%= editSLD.text['weight-normal'] %></option>
                                                 <option <%= generateOptionValue("bold",attrData.text.values['font-weight'].value) %>><%= editSLD.text['weight-bold'] %></option>
                                             </select>
@@ -209,9 +244,8 @@ var updateExternalGraphic = function(target) {
                                     <div class="form-group symbolizer-form-group param <%= attrData.text.values['font-size'].class %>">
                                         <label class="control-label symbolizer-attribute-label col-sm-2" for="font-size"><%= editSLD.text['size'] %></label>
                                         <div class="col-sm-10 symbolizer">
-                                            <input type="number" class="form-control symbolizer-attribute-value"
-                                                    id="font-size"
-                                                    data-param-id="<%= attrData.text.values['font-size'].param_id %>"
+                                            <input type="number" class="form-control symbolizer-attribute-value" min="0"
+                                                    id="font-size" data-css-parameter="font-size" data-param-id="<%= attrData.text.values['font-size'].param_id %>"
                                                     value="<%= attrData.text.values['font-size'].value %>">
                                         </div>
                                     </div>
@@ -219,7 +253,7 @@ var updateExternalGraphic = function(target) {
                                         <label class="control-label symbolizer-attribute-label col-sm-2" for="text-fill"><%= editSLD.text['color'] %></label>
                                         <div class="col-sm-10 symbolizer">
                                             <input type="color" class="form-control symbolizer-attribute-value"
-                                                    id="text-fill"
+                                                    id="text-fill" data-css-parameter="fill"
                                                     data-param-id="<%= attrData.text.values['text-fill'].param_id %>"
                                                     value="<%= attrData.text.values['text-fill'].value %>">
                                         </div>
@@ -229,7 +263,7 @@ var updateExternalGraphic = function(target) {
                                                 for="halo-color"><%= editSLD.text['halo-color'] %></label>
                                         <div class="col-sm-10 symbolizer">
                                             <input type="color" class="form-control symbolizer-attribute-value"
-                                                    id="halo-color"
+                                                    id="halo-color" data-css-parameter="halo-color"
                                                     data-param-id="<%= attrData.text.values['halo-color'].param_id %>"
                                                     value="<%= attrData.text.values['halo-color'].value %>">
                                         </div>
@@ -237,10 +271,62 @@ var updateExternalGraphic = function(target) {
                                     <div class="form-group symbolizer-form-group param <%= attrData.text.values['halo-radius'].class %>">
                                         <label class="control-label symbolizer-attribute-label col-sm-2" for="halo-radius"><%= editSLD.text['radius'] %></label>
                                         <div class="col-sm-10 symbolizer">
+                                            <input type="number" class="form-control symbolizer-attribute-value" min="0" id="halo-radius" data-css-parameter="halo-radius" data-param-id="<%= attrData.text.values['halo-radius'].param_id %>" value="<%= attrData.text.values['halo-radius'].value %>">
+                                        </div>
+                                    </div>
+                                    <span class="label label-info" onclick="(<%= toggleAdvanced %>)('text-advanced')"><%= editSLD.text['advanced'] %></span>
+                                    <div class="form-group symbolizer-form-group param text-advanced hidden-advanced <%= attrData.text.values['pointplacement-anchorpointx'].class %>">
+                                        <label class="control-label symbolizer-attribute-label col-sm-2" for="pointplacement-anchorpointx"><%= editSLD.text['pointplacement-anchorpointx'] %></label>
+                                        <div class="col-sm-10 symbolizer">
                                             <input type="number" class="form-control symbolizer-attribute-value"
-                                                    id="halo-radius"
-                                                    data-param-id="<%= attrData.text.values['halo-radius'].param_id %>"
-                                                    value="<%= attrData.text.values['halo-radius'].value %>">
+                                                    min="0" id="pointplacement-anchorpointx" data-css-parameter="<%= attrData.text.values['pointplacement-anchorpointx'].name %>"
+                                                    data-param-id="<%= attrData.text.values['pointplacement-anchorpointx'].param_id %>"
+                                                    value="<%= attrData.text.values['pointplacement-anchorpointx'].value %>">
+                                        </div>
+                                    </div>
+                                    <div class="form-group symbolizer-form-group param text-advanced hidden-advanced <%= attrData.text.values['pointplacement-anchorpointy'].class %>">
+                                        <label class="control-label symbolizer-attribute-label col-sm-2" for="pointplacement-anchorpointy"><%= editSLD.text['pointplacement-anchorpointy'] %></label>
+                                        <div class="col-sm-10 symbolizer">
+                                            <input type="number" class="form-control symbolizer-attribute-value"
+                                                    min="0" id="pointplacement-anchorpointy" data-css-parameter="<%= attrData.text.values['pointplacement-anchorpointy'].name %>"
+                                                    data-param-id="<%= attrData.text.values['pointplacement-anchorpointy'].param_id %>"
+                                                    value="<%= attrData.text.values['pointplacement-anchorpointy'].value %>">
+                                        </div>
+                                    </div>
+                                    <div class="form-group symbolizer-form-group param text-advanced hidden-advanced <%= attrData.text.values['pointplacement-displacementx'].class %>">
+                                        <label class="control-label symbolizer-attribute-label col-sm-2" for="pointplacement-displacementx"><%= editSLD.text['pointplacement-displacementx'] %></label>
+                                        <div class="col-sm-10 symbolizer">
+                                            <input type="number" class="form-control symbolizer-attribute-value"
+                                                    min="0" id="pointplacement-displacementx" data-css-parameter="<%= attrData.text.values['pointplacement-displacementx'].name %>"
+                                                    data-param-id="<%= attrData.text.values['pointplacement-displacementx'].param_id %>"
+                                                    value="<%= attrData.text.values['pointplacement-displacementx'].value %>">
+                                        </div>
+                                    </div>
+                                    <div class="form-group symbolizer-form-group param text-advanced hidden-advanced <%= attrData.text.values['pointplacement-displacementy'].class %>">
+                                        <label class="control-label symbolizer-attribute-label col-sm-2" for="pointplacement-displacementy"><%= editSLD.text['pointplacement-displacementy'] %></label>
+                                        <div class="col-sm-10 symbolizer">
+                                            <input type="number" class="form-control symbolizer-attribute-value"
+                                                    min="0" id="pointplacement-displacementy" data-css-parameter="<%= attrData.text.values['pointplacement-displacementy'].name %>"
+                                                    data-param-id="<%= attrData.text.values['pointplacement-displacementy'].param_id %>"
+                                                    value="<%= attrData.text.values['pointplacement-displacementy'].value %>">
+                                        </div>
+                                    </div>
+                                    <div class="form-group symbolizer-form-group param text-advanced hidden-advanced <%= attrData.text.values['pointplacement-rotation'].class %>">
+                                        <label class="control-label symbolizer-attribute-label col-sm-2" for="pointplacement-rotation"><%= editSLD.text['pointplacement-rotation'] %></label>
+                                        <div class="col-sm-10 symbolizer">
+                                            <input type="number" class="form-control symbolizer-attribute-value"
+                                                    min="0" id="pointplacement-rotation" data-css-parameter="<%= attrData.text.values['pointplacement-rotation'].name %>"
+                                                    data-param-id="<%= attrData.text.values['pointplacement-rotation'].param_id %>"
+                                                    value="<%= attrData.text.values['pointplacement-rotation'].value %>">
+                                        </div>
+                                    </div>
+                                    <div class="form-group symbolizer-form-group param text-advanced hidden-advanced <%= attrData.text.values['lineplacement-perpendicularoffset'].class %>">
+                                        <label class="control-label symbolizer-attribute-label col-sm-2" for="lineplacement-perpendicularoffset"><%= editSLD.text['lineplacement-perpendicularoffset'] %></label>
+                                        <div class="col-sm-10 symbolizer">
+                                            <input type="number" class="form-control symbolizer-attribute-value"
+                                                    min="0" id="lineplacement-perpendicularoffset" data-css-parameter="<%= attrData.text.values['lineplacement-perpendicularoffset'].name %>"
+                                                    data-param-id="<%= attrData.text.values['lineplacement-perpendicularoffset'].param_id %>"
+                                                    value="<%= attrData.text.values['lineplacement-perpendicularoffset'].value %>">
                                         </div>
                                     </div>
                                 </div>

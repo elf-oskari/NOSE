@@ -3,7 +3,7 @@ define([
 	'backbone',
 	'jquery',
 	'bootstrap',
-  'svg',
+    'svg',
 	'i18n!localization/nls/SLDeditor',
 	'text!templates/SLDeditor.html'
 ], function(_, Backbone, $, Bootstrap, SVG, locale, editSLDTemplate) {
@@ -41,11 +41,12 @@ define([
       self.listenTo(self.SLDconfigmodel, "all", self.logger);
       self.listenTo(self.SLDconfigmodel, "sync", function () { self.render();});
     },
-    render: function(paramlist,symbolType) {
+    render: function(paramlist,symbol) {
         var localization = locale;
         var model = this.SLDconfigmodel.pick('id', 'name');
         var params = _.isUndefined(paramlist) ? false : paramlist;
-        var type = _.isUndefined(symbolType) ? "none" : symbolType;
+        var uom = _.isUndefined(symbol) ? false : symbol.uom;
+        var type = _.isUndefined(symbol) ? "none" : symbol.type.toLowerCase();
         var data;
         var typeKey;
         var attrKey;
@@ -53,6 +54,8 @@ define([
         // Generate attribute data
         this.initAttrData();
         data = this.attrData;
+
+        this.symbolType = type;
 
         // Visit all types
         if (type) {
@@ -65,6 +68,7 @@ define([
                                 if (attrKey === params[i].attributeName) {
                                     data[typeKey].values[attrKey].param_id = params[i].param_id;
                                     data[typeKey].values[attrKey].value = params[i].value;
+                                    data[typeKey].values[attrKey].name = params[i].attributeName;
                                     data[typeKey].values[attrKey].class = "";
                                     break;
                                 }
@@ -79,9 +83,9 @@ define([
             data.graphic.values["external-graphic"].class = ""; // Not hidden
             data.graphic.values["wellknownname"] = "external";  // Drop-down value
         }
-        this.$el.html(this.template({SLDmodel: model, editSLD: localization, attrData: data, symbolType: type}));
+        this.$el.html(this.template({SLDmodel: model, editSLD: localization, attrData: data, symbolType: type, symbolUnit: uom}));
         if (paramlist) {
-          this.renderPreview(paramlist, symbolType);
+          this.renderPreview(paramlist, type);
         }
         return this;
     },
@@ -92,7 +96,11 @@ define([
     updateEditParams: function(params,symbolizer) {
       console.log('updateEditParams', params);
       var paramlist = this.SLDconfigmodel.getSLDValuesByParams(params);
-      this.render(paramlist,symbolizer.type.toLowerCase());
+      var symbol = {
+          type: symbolizer.type,
+          uom: symbolizer.uom
+      };
+      this.render(paramlist,symbol);
     },
 
     setAttribute: function(event) {
@@ -112,11 +120,11 @@ define([
         newvalue = element[0].value.toLowerCase();
         // Update map style
         this.renderWellKnownName(newvalue);
-        this.dispatcher.trigger("updateMapStyle",{'name':'wellknownname','value': newvalue} );
+        this.dispatcher.trigger("updateMapStyle",{'name':'wellknownname','value': newvalue},this.symbolType );
       } else {
         element = $(event.currentTarget).find(".symbolizer-attribute-value");
         var param_id = "" + element.data('param-id');
-        var param_css_parameter = element[0].id;
+        var param_css_parameter = element.data('css-parameter');
         newvalue = element.val();
         if (param_css_parameter === "rotation") {
           this.elementRotation = newvalue;
@@ -127,18 +135,23 @@ define([
         // we don't want preview to update stroke-width
         } else if (param_css_parameter === "stroke-width") {
           this.strokeWidth = parseInt(newvalue);
+        } else if (param_css_parameter === "font-size") {
+          //in case we need this later
+          this.textSize = parseInt(newvalue);
+        } else if (param_css_parameter === "stroke-dasharray-part") {
+          newvalue = jQuery('input#stroke-dasharray-length').val()+' '+jQuery('input#stroke-dasharray-space').val();
         } else {
           this.attributes[param_css_parameter] = newvalue;
           this.updatePreview();
         }
           // Update map style
-          this.dispatcher.trigger("updateMapStyle",[{'name':param_css_parameter,'value': newvalue}] );
+          this.dispatcher.trigger("updateMapStyle",[{'name':param_css_parameter,'value': newvalue}], this.symbolType );
       }
       var sld_values = this.SLDconfigmodel.get('sld_values');
       // we assume the changed param_id is always found
       var paramIndex = _.findIndex(sld_values, {'param_id': param_id});
       var param = sld_values[paramIndex];
-      param.value = newvalue;
+      if(param) param.value = newvalue;
 
       this.SLDconfigmodel.set('sld_values', sld_values);
 
@@ -168,7 +181,7 @@ define([
                 }
             },
             line: {
-                pointsymbolizer: "hidden",
+                pointsymbolizer: "",
                 linesymbolizer: "",
                 polygonsymbolizer: "",
                 textsymbolizer: "hidden",
@@ -254,8 +267,10 @@ define([
         this.renderLine(params);
       } else if (symbolType === "polygonsymbolizer") {
         this.renderPolygon(params);
+      } else if (symbolType === "textsymbolizer") {
+        this.renderText(params);
       } else {
-        alert("geometryType of params is not defined");
+        console.log("geometryType of params is not defined");
       }
     },
 
@@ -318,7 +333,7 @@ define([
 
     renderLine: function (params) {
       this.preview.clear();
-      for (i=0; i < params.length; i++) {
+      for (var i=0; i < params.length; i++) {
         var attribute = params[i].attributeName;
         var attributeValue = params[i].value;
         if (attribute !== "stroke-width") {
@@ -332,7 +347,7 @@ define([
     renderPolygon: function (params) {
       this.preview.clear();
       var strokeWidth = false;
-      for (i=0; i < params.length; i++) {
+      for (var i=0; i < params.length; i++) {
         var attribute = params[i].attributeName;
         var attributeValue = params[i].value;
         if (attribute === "stroke-width") {
@@ -348,8 +363,21 @@ define([
       }
     },
 
-    updatePreview: function () {
+    renderText: function (params) {
+      this.preview.clear();
+      for (i=0; i < params.length; i++) {
+        var attribute = params[i].attributeName;
+        var attributeValue = params[i].value;
+        if (attribute === "font-family" || attribute === "font-style" || attribute === "font-weight" || attribute === "fill" || attribute === "halo-color" || attribute === "halo-radius") {
+          this.attributes[attribute] = attributeValue;
+        }
+      }
+      this.previewElement = this.preview.text("Text!").font({size: 30});
       this.previewElement.attr(this.attributes);
+    },
+
+    updatePreview: function () {
+      if(this.previewElement) this.previewElement.attr(this.attributes);
     }
   });
 	return SLDEditorView;
