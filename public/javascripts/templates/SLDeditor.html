@@ -279,7 +279,7 @@ var toggleAdvanced = function(divClass) {
                                         <label class="control-label symbolizer-attribute-label col-sm-2" for="pointplacement-anchorpointx"><%= editSLD.text['pointplacement-anchorpointx'] %></label>
                                         <div class="col-sm-10 symbolizer">
                                             <input type="number" class="form-control symbolizer-attribute-value"
-                                                    min="0" id="pointplacement-anchorpointx" data-css-parameter="pointplacement-anchorpointx"
+                                                    min="0" max ="1" id="pointplacement-anchorpointx" data-css-parameter="anchorpointx"
                                                     data-param-id="<%= attrData.text.values['pointplacement-anchorpointx'].param_id %>"
                                                     value="<%= attrData.text.values['pointplacement-anchorpointx'].value %>">
                                         </div>
@@ -288,7 +288,7 @@ var toggleAdvanced = function(divClass) {
                                         <label class="control-label symbolizer-attribute-label col-sm-2" for="pointplacement-anchorpointy"><%= editSLD.text['pointplacement-anchorpointy'] %></label>
                                         <div class="col-sm-10 symbolizer">
                                             <input type="number" class="form-control symbolizer-attribute-value"
-                                                    min="0" id="pointplacement-anchorpointy" data-css-parameter="pointplacement-anchorpointy"
+                                                    min="0" max ="1" id="pointplacement-anchorpointy" data-css-parameter="anchorpointy"
                                                     data-param-id="<%= attrData.text.values['pointplacement-anchorpointy'].param_id %>"
                                                     value="<%= attrData.text.values['pointplacement-anchorpointy'].value %>">
                                         </div>
@@ -297,7 +297,7 @@ var toggleAdvanced = function(divClass) {
                                         <label class="control-label symbolizer-attribute-label col-sm-2" for="pointplacement-displacementx"><%= editSLD.text['pointplacement-displacementx'] %></label>
                                         <div class="col-sm-10 symbolizer">
                                             <input type="number" class="form-control symbolizer-attribute-value"
-                                                    min="0" id="pointplacement-displacementx" data-css-parameter="pointplacement-displacementx"
+                                                    min="0" id="pointplacement-displacementx" data-css-parameter="displacementx"
                                                     data-param-id="<%= attrData.text.values['pointplacement-displacementx'].param_id %>"
                                                     value="<%= attrData.text.values['pointplacement-displacementx'].value %>">
                                         </div>
@@ -306,7 +306,7 @@ var toggleAdvanced = function(divClass) {
                                         <label class="control-label symbolizer-attribute-label col-sm-2" for="pointplacement-displacementy"><%= editSLD.text['pointplacement-displacementy'] %></label>
                                         <div class="col-sm-10 symbolizer">
                                             <input type="number" class="form-control symbolizer-attribute-value"
-                                                    min="0" id="pointplacement-displacementy" data-css-parameter="pointplacement-displacementy"
+                                                    min="0" id="pointplacement-displacementy" data-css-parameter="displacementy"
                                                     data-param-id="<%= attrData.text.values['pointplacement-displacementy'].param_id %>"
                                                     value="<%= attrData.text.values['pointplacement-displacementy'].value %>">
                                         </div>
@@ -315,7 +315,7 @@ var toggleAdvanced = function(divClass) {
                                         <label class="control-label symbolizer-attribute-label col-sm-2" for="pointplacement-rotation"><%= editSLD.text['pointplacement-rotation'] %></label>
                                         <div class="col-sm-10 symbolizer">
                                             <input type="number" class="form-control symbolizer-attribute-value"
-                                                    min="0" id="pointplacement-rotation" data-css-parameter="pointplacement-rotation"
+                                                    min="0" id="pointplacement-rotation" data-css-parameter="rotation"
                                                     data-param-id="<%= attrData.text.values['pointplacement-rotation'].param_id %>"
                                                     value="<%= attrData.text.values['pointplacement-rotation'].value %>">
                                         </div>

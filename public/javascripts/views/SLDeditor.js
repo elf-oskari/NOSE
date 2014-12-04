@@ -111,10 +111,10 @@ define([
       this.SLDconfigmodel.set(attribute, newvalue);
     },
     setParam: function(event) {
-      // if shape is changed
       var element,
           newvalue;
 
+      // if shape is changed
       if (event.currentTarget.innerText === "Symbol") {
         element = $(event.currentTarget).find("#graphic-symbol");
         newvalue = element[0].value.toLowerCase();
@@ -134,6 +134,7 @@ define([
           this.elementSize = parseInt(newvalue);
         // we don't want preview to update stroke-width
         } else if (param_css_parameter === "stroke-width") {
+          //in case we need this later
           this.strokeWidth = parseInt(newvalue);
         } else if (param_css_parameter === "font-size") {
           //in case we need this later
@@ -150,11 +151,6 @@ define([
           this.dispatcher.trigger("updateMapStyle",[{'name':param_css_parameter,'value': newvalue}], this.symbolType );
       }
       var sld_values = this.SLDconfigmodel.get('sld_values');
-      // we assume the changed param_id is always found
-      var paramIndex = _.findIndex(sld_values, {'param_id': param_id});
-      var param = sld_values[paramIndex];
-      if(param) param.value = newvalue;
-
       this.SLDconfigmodel.set('sld_values', sld_values);
 
     },
@@ -379,10 +375,11 @@ define([
       }
       this.previewElement = this.preview.text("Text!").font({size: 30});
       this.previewElement.attr(this.attributes);
+      this.previewElement.center(40,40);
     },
 
     updatePreview: function () {
-      if (_.has(this.attributes, "stroke") & this.symbolType === "pointsymbolizer" || this.symbolType === "polygonsymbolizer") {
+      if (_.has(this.attributes, "stroke") && (this.symbolType === "pointsymbolizer" || this.symbolType === "polygonsymbolizer")) {
         this.attributes["stroke-width"] = 3;
       }
       this.previewElement.attr(this.attributes);
