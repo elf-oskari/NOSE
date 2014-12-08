@@ -5,7 +5,7 @@ define([
 ], function(_, Backbone, SLD_template) {
 	var SLDTemplatesCollection = Backbone.Collection.extend({
 		model: SLD_template,
-		url: "/api/v1/templates",
+		url: "./api/v1/templates",
 		initialize: function(models) {
 			if (_.isUndefined(models)) {
 				// TODO: bootstrap collections in application.html

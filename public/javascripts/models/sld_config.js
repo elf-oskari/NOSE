@@ -9,7 +9,7 @@ define(['lodash','backbone'], function(_, Backbone) {
 			created: null,
 			updated: null
 		},
-		urlRoot: "/api/v1/configs",
+		urlRoot: "./api/v1/configs",
 		validate: function(attributes) {
 			console.log('Validating...', attributes, this.isNew());
 

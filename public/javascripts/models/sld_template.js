@@ -9,7 +9,7 @@ define(['lodash','backbone'], function(_, Backbone) {
 			updated: null,
 			wms_url: null
 		},
-		urlRoot: "/api/v1/templates",
+		urlRoot: "./api/v1/templates",
 		validate: function(attributes) {
 			console.log('Validating...', attributes, this.isNew());
 			if (attributes.id === null || attributes.id === "") {
