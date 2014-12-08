@@ -1,7 +1,6 @@
 module.exports = function (app, path, client, data, libs) {
 
     var formidable = require('formidable'),
-        pg = libs.pg,
         parse = libs.parse.parse,
         store = libs.store.store,
         select = libs.select.select,
@@ -19,17 +18,25 @@ module.exports = function (app, path, client, data, libs) {
 
 
     app.get('/api/v1/templates/', function (req, res) {
+	console.log('this fails');
         // TODO: refactor -1 to something more descriptive
+    try {
         select(-1, client,
             function(error, result) {
+            //console.log('here', error, result);
                 if (error) {
                     console.log('An error occurred:', error);
                     return res.send(500);
                 }
+                console.log("result: ", result);
                 res.status(200);
                 res.json(result);
             }
         );
+       } catch (e) {
+                    //console.log('we got error', e);
+                    return res.send(500);
+        }
     });
 
     // Upload route.
@@ -125,14 +132,7 @@ module.exports = function (app, path, client, data, libs) {
 
         delete_config(req.params.id,
             function (err) {
-////
-                    console.log("API ERROR!!!", err);
-                    res.status(500);
-                    res.json({'delete config': 'failed'});
-////////
-
-
-/*                if (err) {
+                if (err) {
                     console.log("API ERROR!!!", err);
                     res.status(500);
                     res.json({'delete config': 'failed'});
@@ -141,7 +141,7 @@ module.exports = function (app, path, client, data, libs) {
                     // we cannot use 204 as it is not supported by Backbone
                     res.status(200);
                     res.json({});
-                } */
+                }
             }            
         );
     });
@@ -274,22 +274,8 @@ module.exports = function (app, path, client, data, libs) {
         });
     });
 
-    app.get('/fix', function(req, res) {
-        console.log("trying to fix db connection");
-        // DB client
-        try {
-            client = new pg.Client(data);
-            client.connect(function(err) {
-                if (err) {
-                  console.error('Could not connect to postgres', err);
-                }else{
-                    console.log("new db connection created");
-                    res.status(200);
-                    res.json({'fix db': 'new db connection created'});                } 
-                }
-            );
-        } catch(e) {
-            console.error('Unable to read database configuration: '+e);
-        }
-    });
+app.get('*', function(req, res) {
+  console.log('Unhandled url', req.url);
+  res.status(404);
+});
 };

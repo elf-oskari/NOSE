@@ -36,7 +36,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // DB client
 try {
-       var data = JSON.parse(fs.readFileSync('./db.json','utf-8'));
+       //var data = JSON.parse(fs.readFileSync('./db.json','utf-8'));
+       var file = fs.readFileSync(path.resolve(__dirname, 'db.json'),'utf-8');
+       console.log('got file:', file);
+       var data = JSON.parse(file);
        client = new pg.Client(data);
        client.connect(function(err) {
         if (err) {
