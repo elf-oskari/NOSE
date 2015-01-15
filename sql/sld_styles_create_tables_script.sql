@@ -7,7 +7,70 @@ CREATE DATABASE sld_styles
        LC_COLLATE = 'Finnish_Finland.1252'
        LC_CTYPE = 'Finnish_Finland.1252'
        CONNECTION LIMIT = -1;
--- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ sld_template
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ sld_users
+-- Procedure: sld_users
+-- DROP FUNCTION procedure_sld_users_update();
+
+CREATE OR REPLACE FUNCTION procedure_sld_users_update()
+  RETURNS trigger AS
+  $BODY$
+BEGIN
+	IF (TG_OP = 'UPDATE') THEN
+		NEW.updated := current_timestamp;
+	RETURN NEW;
+	ELSIF (TG_OP = 'INSERT') THEN
+		NEW.created := current_timestamp;
+    NEW.uuid := (SELECT uuid_in(md5(random()::text || now()::text)::cstring));
+	RETURN NEW;
+	END IF;
+	RETURN NEW;
+END;
+$BODY$
+LANGUAGE plpgsql VOLATILE
+COST 100;
+
+-- DROP TYPE sld_role
+
+CREATE TYPE sld_role AS ENUM ('ADMIN', 'USER');
+-- Table: sld_users
+
+-- DROP TABLE sld_users;
+
+CREATE TABLE sld_users
+(
+  id serial NOT NULL,
+  "user" character varying(64) NOT NULL,
+  pw character varying(64) NOT NULL,
+  role sld_role NOT NULL DEFAULT 'USER',
+  uuid character varying(64) NOT NULL,
+  created timestamp with time zone NOT NULL,
+  updated timestamp with time zone,
+  CONSTRAINT sld_users_pkey PRIMARY KEY (id),
+  CONSTRAINT sld_users_user_key UNIQUE ("user"),
+  CONSTRAINT sld_users_uuid_key UNIQUE (uuid)
+)
+WITH (
+OIDS=FALSE
+);
+ALTER TABLE sld_users
+OWNER TO liferay;
+
+-- Trigger: trigger_sld_users on sld_users
+
+-- DROP TRIGGER trigger_sld_users ON sld_users;
+
+CREATE TRIGGER trigger_sld_users
+BEFORE INSERT OR UPDATE
+ON sld_users
+FOR EACH ROW
+EXECUTE PROCEDURE procedure_sld_users_update();
+
+INSERT INTO sld_users("user", pw, role)   VALUES ('admin','oskari','ADMIN');
+INSERT INTO sld_users("user", pw, role)   VALUES ('user','user','USER');
+INSERT INTO sld_users("user", pw, role)   VALUES ('pekka','pekka','ADMIN');
+INSERT INTO sld_users("user", pw, role)   VALUES ('oskari','oskari','USER');
+
 
 
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ sld_template
@@ -50,7 +113,10 @@ CREATE TABLE sld_template
   content text,
   created timestamp with time zone NOT NULL,
   updated timestamp with time zone,
-  CONSTRAINT sld_template_pkey PRIMARY KEY (id)
+  CONSTRAINT sld_template_pkey PRIMARY KEY (id),
+  CONSTRAINT users_uuid_fkey FOREIGN KEY (uuid)
+  REFERENCES sld_users (uuid) MATCH SIMPLE
+  ON UPDATE NO ACTION ON DELETE NO ACTION
 )
 WITH (
   OIDS=FALSE
@@ -107,6 +173,9 @@ CREATE TABLE sld_config
   created timestamp with time zone NOT NULL,
   updated timestamp with time zone,
   CONSTRAINT sld_config_pkey PRIMARY KEY (id),
+  CONSTRAINT users_uuid_fkey FOREIGN KEY (uuid)
+  REFERENCES sld_users (uuid) MATCH SIMPLE
+  ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT template_id_fkey FOREIGN KEY (template_id)
       REFERENCES sld_template (id) MATCH SIMPLE
       ON UPDATE NO ACTION ON DELETE CASCADE
@@ -265,6 +334,10 @@ CREATE TABLE sld_value
 WITH (
   OIDS=FALSE
 );
+
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ views
 
 CREATE  VIEW sld_all_test AS
  SELECT a.id AS sld_id,
