@@ -1,5 +1,3 @@
-
-
 .main
 {
     width: 100%;
@@ -11,17 +9,12 @@
     border-width: 5px;
 }
 
-.container-main
-{
-    margin-top: 50px;
-}
-
 /* Space out content a bit */
 
 body
 {
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 
 /* Everything but the jumbotron gets side spacing for mobile first views */
@@ -135,50 +128,6 @@ body
     display: inline-block;
 }
 
-.back-to-list
-{
-    margin-bottom: 10px;
-    margin-right: 15px;
-}
-
-.symbolizer-attribute-value
-{
-    width: 100px;
-}
-
-.symbolizer-attribute-label
-{
-    width: 100px;
-    padding: 0;
-}
-
-.symbolizer-column
-{
-    margin-left: 0;
-    margin-right: 5px;
-    width: 100%;
-}
-
-.hidden-advanced
-{
-    display: none;
-}
-
-.sld-tree
-{
-    overflow: auto;
-}
-
-.sld-editor-page
-{
-    min-height: 800px;
-}
-
-.parameter-form
-{
-    padding-left: 0;
-}
-
 .symbolizer
 {
     width: 50%;
@@ -195,6 +144,47 @@ body
     margin-left: 0;
 }
 
+/* CUSTOM STYLE for EDITOR PAGE */
+
+.editor-page-header-panel {
+    margin-bottom: 10px;
+}
+
+.editor-page-header {
+    background-color: #0099CB;
+    color: #FFFFFF;
+    font-weight: bold;
+    font-size: 20px;
+    padding: 15px;
+}
+
+.editor-page-header-body {
+    background-color: #2EA9E2;
+    padding: 5px;
+    padding-left: 10px;
+}
+
+.SLD-config-name {
+    margin-left: 15px;
+    margin-bottom: 15px;
+}
+.back-to-list {
+    color: #FFFFFF;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/*SLD-tree*/
+.sld-tree-container {
+    padding-left: 25px;
+}
+
+.sld-tree-panel {
+    border-radius: 0px;
+    margin: 0px;
+    border: 1px solid #B8B8B8;
+}
+
 .cursor-pointer {
     cursor: pointer;
 }
@@ -202,8 +192,156 @@ body
 .label-info {
     cursor: pointer;
 }
+
+.sld-tree
+{
+    height: 723px;
+    overflow: auto;
+    padding: 0px;
+}
+
+.panel-heading {
+    border-radius: 0px;
+}
+
+.container-panel {
+    padding: 0px;
+}
+
+.editor-panel, .container-panel, .panel.second-level {
+    border-color: #B8B8B8;
+    border-radius: 0px;
+}
+
+.search-input {
+    margin-bottom: 10px;
+}
+
+.page-title {
+    margin-bottom: 15px;
+}
+
+.editor-page-title {
+    font-family: Arial;
+    font-weight: 700;
+}
+
+.panel-heading.cursor-pointer.open {
+    background-color: #FFFFFF;
+    border-bottom-color: #FFFFFF;
+}
+
+.panel-heading.cursor-pointer.second-level.open, .panel-heading.cursor-pointer.second-level, .panel-body.second-level {
+    background-color: #F3F3F3;
+}
+
+.panel-heading.cursor-pointer.second-level.open {
+    border-bottom: none;
+}
+
+.btn.btn-block.sld_symbolizer {
+    border-radius: 0px;
+    background-color: #0099CB;
+    color: #FFFFFF;
+}
+
+.chosen-container {
+    width: 100%;
+}
+
+/*Symbolizer*/
+
+.main-heading {
+    height: 40px;
+    background-color: #0099CB;
+    font-size: 18px;
+    color: #FFFFFF;
+}
+
+.symbolizer-attribute-value {
+    width: 100px;
+}
+
+.symbolizer-attribute-label {
+    width: 100px;
+    padding: 0;
+}
+
+.symbolizer-column {
+    margin-left: 0;
+    margin-right: 5px;
+    width: 100%;
+}
+
+.hidden-advanced {
+    display: none;
+}
+
+.control-label.edit-sld-label {
+    text-align: left;
+    font-weight: 500;
+}
+
+.editor-label {
+    font-size: 18px;
+}
+
+.editor-label-heading {
+    font-size: 20px;
+    color: #B8B8B8;
+}
+
+.form-group {
+    margin-bottom: 10px;
+}
+
+.panel-body.sld-editor-page {
+    padding-right: 30px;
+}
+
+.editor-label.preview-label {
+    margin-top: 15px;
+}
+
 #preview
 {
-    margin-top: 30px;
     min-width: 150px;
+    margin-left: 15px;
+    margin-bottom: 10px;
+}
+
+.upper-panel {
+    height: 500px;
+    overflow: auto;
+}
+
+.preview-panel {
+    height: 230px;
+    margin-bottom: 0px;
+}
+
+.button-tools {
+    margin-left: 15px;
+    margin-top: 30px;
+}
+
+.btn.save {
+    background-color: #2EA9E2;
+    color: #FFFFFF;
+}
+
+.btn.cancel-changes {
+    background-color: #B8B8B8;
+    color: #FFFFFF;
+}
+
+/*Map panel*/
+
+.map-panel {
+    height: 750px;
+    margin-bottom: 0px;
+}
+
+.map {
+    height: 680px;
 }

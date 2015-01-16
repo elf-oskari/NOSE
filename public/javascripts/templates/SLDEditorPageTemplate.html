@@ -1,10 +1,31 @@
-
-<div class="col-sm-6 col-md-5 col-lg-3">
-  <div class="tree" style="height:800px"></div>
+<div class="row">
+	<div class="col-md-12">
+		<div class="panel editor-page-header-panel">
+			<div class="panel-heading editor-page-header"><%= locale.common['SLD-editor'] %></div>
+			<div class="panel-body editor-page-header-body">
+				<h4 class="back-to-list" onclick="back-to-list"><i class="fa fa-chevron-left pull-left"></i><%= locale.buttons['backToSLDlist'] %></h4>
+			</div>
+		</div>
+	</div>
 </div>
-<div class="col-sm-6 col-md-7 col-lg-4">
-  <div class="page" id="page"></div>
+<div class="row">
+	<div class="col-md-4">
+		<h4 class="SLD-config-name"><%= locale.common['SLD-features-heading'] + " - " + SLDconfigmodel.name %></h4>
+	</div>
 </div>
-<div class="col-sm-12 col-md-12 col-lg-5">
-  <div id="map" style="height:800px" class="map"></div>
+<div class="row">
+	<div class="col-sm-6 col-md-5 col-lg-3 sld-tree-container">
+	  <div class="tree"></div>
+	</div>
+	<div class="col-sm-6 col-md-7 col-lg-4">
+	  <div class="page" id="page"></div>
+	</div>
+	<div class="col-sm-12 col-md-12 col-lg-5">
+		<div class="panel editor-panel map-panel">
+      		<div class="panel-heading main-heading"><%= locale.common['SLDmap-heading'] %></div>
+      		<div class="panel-body">
+              	<div id="map" class="map"></div>
+      		</div>
+  		</div>
+	</div>
 </div>

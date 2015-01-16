@@ -41,7 +41,7 @@ define([
       self.listenTo(self.SLDconfigmodel, "all", self.logger);
       self.listenTo(self.SLDconfigmodel, "sync", function () { self.render();});
     },
-    render: function(paramlist,symbol) {
+    render: function(paramlist,symbol,ruletitle) {
         var localization = locale;
         var model = this.SLDconfigmodel.pick('id', 'name');
         var params = _.isUndefined(paramlist) ? false : paramlist;
@@ -65,7 +65,9 @@ define([
                     for (attrKey in data[typeKey].values) {
                         if (data[typeKey].values.hasOwnProperty(attrKey)) {
                             for (i = 0; i < params.length; i++) {
+                                data[typeKey].values[attrKey].class = "hidden";
                                 if (attrKey === params[i].attributeName) {
+                                    data[typeKey].class = "";
                                     data[typeKey].values[attrKey].param_id = params[i].param_id;
                                     data[typeKey].values[attrKey].value = params[i].value;
                                     data[typeKey].values[attrKey].name = params[i].attributeName;
@@ -83,9 +85,12 @@ define([
             data.graphic.values["external-graphic"].class = ""; // Not hidden
             data.graphic.values["wellknownname"] = "external";  // Drop-down value
         }
-        this.$el.html(this.template({SLDmodel: model, editSLD: localization, attrData: data, symbolType: type, symbolUnit: uom}));
+        this.$el.html(this.template({SLDmodel: model, editSLD: localization, attrData: data, symbolType: type, symbolUnit: uom, ruletitle: ruletitle}));
         if (paramlist) {
           this.renderPreview(paramlist, type);
+          $(this.el).find(".symbolizer-chosen").removeClass("hidden");
+          $(this.el).find(".preview-frame").removeClass("hidden");
+          $(this.el).find(".info-text").addClass("hidden");
         }
         return this;
     },
@@ -93,14 +98,15 @@ define([
      * @method updateEditParams
      * Updates SLDeditor view with editable params
      */
-    updateEditParams: function(params,symbolizer) {
+    updateEditParams: function(params,symbolizer,ruletitle) {
       console.log('updateEditParams', params);
+      //$(this.el).find(".symbolizer-chosen").removeClass("hidden");
       var paramlist = this.SLDconfigmodel.getSLDValuesByParams(params);
       var symbol = {
           type: symbolizer.type,
           uom: symbolizer.uom
       };
-      this.render(paramlist,symbol);
+      this.render(paramlist,symbol,ruletitle);
     },
 
     setAttribute: function(event) {
@@ -122,10 +128,10 @@ define([
         this.renderWellKnownName(newvalue);
         this.dispatcher.trigger("updateMapStyle",{'name':'wellknownname','value': newvalue},this.symbolType );
       } else {
-        element = $(event.currentTarget).find(".symbolizer-attribute-value");
-        var param_id = "" + element.data('param-id');
-        var param_css_parameter = element.data('css-parameter');
-        newvalue = element.val();
+        element = $(event.currentTarget).find(".form-control")[0];
+        var param_id = "" + element.dataset['paramId'];
+        var param_css_parameter = element.dataset['cssParameter'];
+        newvalue = element.value;
         if (param_css_parameter === "rotation") {
           this.elementRotation = newvalue;
           this.previewElement.transform({rotation: this.elementRotation});
@@ -152,6 +158,7 @@ define([
       }
       var sld_values = this.SLDconfigmodel.get('sld_values');
       this.SLDconfigmodel.set('sld_values', sld_values);
+      $(this.el).find(".cancel-changes").removeClass("disabled");
 
     },
 
@@ -167,6 +174,7 @@ define([
                 polygonsymbolizer: "hidden",
                 textsymbolizer: "hidden",
                 none: "hidden",
+                class: "hidden",
                 values: {
                     "size": {class: ""},
                     "opacity": {class: ""},
@@ -184,6 +192,7 @@ define([
                 polygonsymbolizer: "",
                 textsymbolizer: "hidden",
                 none: "hidden",
+                class: "hidden",
                 values: {
                     "stroke": {class: ""},
                     "stroke-opacity": {class: ""},
@@ -200,6 +209,7 @@ define([
                 polygonsymbolizer: "",
                 textsymbolizer: "hidden",
                 none: "hidden",
+                class: "hidden",
                 values: {
                     "fill": {class: ""},
                     "fill-opacity": {class: ""}
@@ -211,6 +221,7 @@ define([
                 polygonsymbolizer: "hidden",
                 textsymbolizer: "",
                 none: "hidden",
+                class: "hidden",
                 values: {
                     "label": {class: ""},
                     "font-family": {class: ""},
@@ -318,11 +329,11 @@ define([
       } else {
         var path = this.graphicPaths[wellknownname];
         this.previewElement = this.preview.path(path);
+        this.previewElement.size(50);
       }
       this.previewElement.attr(this.attributes);
-      this.previewElement.size(50);
       this.previewElement.transform({rotation: this.elementRotation});
-      this.previewElement.center(30,30);
+      this.previewElement.center(80,75);
     },
 
     renderExternalGraphics: function () {

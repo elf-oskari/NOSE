@@ -16,6 +16,10 @@ define([
     var SLDEditorPageView = Backbone.View.extend({
         el: '.container-main',
         template: _.template(editorTemplate),
+        events: {
+            'click .update': 'updateConfigName',
+            'click .back-to-list': 'back',
+        },
 
         initialize: function(params) {
             this.dispatcher = params.dispatcher;
@@ -26,7 +30,6 @@ define([
             this.treeView = new SLDTreeView({'SLDconfigmodel': this.SLDconfigmodel, 'SLDtemplatemodel': this.SLDtemplatemodel, 'dispatcher': this.dispatcher});
             this.mapView = new SLDMapView({'dispatcher': this.dispatcher});
             _.bindAll(this, 'render');
-            $(".btn.back-to-list").on('click', this.back);
         },
 
         back: function (event) {
@@ -34,6 +37,7 @@ define([
             $(event.currentTarget).addClass("hidden");
             Backbone.history.navigate('/', true);
         },
+
         setModels: function(models) {
             this.SLDtemplatemodel = models.SLDtemplatemodel;
             this.SLDconfigmodel = models.SLDconfigmodel;
@@ -43,8 +47,9 @@ define([
             return this;
         },
         render: function() {
+            var model = this.SLDconfigmodel.pick('id', 'name');
             $(".btn.back-to-list").removeClass("hidden");
-            this.$el.html(this.template());
+            this.$el.html(this.template({SLDconfigmodel: model, locale: locale}));
             this.assign(this.treeView, '.tree');
             this.assign(this.editorView, '.page');
             this.assign(this.mapView, '.map');
@@ -59,6 +64,17 @@ define([
             view
                 .setElement(this.$(selector))
                 .render();
+        },
+
+        updateConfigName: function(event) {
+            event.preventDefault();
+            this.SLDconfigmodel.save({},{
+                wait: true,
+                error: function (model, response, options) {
+                    alert('something went wrong!');
+                    console.log('Error', model, response, options);
+                }
+            });
         }
     });
     return SLDEditorPageView;

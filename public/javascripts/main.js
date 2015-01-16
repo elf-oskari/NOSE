@@ -7,10 +7,14 @@ requirejs.config({
 		ol3: 'lib/ol3-v3.0.0-debug-modified',
 		i18n: 'lib/i18n',
 		bootstrap: 'lib/bootstrap',
-		svg: 'lib/svg'
+		svg: 'lib/svg',
+		chosen: 'lib/chosen/chosen.jquery'
 	},
 	shim: {
 		'bootstrap': {
+			deps: ['jquery']
+		},
+		'chosen': {
 			deps: ['jquery']
 		},
 		'ol3': {

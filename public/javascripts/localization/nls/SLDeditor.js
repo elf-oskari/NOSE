@@ -8,18 +8,25 @@ define({
 			"upload": "Upload",
 			"cancel": "Cancel",
 			"update": "Update",
-			"backToSLDlist": "Back to SLDlist"
+			"save": "Save",
+			"reset": "Reset",
+			"backToSLDlist": "Back to SLDlist",
+			"searchRule": "Search rule..."
 		},
 		"common": {
-			"SLDeditor-heading": "SLD Editor",
+			"SLD-editor": "SLD Editor",
+			"SLDeditor-heading": "Symbolizer",
 			"SLDtree-heading": "SLD Featuretypes",
-			"SLDeditor-name": "Config name:",
+			"Config-name": "SLD config name:",
+			"SLDmap-heading": "Rule preview",
 			"SLDtree-name": "name",
 			"featuretype_id": "Featuretype id",
+			"SLD-features-heading": "Features",
 			"unit": "Unit",
 			"foot": "Foot",
 			"metre": "Metre",
-			"pixel": "Pixel"
+			"pixel": "Pixel",
+			"info-text": "Choose the symbolizer you want to edit from the menu on the left."
 		},
 		"point": {
 			"label": "Point",
@@ -85,6 +92,9 @@ define({
 			"pointplacement-rotation": "Rotation",
 			"lineplacement-perpendicularoffset": "Perpendicular"
 
+		},
+		"preview": {
+			"label": "Symbolizer preview"
 		}
 	}
 });
