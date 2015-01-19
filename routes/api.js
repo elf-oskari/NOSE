@@ -5,6 +5,10 @@ module.exports = function (app, path, client, data, libs) {
         store = libs.store.store,
         select = libs.select.select,
         store_config_post = libs.store_config_post.store_config_post,
+
+        select_user = libs.select_user.select_user,
+        check_config_ownership = libs.update_config.check_config_ownership,
+
         select_config = libs.select_config.select_config,
         select_fields = libs.select_fields.select_fields,
         download_config = libs.download_config.download_config,
@@ -14,33 +18,132 @@ module.exports = function (app, path, client, data, libs) {
         client = client,
         errorMessage = "We are working on the problem, please try again later. Thanks for understanding!",
         configIdCounter = 1,
-        configs = [];
+        configs = [],
 
+        express = require('express'),
+        bodyParser = require('body-parser'),
+        session = require('express-session'),
+        passport = require('passport'), 
+        LocalStrategy = require('passport-local').Strategy;
 
-    app.get('/api/v1/templates/', function (req, res) {
-	console.log('this fails');
-        // TODO: refactor -1 to something more descriptive
-    try {
-        select(-1, client,
-            function(error, result) {
-            //console.log('here', error, result);
-                if (error) {
-                    console.log('An error occurred:', error);
-                    return res.send(500);
-                }
-                console.log("result: ", result);
-                res.status(200);
-                res.json(result);
+    var users = [];
+
+    function findByUsername(username, fn) {
+        select_user(username, client, function(error, result) {
+            users = result;
+            fn(null, users[0]);
+        });
+    }
+
+    function findById(id, fn) {
+        for (var i = 0; i < users.length; i++) {
+            if (users[i].id == id) {
+                fn(null, users[i]);
+                return;
             }
-        );
-       } catch (e) {
-                    //console.log('we got error', e);
-                    return res.send(500);
         }
+        fn(new Error('User ' + id + ' does not exist'));
+    }
+    app.use(bodyParser.urlencoded({ extended: false }));
+    app.use(session({
+        secret: 'keyboard cat',
+        resave: false,
+        saveUninitialized: true
+    }));
+    app.use(passport.initialize());
+    app.use(passport.session());
+    app.engine('html', require('ejs').renderFile);
+
+    // Passport session setup.
+    //   To support persistent login sessions, Passport needs to be able to
+    //   serialize users into and deserialize users out of the session.  Typically,
+    //   this will be as simple as storing the user ID when serializing, and finding
+    //   the user by ID when deserializing.
+    passport.serializeUser(function(user, done) {
+      done(null, user);
+    });
+
+    passport.deserializeUser(function(user, done) {
+      findById(user.id, function (err, user) {
+        done(err, user);
+      });
+    });
+
+    passport.use(new LocalStrategy(
+      function(username, password, done) {
+          // Find the user by username.  If there is no user with the given
+          // username, or the password is not correct, set the user to `false` to
+          // indicate failure and set a flash message.  Otherwise, return the
+          // authenticated `user`.
+          findByUsername(username, function(err, user) {
+
+            console.log("passport find by username");
+            if (err) { return done(err); }
+            if (!user) { return done(null, false, { message: 'Unknown user ' + username }); }
+            if (user.pw != password) { return done(null, false, { message: 'Invalid password' }); }
+            return done(null, user);
+          })
+      }
+    ));
+
+    /*Check if user is admin and return boolean*/
+    function checkAdmin(user) {
+        console.log("checkAdmin user "+user.user+" role "+user.role);
+        return user.role === "ADMIN";
+    }
+
+    /*admin check to be used in chained express callbacks*/
+    function isAdmin(req, res, next) {
+        if (req && req.user && req.user.role == "ADMIN") {
+            next();
+        } else {
+            //TODO: some notification text as well?
+            res.status(401).send("Unauthorized");
+        }
+    }
+
+    function loggedIn(req, res, next) {
+        if (req.user) {
+            next();
+        } else {
+            res.redirect('/');
+        }
+    }
+
+    app.post('/login', passport.authenticate('local', { failureRedirect:'/' }), function(req, res, next) {
+        res.redirect('/application.html');
+    });
+    app.get('/application.html', loggedIn, function(req, res) {
+        res.render('application.html', {user: req.user ? req.user: null});                
+    });
+    app.get('/logout', function(req, res){
+        console.log("logging out user "+(req.user ? req.user.user : ""));
+        req.logout();
+        res.redirect('/');
+    });
+
+    app.get('/api/v1/templates/', loggedIn, function (req, res) {
+        console.log('this fails ');
+        // TODO: refactor -1 to something more descriptive
+        try {
+            select(-1, client,
+                function(error, result) {
+                    if (error) {
+                        console.log('An error occurred:', error);
+                        return res.send(500);
+                    }
+                    res.status(200);
+                    res.json(result);
+                }
+            );
+           } catch (e) {
+                return res.send(500);
+            }
     });
 
     // Upload route.
-    app.post('/api/v1/templates/', function (req, res) {
+    app.post('/api/v1/templates/', loggedIn, isAdmin, function (req, res) {
+        console.log("Upload SLD")
         var form = new formidable.IncomingForm();
         form.parse(req, function (err, fields, files) {
             // `file` is the name of the <input> field of type `file`
@@ -94,7 +197,7 @@ module.exports = function (app, path, client, data, libs) {
     });
 
     // Returns result of sql execution
-    app.get('/api/v1/templates/:id', function(req, res) {
+    app.get('/api/v1/templates/:id', loggedIn, function(req, res) {
         console.log('GET /api/v1/templates/' + req.params.id);
         select(req.params.id, client,
             function(error, result) {
@@ -108,7 +211,7 @@ module.exports = function (app, path, client, data, libs) {
         );
     });
 
-    app.delete('/api/v1/templates/:id', function(req, res) {
+    app.delete('/api/v1/templates/:id', loggedIn, isAdmin, function(req, res) {
         console.log('DELETE /api/v1/templates/' +req.params.id);
 
         delete_template(req.params.id,
@@ -127,10 +230,14 @@ module.exports = function (app, path, client, data, libs) {
         );
     });
 
-    app.delete('/api/v1/configs/:id', function(req, res) {
+    app.delete('/api/v1/configs/:id', loggedIn, function(req, res) {
         console.log('DELETE /api/v1/configs/' +req.params.id);
 
-        delete_config(req.params.id,
+        /*in case of a regular user the uuid must also be provided to delete function.*/
+        var uuid = checkAdmin(req.user) ? -1 : req.user.uuid;        
+        
+        //console.log(uuid+" "+req.user.uuid); return;
+        delete_config(req.params.id, uuid, 
             function (err) {
                 if (err) {
                     console.log("API ERROR!!!", err);
@@ -147,11 +254,16 @@ module.exports = function (app, path, client, data, libs) {
     });
 
 
-    app.get('/api/v1/configs/:id', function (req, res) {
+    app.get('/api/v1/configs/:id', loggedIn, function (req, res) {
         console.log('getting config with id');
         console.log('GET /api/v1/configs/' + req.params.id);
+
+        /*in case of a regular user the uuid must also be provided -> only show the configs owned by user.*/
+        var uuid = checkAdmin(req.user) ? -1 : req.user.uuid;        
+
+
         // TODO: refactor -1 to something more descriptive
-        select_config(req.params.id, client,
+        select_config(req.params.id, uuid, client,
             function(error, result) {
                 if (error) {
                     console.log('An error occurred:', error);
@@ -166,7 +278,7 @@ module.exports = function (app, path, client, data, libs) {
     });
 
     // Download an SLD file
-    app.get('/api/v1/configs/:id/download', function (req, res) {
+    app.get('/api/v1/configs/:id/download', loggedIn, function (req, res) {
         console.log('downloading sld file with id');
         console.log('GET /api/v1/configs/' + req.params.id);
         download_config(req.params.id, client,
@@ -192,11 +304,15 @@ module.exports = function (app, path, client, data, libs) {
     });
 
 
-    app.get('/api/v1/configs/', function (req, res) {
+    app.get('/api/v1/configs/', loggedIn, function (req, res) {
         console.log('getting config without id --> ALL');
         console.log('GET /api/v1/configs/');
 
-        select_config(-1, client,
+        /*in case of a regular user the uuid must also be provided -> only show the configs owned by user.*/
+        var uuid = checkAdmin(req.user) ? -1 : req.user.uuid;        
+
+        console.log("UUID? "+uuid);
+        select_config(-1, uuid, client,
             function(err, result) {
                 if (err) {
                     console.log('An error occurred:', error);
@@ -209,32 +325,65 @@ module.exports = function (app, path, client, data, libs) {
                 res.json(result);
             }
         );
+
     });
 
-    app.put('/api/v1/configs/:id', function (req, res) {
+    app.put('/api/v1/configs/:id', loggedIn, function (req, res) {
         console.log('PUT /api/v1/configs/' +req.params.id);
+
+        /*in case of a regular user the uuid must also be provided*/
+        var uuid = (req.user && req.user.uuid) ? req.user.uuid : 0;        
         var form = new formidable.IncomingForm();
         form.parse(req, function (err, fields, files) {
-            //console.log('we got', fields);
-            update_config(fields, client,
-                function (err) {
-                    if (err) {
-                        console.log("API ERROR!!!", err);
-                        res.status(500);
-                        res.json({'delete template': 'failed'});
+
+
+        //    var configOwnerUUID = null;
+        //    return check_config_ownership(fields.id, client, callback);
+ 
+            check_config_ownership(fields.id, client,function(err, result) {
+                configOwnerUUID = result[0]['uuid'];
+                console.log("Config id "+fields.id+" owner uuid "+result[0]['uuid']+" logged in user uuid "+uuid+" "+configOwnerUUID);
+                if (uuid != configOwnerUUID) {
+                    console.log("Different owner!");
+                    //user is admin -> allow operation but use the existing uid. Otherwise send 401.
+                    if (checkAdmin(req.user)) {
+                        uuid = configOwnerUUID;
+                        console.log("Admin editing somebody elses conf. Let him.")
                     } else {
-                        console.log("API SUCCESS!!!");
-                        // we cannot use 204 as it is not supported by Backbone
-                        res.status(200);
-                        res.json({});
+                        res("401");
                     }
-                } 
-            );           
+
+                }
+
+                console.log('Getting this far? ', fields);
+                update_config(fields, uuid, client,
+                    function (err) {
+                        if (err) {
+                            console.log("API ERROR!!!", err);
+                            res.status(500);
+                            res.json({'delete template': 'failed'});
+                        } else {
+                            console.log("API SUCCESS!!!");
+                            // we cannot use 204 as it is not supported by Backbone
+                            res.status(200);
+                            res.json({});
+                        }
+                    } 
+                );           
+
+
+
+            });
+
+
         });
     });
 
-    app.post('/api/v1/configs/', function (req, res) {
+    app.post('/api/v1/configs/', loggedIn, function (req, res) {
         console.log('POST /api/v1/configs/');
+
+        var uuid = (req.user && req.user.uuid) ? req.user.uuid : -1;
+
         var form = new formidable.IncomingForm();
         form.parse(req, function (err, fields, files) {
             console.log('we got', fields);
@@ -248,7 +397,7 @@ module.exports = function (app, path, client, data, libs) {
                 console.log("G: ", lista[i])
             }
 
-            store_config_post(fields, client,
+            store_config_post(fields, uuid, client,
                 function (err, result_id) {
                     if (err) {
                         console.log("API ERROR!!!", err);
@@ -256,7 +405,9 @@ module.exports = function (app, path, client, data, libs) {
                         res.json({'delete template': 'failed'});
                     } else {
                         console.log("API SUCCESS!!! for 3 -->:",result_id);
-                        select_config(result_id, client,
+                        /*in case of a regular user the uuid must also be provided -> only show the configs owned by user.*/
+                        var uuid = checkAdmin(req.user) ? -1 : req.user.uuid;        
+                        select_config(result_id, uuid, client,
                             function(err, result) {
                                 if (err) {
                                     console.log('An error occurred:', error);
@@ -274,8 +425,30 @@ module.exports = function (app, path, client, data, libs) {
         });
     });
 
-app.get('*', function(req, res) {
+app.get('*', loggedIn, function(req, res) {
   console.log('Unhandled url', req.url);
   res.status(404);
 });
 };
+
+
+
+
+
+
+/*
+    app.get('/login',
+        function (req, res) {
+            console.log("0");
+            console.log(req.query.username);
+            for (var key in req.params) {
+                console.log("get: "+key+" "+req.params[key]);
+            }
+        },
+        passport.authenticate('local', { failureRedirect:'/' }),
+        function(req, res, next) {
+            console.log('trying to redirect');
+            res.render('application.html', {user: req.user ? req.user: null});                
+        }
+    );
+*/    

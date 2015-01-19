@@ -27,8 +27,9 @@ define([
         },
         render: function() {
             var localization = locale;
+            var userRole = $('#userrole').val();
             var templateConfigTree = this.templates.getTemplateConfigTree(this.configs.getConfigTree());
-            this.$el.html(this.template({_: _, SLDtemplates: templateConfigTree, SLDlist_i18n: localization}));
+            this.$el.html(this.template({_: _, SLDtemplates: templateConfigTree, SLDlist_i18n: localization, userrole: userRole}));
             return this;
         },
         deleteConfirmation: function (event) {
@@ -106,6 +107,11 @@ define([
                     $('#uploadModal').modal('hide');
                     self.templates.create(newTemplate);
                     self.render();
+                },
+                error: function(response) {
+                    //TODO: handle error, notify user (401 for instance)
+                    $('#uploadModal').modal('hide');
+
                 }
             });
         }

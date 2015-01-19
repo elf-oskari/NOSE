@@ -280,13 +280,77 @@ SldInserter.prototype.deleteConfig=function(id) {
     return(self.db.queryResult('delete from sld_value where config_id='+id ));
 };
 
+SldInserter.prototype.getConfigOwner=function(id) {
+    
+try {
+    var self=this;
+    var sql = 'select uuid from sld_config where id='+id;
+    console.log("getConfigOwner, sql: "+sql);
+    
+    return(self.db.queryResult(sql));
+} catch(e) {
+	console.log("Virhe "+e);
+}
+}
+
+
+
+exports.check_config_ownership = function(config_id, client, cb) {
+	var inserter=new SldInserter();
+	var connected=inserter.connect(client);
+	/*
+		Check, if uuid matches the current uuid of the config in the db
+		if not -> error
+		else if admin, editing must be possible but uuid must still remain as it was? wtf...
+	*/
+
+
+	var result = [];
+	console.log("Check ownership")
+	var configOwnerQueried = connected.then(function() {
+		return(inserter.getConfigOwner(config_id));
+	});
+
+	var ready = configOwnerQueried.then(function(res) {
+		console.log("configOwnerQueried then "+res);
+		result = res;
+		return result;
+	});
+
+    ready.catch(function(err) {
+    	console.log("ready catch "+err);
+       // TODO: better management for empty result
+       console.log("ready.catch "+err);
+        if(result.length === 0){
+           // Empty select
+            cb(false,result);
+        }
+        else {
+            cb(err, 0);
+            console.error(err);
+            return;
+        }
+    });
+
+    ready.then(function() {
+      console.log('success in check_config_ownership! '+result.length);
+      cb(false,result);
+    });
+
+
+
+}
+
+
 /** Main function, read template and store data to sld_styles db
  * @param params : [] output of sld parse function
  * @param sld_template: file name of template file
  * @param name  original sld file name
  * @param cb {function} status cb
  * */
-exports.update_config = function(fields, client, cb) {
+exports.update_config = function(fields, uuid, client, cb) {
+
+
 
   console.log("Upadataing config");
   console.log("jeps_upadte_name: ", fields.name);
