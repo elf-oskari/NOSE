@@ -24,14 +24,13 @@
       <div class="jumbotron">
         <h1>SLD Editor</h1>
         <p class="lead"> Please sign in to use the editor.</p>
-        <form class="form-signin" role="form">
-	        <input type="email" class="form-control" placeholder="Email address" required autofocus />
-	        <input type="password" class="form-control" placeholder="Password" required />
+        <form class="form-signin" role="form" action="/login" method="post">
+          <input id="username" name="username" type="text" class="form-control" placeholder="Username" required autofocus />
+          <input id="password" name="password" type="password" class="form-control" placeholder="Password" required />
 	        <label class="checkbox">
 	      		<input type="checkbox" value="remember-me"/>
 	    	</label>
-	    	<a href="application.html" class="btn btn-lg btn-primary btn-block" type="submit">Sign in</a>
-<!--        <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button> -->
+        <input type="submit" id="submit" name="submit" class="btn btn-lg btn-primary btn-block" value="Sign in"/>
     	</form>
       </div>
       <!-- footer

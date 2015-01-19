@@ -3,12 +3,17 @@
   "version": "0.0.3",
   "private": true,
   "dependencies": {
-    "sax": "0.6.0",
+    "body-parser": "^1.10.1",
+    "ejs": "^2.1.4",
     "es6-promise": "1.0.0",
-    "pg.js": "3.4.4",
     "express": "4.9.5",
-    "lodash-node": "~2.4.1",
+    "express-session": "^1.10.1",
     "formidable": "1.0.15",
+    "lodash-node": "~2.4.1",
+    "passport": "^0.2.1",
+    "passport-local": "^1.0.0",
+    "pg.js": "3.4.4",
+    "sax": "0.6.0",
     "temporary": "0.0.8"
   },
   "engines": {

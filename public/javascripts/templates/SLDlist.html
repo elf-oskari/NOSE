@@ -3,18 +3,27 @@
   <div class="col-md-8 col-md-offset-2">
     <div class="panel panel-primary">
       <div class="panel-heading"><%= SLDlist_i18n.texts.title %></div>
-      <div class="panel-body">
-        <p> <%= SLDlist_i18n.texts.body %><p>
-        <a class="btn btn-primary" data-toggle="modal" data-target="#uploadModal"><%= SLDlist_i18n.texts.upload %></a>
-      </div>
+      <%
+        var isAdmin = (userrole && userrole == "ADMIN");
+      %>
+      <!-- uploading new sld only allowed for admins (role == 1) -->
+      <% if (isAdmin) {%>
+        <div class="panel-body">
+          <p> <%= SLDlist_i18n.texts.body %><p>
+          <a class="btn btn-primary" data-toggle="modal" data-target="#uploadModal"><%= SLDlist_i18n.texts.upload %></a>
+        </div>
+      <% } %>
+
       <table class="table table-striped table-condensed">
         <% _.forEach(SLDtemplates, function(SLDtemplateModel) { %>
           <thead>
             <tr>
               <th><%= SLDtemplateModel.name %></th>
               <th>
-                <button type="button" class="btn btn-primary btn-sm new" data-id="<%= SLDtemplateModel.id %>" data-target="#createConfigModal"><%= SLDlist_i18n.buttons.create %></button>
-                <button type="button" class="btn btn-danger btn-sm delete" data-id="<%= SLDtemplateModel.id %>" data-target="#deleteTemplateModal"><%= SLDlist_i18n.buttons.delete %></button>
+                <button type="button" class="btn btn-primary btn-sm new" data-id="<%= SLDtemplateModel.id %>"><%= SLDlist_i18n.buttons.create %></button>
+                <% if (isAdmin) {%>
+                  <button type="button" class="btn btn-danger btn-sm delete" data-id="<%= SLDtemplateModel.id %>" data-target="#deleteTemplateModal"><%= SLDlist_i18n.buttons.delete %></button>
+                <% } %>
               </th>
             </tr>
           </thead>

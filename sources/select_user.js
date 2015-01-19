@@ -106,14 +106,14 @@ PgDatabase.prototype.rollback=function() {
 }
 
 /** @constructor
-  * SldSelecter executes slq select to
+  * UserSelecter executes slq select to
   *  an SQL database. */
-var SldSelecter=function() {
+var UserSelecter=function() {
 	this.db=null;
 }
 
 /** @param {string} dbPath Name of JSON file with database address and credentials. */
-SldSelecter.prototype.connect=function(client) {
+UserSelecter.prototype.connect=function(client) {
     var defer=new Deferred();
 
     this.db=new PgDatabase();
@@ -124,46 +124,22 @@ SldSelecter.prototype.connect=function(client) {
 /** Select templates with all data
  * @param {string/number} id  template id
  *                        if  < 1  --> select all templates
- * @param {string/number} uuid  userid id
- *                        if  == -1  -->admin: select all templates. Otherwise only configs of the user
  * @return {Promise} */
-SldSelecter.prototype.selectConfig=function(id, uuid) {
+UserSelecter.prototype.selectUser=function(username) {
     var self=this,
-        sql = 'SELECT id,uuid,template_id,name,output_path,created,updated FROM SLD_CONFIG';
+        sql = 'SELECT id, uuid, \"user\", pw, role FROM SLD_USERS WHERE \"user\" = '+"\'"+username+"\';";
 
-    if (id > 0) {
-      sql = sql + ' WHERE ID='+id
-      if (uuid != -1) {
-        sql += ' AND uuid =\''+uuid+'\'';
-      }
-    } else if (uuid != -1) {
-      sql = sql + ' WHERE uuid =\''+uuid+'\'';
-    };
-
-    console.log("selectConfig: SQL: ", sql);
+        console.log("selectUser, SQL: "+sql);
     return(self.db.queryResult( sql));
 };
 
-/** Select featuretypes of one template
- * @param {string/number} id  template id
- * @return {Promise} */
-SldSelecter.prototype.selectValues=function(id) {
-    var self=this;
-
-    var value_sql = 'SELECT param_id, value from SLD_VALUE WHERE CONFIG_ID='+id;
-    console.log("value_sql: ", value_sql);
-
-    return(self.db.queryResult(value_sql));
-};
-
-
 /** Roll back current transaction and close connection. */
-SldSelecter.prototype.abort=function() {
+UserSelecter.prototype.abort=function() {
     return(this.db.rollback()); //.then(bindToScope(this.db,this.db.close)));
 };
 
 /** Commit current transaction and close connection. */
-SldSelecter.prototype.finish=function() {
+UserSelecter.prototype.finish=function() {
     return(this.db.commit()); //.then(bindToScope(this.db,this.db.close)));
 };
 
@@ -172,57 +148,37 @@ SldSelecter.prototype.finish=function() {
 /** Top function, to execute sql statement
  * @param {String} sql_template id
  * */
-exports.select_config = function(id, uuid, client, cb) {
-
-
-    console.log("in select_config "+uuid);
-
-	var selecter=new SldSelecter(),
-        cb = cb,
-        ressu = {},
+exports.select_user = function(username, client, callback) {
+  console.log("in select_user "+username);
+	var selecter=new UserSelecter(),
+        callback = callback,
         result = [];
 
-	var connected=selecter.connect(client);
+  	var connected=selecter.connect(client);
 
-    var configSelected=connected.then(function() {
-        return(selecter.selectConfig(id, uuid));
+    var userSelected=connected.then(function() {
+        return(selecter.selectUser(username));
     });
 
-    var ready = configSelected;
+    var ready = userSelected.then(function (userResult) {
+      
+      userResult.forEach(function(row) {
+        result.push(row);
+      });
 
-
-    var ready = configSelected.then(function (configResult) {
-       //Loop templates
-            var ind = 0;
-            var maxind = configResult.lenght;
-            var feaSelected = null;
-        configResult.forEach(function(row){
-            result.push(row);
-            valuesSelected = subSelectValues(ind, row.id);
-            ind++;
-        });
-        return valuesSelected;
+      return result;
+      
     }); 
-
-    function subSelectValues(ind, id) {
-        var featuretypeSelected = selecter.selectValues(id);
-        var allSelected = featuretypeSelected.then(function (valueResult) {
-            //console.log("valueResult: ", valueResult);
-            result[ind].sld_values = valueResult;
-
-        });
-        console.log("allSelected: ", allSelected);
-        return allSelected;
-    };
 
     ready.catch(function(err) {
        // TODO: better management for empty result
+       console.log("ready.catch "+err);
         if(result.length === 0){
            // Empty select
-            cb(false,result);
+            callback(false,result);
         }
         else {
-            cb(err, 0);
+            callback(err, 0);
             console.error(err);
             return;
         }
@@ -230,17 +186,8 @@ exports.select_config = function(id, uuid, client, cb) {
     });
 
     ready.then(function() {
-        console.log('success in select_config!');
-
-        if(id != -1){
-            console.log("id != -1: ", id);
-            ressu = result[0];
-            cb(false,ressu);
-        }else{
-            console.log("id == -1: ", id);
-            cb(false,result);
-        }
-
+      console.log('success in select_user!');
+      callback(false,result);
     });
 }
 

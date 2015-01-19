@@ -167,15 +167,14 @@ SldInserter.prototype.readFile=function(path, name) {
   * @param {string} name name of original sld file
   * @param {string} templatePath Path of file to read.
   * @return {Promise} */
-SldInserter.prototype.insertSldConfig=function(outputPath, fields) {
+SldInserter.prototype.insertSldConfig=function(outputPath, fields, uuid) {
     
 	console.log("name: " , fields.name);
 	console.log("templateId: " , fields.template_id);
-
 	return(this.db.querySingle(
-		'INSERT INTO sld_config (template_id,name,output_path)'+
- 			'VALUES ($1,$2,$3)'+
- 			'RETURNING id', [fields.template_id,fields.name,outputPath]
+		'INSERT INTO sld_config (template_id,name,output_path, uuid)'+
+ 			'VALUES ($1,$2,$3,$4)'+
+ 			'RETURNING id', [fields.template_id,fields.name,outputPath, uuid]
 	));
 };
 
@@ -258,7 +257,7 @@ SldInserter.prototype.insertValuesToConfig=function(fields, config_id) {
  * @param name  original sld file name
  * @param cb {function} status cb
  * */
-exports.store_config_post = function(fields, client, cb) {
+exports.store_config_post = function(fields, uuid, client, cb) {
 
   console.log("Saving config");
   console.log("jeps_post: ", fields.name);
@@ -270,7 +269,7 @@ exports.store_config_post = function(fields, client, cb) {
 	var connected=inserter.connect(client);
 
 	var templateInserted=connected.then(function() {
-		return(inserter.insertSldConfig(outputPath, fields));
+		return(inserter.insertSldConfig(outputPath, fields, uuid));
 	});
 
 	var configInserted=templateInserted.then(function(configRow) {

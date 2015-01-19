@@ -25,6 +25,8 @@ app.set("view options", {layout: false});
 //app.use(express.bodyParser());
 //app.use(express.methodOverride());
 //app.use(app.router);
+
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 // development only
@@ -56,6 +58,7 @@ var libs = {
   parse : require('./sources/parse'),
   store : require('./sources/store'),
   store_config_post : require('./sources/store_config_post'),
+  select_user : require('./sources/select_user'),
   select_config : require('./sources/select_config'),
   select_fields : require('./sources/select_fields'),
   download_config : require('./sources/download_config'),

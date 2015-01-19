@@ -67,10 +67,19 @@ SldDeleter.prototype.finish=function() {
 /** Select templates with all data
  * @param {string/number} id  template id
  *                        if  < 1  --> select all templates
+ * @param {string/number} uuid  user id
+ *                        if   == -1  -> admin user, always allow delete
  * @return {Promise} */
-SldDeleter.prototype.deleteConfig=function(id) {
+SldDeleter.prototype.deleteConfig=function(id, uuid) {
     var self=this;
-    return(self.db.queryResult('delete from sld_config where id='+id ));
+    var sql = 'delete from sld_config where id='+id;
+    if (uuid && uuid != -1) {
+    	sql += " AND uuid = \'"+uuid+"\'";
+    }
+    console.log("deleteConfig: sql "+sql)
+    return(self.db.queryResult(sql));
+
+//    return(self.db.queryResult('delete from sld_config where id='+id ));
 };
 
 
@@ -79,7 +88,7 @@ SldDeleter.prototype.deleteConfig=function(id) {
  * @param id  templates id to be deleted
  * @param cb {function} status cb
  * */
-exports.delete_config = function(id, cb) {
+exports.delete_config = function(id, uuid, cb) {
 
 	console.log("IN DELETE CONFIG....");
 	var deletes=new SldDeleter(),
@@ -88,7 +97,7 @@ exports.delete_config = function(id, cb) {
 	var connected=deletes.connect('db.json');
 
     var ready=connected.then(function() {
-        return(deletes.deleteConfig(id));
+        return(deletes.deleteConfig(id, uuid));
     });
     console.log("READY: " , ready);
 
