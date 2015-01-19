@@ -11,7 +11,7 @@ define({
 			"delete": "Delete",
 			"download": "Download",
 			"upload": "Upload",
-			"cancel": "Cancel"
+			"cancel": "Cancel",
 		},
 		"upload" : {
 			"title": "Upload new SLD template",
@@ -27,6 +27,11 @@ define({
 			"title": "Are you sure you want to delete this template?",
 			"body": "Deleting this template will also delete all the configs of this template.",
 			"delete": "Delete template"
+		},
+		"createConfig" : {
+			"title": "Create new config",
+			"body": "The new config will have the same values as the template",
+			"label": "Name:"
 		},
 		"internalError": "Hups, tallennus ei väliaikaisesti toimi, kokeile myöhemmin uudelleen."
 	}

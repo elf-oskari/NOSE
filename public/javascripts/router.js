@@ -4,7 +4,6 @@ define(['lodash','backbone'], function(_, Backbone) {
 			'application.html' : 'listSLD',
 			'/' : 'listSLD',
 			'edit/:id' : 'editSLD',
-			'new/:id' : 'newSLD',
 			'*default' : 'listSLD'
 		},
 
@@ -30,17 +29,6 @@ define(['lodash','backbone'], function(_, Backbone) {
 					.setModels({'SLDconfigmodel': SLDconfigmodel, 'SLDtemplatemodel': SLDtemplatemodel})
 					.render();
 			}
-		},
-		newSLD: function(template_id) {
-			var self = this;
-			var SLDtemplatemodel = self.WebApp.collections.SLDTemplatesCollection.getById(template_id);
-            var new_config_sld_values = SLDtemplatemodel.getDefaultConfigSLDValues();
-            var new_config = {
-                "template_id": template_id,
-                "sld_values": new_config_sld_values
-            };
-            var SLDconfigmodel = self.WebApp.collections.SLDConfigsCollection.create(new_config);
-            self.editorPage(SLDtemplatemodel, SLDconfigmodel);
 		},
 		editSLD: function(id) {
 			var self = this;

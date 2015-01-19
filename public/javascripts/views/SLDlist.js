@@ -15,6 +15,7 @@ define([
             'click .btn.upload': 'upload',
             'click .btn.delete-template': 'deleteTemplate',
             'click .btn.new': 'newConfig',
+            'click .btn.create-config': 'createNewConfig',
             'click .btn.edit': 'editConfig',
             'click .btn.delete-config': 'deleteConfig',
             'click .btn.download': 'downloadConfig'
@@ -31,12 +32,45 @@ define([
             this.$el.html(this.template({_: _, SLDtemplates: templateConfigTree, SLDlist_i18n: localization}));
             return this;
         },
+        newConfig: function (event) {
+            var element = $(event.currentTarget);
+            var target = element.data('target');
+            var template_id = element.data('id');
+            var SLDtemplatemodel = this.templates.getById(template_id);
+            var new_config_sld_values = SLDtemplatemodel.getDefaultConfigSLDValues();
+            var new_config = {
+                "template_id": template_id,
+                "sld_values": new_config_sld_values
+            };
+            this.SLDconfigmodel = this.configs.create(new_config);
+            this.SLDconfigmodel;
+            $(target).attr('data-id', template_id).modal();
+        },
+        createNewConfig: function (event) {
+            event.preventDefault();
+            var self = this;
+            var name = $(event.currentTarget.offsetParent.children).find("#nameInput")[0].value;
+            this.SLDconfigmodel.set('name', name);
+            this.SLDconfigmodel.save({},{
+                wait: true,
+                success: function (model, response, options) {
+                    $('#createConfigModal').modal('hide');
+                    self.render();
+                },
+                error: function (model, response, options) {
+                    alert('something went wrong!');
+                    console.log('Error', model, response, options);
+                }
+            });
+        },
+
         deleteConfirmation: function (event) {
             var element = $(event.currentTarget);
             var target = element.data('target');
             var id = element.data('id');
             $(target).attr('data-id', id).modal();
         },
+
         deleteConfig: function (event) {
             event.preventDefault();
             var self = this;
@@ -57,11 +91,7 @@ define([
                 },
             });
         },
-        newConfig: function (event) {
-            event.preventDefault();
-            var template_id = $(event.currentTarget).data('id');
-            Backbone.history.navigate('/new/' + template_id, true);
-        },
+
         editConfig: function (event) {
             event.preventDefault();
             Backbone.history.navigate('/edit/' + $(event.currentTarget).data('id'), true);
