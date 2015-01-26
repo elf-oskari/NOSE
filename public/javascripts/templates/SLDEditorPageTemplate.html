@@ -1,7 +1,15 @@
 <div class="row">
 	<div class="col-md-12">
 		<div class="panel editor-page-header-panel">
-			<div class="panel-heading editor-page-header"><%= locale.common['SLD-editor'] %></div>
+			<div class="panel-heading editor-page-header">
+				<%= locale.common['SLD-editor'] %>
+			      <a href="/logout">
+			        <h4 class="sld-list-signout-link">
+			          <%=userName%>&nbsp;-&nbsp;<%= locale.common.logout%>
+			          <i class="fa fa-sign-out pull-right"></i>
+			        </h4>
+			      </a>
+			</div>
 			<div class="panel-body editor-page-header-body">
 				<h4 class="back-to-list" onclick="back-to-list"><i class="fa fa-chevron-left pull-left"></i><%= locale.buttons['backToSLDlist'] %></h4>
 			</div>

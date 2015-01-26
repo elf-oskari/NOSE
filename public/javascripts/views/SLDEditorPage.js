@@ -49,7 +49,8 @@ define([
         render: function() {
             var model = this.SLDconfigmodel.pick('id', 'name');
             $(".btn.back-to-list").removeClass("hidden");
-            this.$el.html(this.template({SLDconfigmodel: model, locale: locale}));
+            var userName = $("#user").attr("name");
+            this.$el.html(this.template({SLDconfigmodel: model, locale: locale, userName:userName}));
             this.assign(this.treeView, '.tree');
             this.assign(this.editorView, '.page');
             this.assign(this.mapView, '.map');

@@ -3,13 +3,14 @@ define({
 		"texts" : {
 			"title" : "SLD templates",
 			"body" : "Below is a list of SLD templates. You can also upload a new SLD.",
-			"upload" : "Upload SLD"
+			"upload" : "Import Style",
+			"logout": "Sign out"
 		},
 		"buttons" : {
-			"create": "Create new config",
+			"create": "Create new",
 			"edit": "Edit",
 			"delete": "Delete",
-			"download": "Download",
+			"download": "Create output SLD",
 			"upload": "Upload",
 			"cancel": "Cancel",
 		},

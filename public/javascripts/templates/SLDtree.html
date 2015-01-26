@@ -1,6 +1,6 @@
 <!-- List template -->
 <div class="view" id="sld-tree-view">
-    <select id="rule-select" class="chosen-select form-control" style="width: 100%" data-placeholder="<%= locale.buttons['searchRule'] %>">
+    <select id="rule-select" class="chosen-select form-control" data-placeholder="<%= locale.buttons['searchRule'] %>">
       <option></option>
         <% _.forEach(SLDfeaturetypeTree, function(SLDfeatureType) { %>
               <% _.forEach(SLDfeatureType.rules, function(SLDrule) { %>

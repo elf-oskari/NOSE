@@ -26,7 +26,8 @@ define({
 			"foot": "Foot",
 			"metre": "Metre",
 			"pixel": "Pixel",
-			"info-text": "Choose the symbolizer you want to edit from the menu on the left."
+			"info-text": "Choose the symbolizer you want to edit from the menu on the left.",
+			"logout": "Sign out",
 		},
 		"point": {
 			"label": "Point",

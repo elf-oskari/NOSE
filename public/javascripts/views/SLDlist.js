@@ -4,12 +4,14 @@ define([
     'jquery',
     'i18n!localization/nls/SLDlist',
     'text!templates/SLDlist.html',
+    'text!templates/SLDListButtons.html',
     'models/sld_config',
     'bootstrap'
-], function(_, Backbone, $, locale, SLDListTemplate, SLDconfigModel) {
+], function(_, Backbone, $, locale, SLDListTemplate, SLDListButtons, SLDconfigModel) {
     var SLDListView = Backbone.View.extend({
         el: '.container-main',
         template: _.template(SLDListTemplate),
+        userRole: null,
         events: {
             'click .btn.delete': 'deleteConfirmation',
             'click .btn.upload': 'upload',
@@ -18,7 +20,10 @@ define([
             'click .btn.create-config': 'createNewConfig',
             'click .btn.edit': 'editConfig',
             'click .btn.delete-config': 'deleteConfig',
-            'click .btn.download': 'downloadConfig'
+            'click .btn.download': 'downloadConfig',
+
+            'click .list-group-item':'listGroupItemClick'
+
 
         },
         initialize: function(params) {
@@ -28,10 +33,17 @@ define([
         },
         render: function() {
             var localization = locale;
-            var userRole = $('#userrole').val();
+            this.userRole = $('#user').val();
+            this.userName = $('#user').attr('name');
             var templateConfigTree = this.templates.getTemplateConfigTree(this.configs.getConfigTree());
-            this.$el.html(this.template({_: _, SLDtemplates: templateConfigTree, SLDlist_i18n: localization, userrole: userRole}));
+            this.$el.html(this.template({_: _, SLDtemplates: templateConfigTree, SLDlist_i18n: localization, userName: this.userName, userrole: this.userRole}));
+            var buttonOptions = {SLDModel: null, SLDConfigModel: null, SLDlist_i18n: locale, userrole: this.userRole};
+            this.renderButtons(buttonOptions);
             return this;
+        },
+        renderButtons: function(options) {
+            //Update the action buttons navbar according to the selection.
+            $("#sld_buttons_navbar").html(_.template(SLDListButtons, options));
         },
         newConfig: function (event) {
             var element = $(event.currentTarget);
@@ -144,6 +156,32 @@ define([
 
                 }
             });
+        },
+        listGroupItemClick: function(event) {
+            var element = $(event.currentTarget);
+            var wasSelected = $(element).hasClass('list-group-item-selected');
+            //Remove selection from the previously selected list item, if any
+            $('.list-group-item-selected').removeClass('list-group-item-selected');
+            
+
+            var sldModel = null;
+            var configModel = null;
+            //Element wasn't selected before -> highlight it
+            if (!wasSelected) {
+                $(element).addClass('list-group-item-selected');
+
+                //get the active sld or config
+                if ($(element).hasClass('list-group-item-config')) {
+                    configModel = this.configs.getById(element.data('id')); 
+                } else {
+                    //sld
+                    sldModel = this.templates.getById(element.data('id'));
+                }
+
+            }
+
+            var buttonOptions = {SLDModel: sldModel, SLDConfigModel: configModel, SLDlist_i18n: locale, userrole: this.userRole};
+            this.renderButtons(buttonOptions);
         }
     });
     return SLDListView;
