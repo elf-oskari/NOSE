@@ -63,7 +63,7 @@ var toggleAdvanced = function(divClass) {
                             <div class="form-group param <%= attrData.graphic.values['wellknownname'].class %>">
                                 <label class="col-md-3 control-label edit-sld-label" for="graphic-symbol"><%= editSLD.point['symbol'] %></label>
                                 <div class="col-md-7 col-md-offset-2">
-                                    <select onchange="(<%= updateExternalGraphic %>)(this)" id="graphic-symbol" class="form-control">
+                                    <select onchange="(<%= updateExternalGraphic %>)(this)" id="graphic-symbol" class="form-control" data-param-id="<%=attrData.graphic.values['wellknownname'].param_id%>">
                                         <option <%= generateOptionValue("circle",attrData.graphic.values['wellknownname'].value) %>><%= editSLD.point['circle'] %></option>
                                         <option <%= generateOptionValue("cross",attrData.graphic.values['wellknownname'].value) %>><%= editSLD.point['cross'] %></option>
                                         <option <%= generateOptionValue("square",attrData.graphic.values['wellknownname'].value) %>><%= editSLD.point['square'] %></option>
@@ -132,7 +132,7 @@ var toggleAdvanced = function(divClass) {
                             <div class="form-group param <%=attrData.line.values['stroke-linejoin'].class %>">
                                 <label class="control-label col-md-3 edit-sld-label" for="stroke-linejoin"><%= editSLD.line['line-join'] %></label>
                                 <div class="col-md-7 col-md-offset-2">
-                                    <select id="stroke-linejoin" data-css-parameter="stroke-linejoin" class="form-control">
+                                    <select id="stroke-linejoin" data-css-parameter="stroke-linejoin"  data-param-id="<%= attrData.line.values['stroke-linejoin'].param_id%>" class="form-control">
                                         <option <%= generateOptionValue("miter",attrData.line.values['stroke-linejoin'].value) %>><%= editSLD.line['join-miter'] %></option>
                                         <option <%= generateOptionValue("round",attrData.line.values['stroke-linejoin'].value) %>><%= editSLD.line['join-round'] %></option>
                                         <option <%= generateOptionValue("bevel",attrData.line.values['stroke-linejoin'].value) %>><%= editSLD.line['join-bevel'] %></option>
@@ -142,7 +142,7 @@ var toggleAdvanced = function(divClass) {
                             <div class="form-group param <%=attrData.line.values['stroke-linecap'].class %>">
                                 <label class="control-label col-md-3 edit-sld-label" for="stroke-linecap"><%= editSLD.line['line-cap'] %></label>
                                 <div class="col-md-7 col-md-offset-2">
-                                    <select id="stroke-linecap" data-css-parameter="stroke-linecap" class="form-control">
+                                    <select id="stroke-linecap" data-css-parameter="stroke-linecap" data-param-id="<%= attrData.line.values['stroke-linecap'].param_id%>" class="form-control">
                                         <option <%= generateOptionValue("butt",attrData.line.values['stroke-linecap'].value) %>><%= editSLD.line['cap-butt'] %></option>
                                         <option <%= generateOptionValue("round",attrData.line.values['stroke-linecap'].value) %>><%= editSLD.line['cap-round'] %></option>
                                         <option <%= generateOptionValue("square",attrData.line.values['stroke-linecap'].value) %>><%= editSLD.line['cap-square'] %></option>
