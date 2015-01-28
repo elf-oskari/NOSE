@@ -8,7 +8,6 @@ var http = require('http');
 var path = require('path');
 var fs = require('fs');
 var pg = require('pg.js');
-var router = express.Router();
 
 //var mongo = require('mongodb');
 //var fs = require('fs');
@@ -69,7 +68,7 @@ var libs = {
   pg : pg
 };
 
-var routes = require('./routes/api')(app, path, client, data, libs, router);
+var routes = require('./routes/api')(app, path, client, data, libs);
 
 
 // the startup sequence is async, therefore start the server only if everything else also works

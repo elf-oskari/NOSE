@@ -1,4 +1,4 @@
-module.exports = function (app, path, client, data, libs, router) {
+module.exports = function (app, path, client, data, libs) {
 
     var formidable = require('formidable'),
         parse = libs.parse.parse,
@@ -23,9 +23,7 @@ module.exports = function (app, path, client, data, libs, router) {
         bodyParser = require('body-parser'),
         session = require('express-session'),
         passport = require('passport'), 
-        LocalStrategy = require('passport-local').Strategy,
-        router = router;
-    console.log("router", router);
+        LocalStrategy = require('passport-local').Strategy;
 
     var users = [];
 
@@ -54,7 +52,6 @@ module.exports = function (app, path, client, data, libs, router) {
     app.use(passport.initialize());
     app.use(passport.session());
     app.engine('html', require('ejs').renderFile);
-    app.use('/sld-editor', router);
 
 
     // Passport session setup.
@@ -109,27 +106,27 @@ module.exports = function (app, path, client, data, libs, router) {
         if (req.user) {
             next();
         } else {
-            res.redirect('/');
+            setResLocation('/', res);
         }
     }
 
     function setResLocation (path, res) {
-        res.location(path);
+        res.redirect((data.baseUrl || '') + path);
     }
 
-    app.post('/login', passport.authenticate('local', { failureRedirect:'/' }), function(req, res, next) {
-        res.redirect('/application.html');
+    app.post('/login', passport.authenticate('local', { failureRedirect:(data.baseUrl || '') +'/' }), function(req, res, next) {
+        setResLocation('/application.html',res);
     });
-    router.get('/application.html', loggedIn, function(req, res) {
+    app.get('/application.html', loggedIn, function(req, res) {
         res.render('application.html', {user: req.user ? req.user: null});                
     });
-    router.get('/logout', function(req, res){
+    app.get('/logout', function(req, res){
         console.log("logging out user "+(req.user ? req.user.user : ""));
         req.logout();
-        res.redirect('/');
+        setResLocation('/', res);
     });
 
-    router.get('/api/v1/templates/', loggedIn, function (req, res) {
+    app.get('/api/v1/templates/', loggedIn, function (req, res) {
         console.log('this fails ');
         // TODO: refactor -1 to something more descriptive
         try {
