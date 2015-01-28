@@ -28,6 +28,12 @@ app.set("view options", {layout: false});
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+// dummy error handler
+app.use(function(err, req, res, next){
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
+
 // development only
 //if ('development' == app.get('env')) {
   // use development db
