@@ -110,7 +110,7 @@ module.exports = function (app, path, client, data, libs) {
         }
     }
 
-    app.post('/login', passport.authenticate('local', { failureRedirect:'/' }), function(req, res, next) {
+    app.post('/login', passport.authenticate('local', { failureRedirect:'/justtesting' }), function(req, res, next) {
         res.render('application.html', {user: req.user ? req.user: null});
     });
     app.get('/application.html', loggedIn, function(req, res) {
