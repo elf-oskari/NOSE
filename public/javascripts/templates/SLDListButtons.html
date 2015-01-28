@@ -31,8 +31,15 @@
 			<button id="edit_config_button" type="button" class="btn btn-default navbar-btn edit" data-id="<%= SLDConfigModel.id %>"><%=SLDlist_i18n.buttons.edit%></button>
 		</div>
 		<div class="btn-group">
+			<% if (isAdmin) { %>
+				<button id="upload_sld_button" type="button" class="btn btn-default navbar-btn" data-toggle="modal" data-target="#uploadModal"><%=SLDlist_i18n.texts.upload%></button>
+			<% } %>
 			<button type="button" class="btn btn-default navbar-btn download" data-id="<%= SLDConfigModel.id %>"><%= SLDlist_i18n.buttons.download %></button>
 		</div>
+	<% } else if (isAdmin) {%>
+		<% if (isAdmin) { %>
+			<button id="upload_sld_button" type="button" class="btn btn-default navbar-btn" data-toggle="modal" data-target="#uploadModal"><%=SLDlist_i18n.texts.upload%></button>
+		<% } %>
 	<% } %>
 <!--
 </div>

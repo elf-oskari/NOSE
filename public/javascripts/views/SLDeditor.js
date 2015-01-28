@@ -146,19 +146,26 @@ define([
     },
     setParam: function(event) {
       var element,
-          newvalue;
+          newvalue, 
+          param_id, 
+          param_css_parameter;
 
       // if shape is changed
-      if (event.currentTarget.innerText === "Symbol") {
-        element = $(event.currentTarget).find("#graphic-symbol");
-        newvalue = element[0].value.toLowerCase();
+//      if (event.currentTarget.innerText === "Symbol") {
+      var param_id = null;
+      var param_css_parameter = null;
+
+      if (event.target.id === "graphic-symbol") {
+        element = $(event.target)[0];//.find("#graphic-symbol");
+        newvalue = element.value.toLowerCase();
         // Update map style
         this.renderWellKnownName(newvalue);
-        this.dispatcher.trigger("updateMapStyle",{'name':'wellknownname','value': newvalue},this.symbolType );
+        param_id = "" + element.dataset['paramId'];
+        this.dispatcher.trigger("updateMapStyle",[{'name':'wellknownname','value': newvalue}],this.symbolType );
       } else {
         element = $(event.currentTarget).find(".form-control")[0];
-        var param_id = "" + element.dataset['paramId'];
-        var param_css_parameter = element.dataset['cssParameter'];
+        param_id = "" + element.dataset['paramId'];
+        param_css_parameter = element.dataset['cssParameter'];
         newvalue = element.value;
         if (param_css_parameter === "rotation") {
           this.elementRotation = newvalue;
@@ -183,6 +190,16 @@ define([
         }
           // Update map style
           this.dispatcher.trigger("updateMapStyle",[{'name':param_css_parameter,'value': newvalue}], this.symbolType );
+      }
+
+
+      //Update the model. But now there's a problem with reset
+      if (param_id) {
+        var sld_param = _.findWhere(this.SLDconfigmodel.attributes.sld_values, {param_id: param_id});
+
+        if (sld_param) {
+          sld_param.value = newvalue;
+        }
       }
       var sld_values = this.SLDconfigmodel.get('sld_values');
       this.SLDconfigmodel.set('sld_values', sld_values);
