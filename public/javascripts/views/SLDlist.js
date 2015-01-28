@@ -21,9 +21,7 @@ define([
             'click .btn.edit': 'editConfig',
             'click .btn.delete-config': 'deleteConfig',
             'click .btn.download': 'downloadConfig',
-
             'click .list-group-item':'listGroupItemClick'
-
 
         },
         initialize: function(params) {

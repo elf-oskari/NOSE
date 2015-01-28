@@ -1,27 +1,30 @@
 define([
-	'lodash',
-	'backbone',
-	'jquery',
-	'bootstrap',
+  'lodash',
+  'backbone',
+  'jquery',
+  'bootstrap',
   'svg',
-	'i18n!localization/nls/SLDeditor',
-	'text!templates/SLDeditor.html'
+  'i18n!localization/nls/SLDeditor',
+  'text!templates/SLDeditor.html'
 ], function(_, Backbone, $, Bootstrap, SVG, locale, editSLDTemplate) {
-	var SLDEditorView = Backbone.View.extend({
+  var SLDEditorView = Backbone.View.extend({
     className: 'page',
-		template: _.template(editSLDTemplate),
+    template: _.template(editSLDTemplate),
         // Configuration:
         attrData: {},
-		events: {
-	      'click .delete': 'deleteConfig',
-	      'click .upload': 'showUpload',
+    events: {
+        'click .delete': 'deleteConfig',
+        'click .upload': 'showUpload',
         'click .save': 'saveConfig',
         'change .name': 'setAttribute',
-        'change .param': 'setParam'
+        'change .param': 'setParam',
     },
-		initialize: function(params) {
+    initialize: function(params) {
       this.dispatcher = params.dispatcher;
       this.listenTo(this.dispatcher, "selectSymbolizer", this.updateEditParams);
+      this.listenTo(this.dispatcher, "backToList", this.back);
+      this.listenTo(this.dispatcher, "configSaved", this.showInfoModal);
+      this.listenTo(this.dispatcher, "logout", this.logoutFromEditor);
       this.listenTo(this.dispatcher, "all", this.logger);
       this.setModel(params.SLDconfigmodel);
       _.bindAll(this, 'render');
@@ -100,13 +103,38 @@ define([
      */
     updateEditParams: function(params,symbolizer,ruletitle) {
       console.log('updateEditParams', params);
-      //$(this.el).find(".symbolizer-chosen").removeClass("hidden");
-      var paramlist = this.SLDconfigmodel.getSLDValuesByParams(params);
-      var symbol = {
-          type: symbolizer.type,
-          uom: symbolizer.uom
-      };
-      this.render(paramlist,symbol,ruletitle);
+      var self = this,
+          paramlist = this.SLDconfigmodel.getSLDValuesByParams(params),
+          symbol = {
+            type: symbolizer.type,
+            uom: symbolizer.uom
+          };
+
+      if (self.configSaved === false) {
+        $('#confirmNoSave').modal('show');
+        $('#continueButton').on("click", function () {
+          $('#confirmNoSave').modal('hide');
+          self.configSaved = true;
+          self.render(paramlist,symbol,ruletitle);
+        });
+      } else {
+        self.render(paramlist,symbol,ruletitle);
+      }
+    },
+
+    back: function () {
+      var self = this;
+
+      if (self.configSaved === false) {
+        $('#confirmNoSave').modal('show');
+        $('#continueButton').on("click", function () {
+          $('#confirmNoSave').modal('hide');
+          self.configSaved = true;
+          Backbone.history.navigate('/', true);
+        });
+      } else {
+        Backbone.history.navigate('/', true);
+      }
     },
 
     setAttribute: function(event) {
@@ -158,6 +186,8 @@ define([
       }
       var sld_values = this.SLDconfigmodel.get('sld_values');
       this.SLDconfigmodel.set('sld_values', sld_values);
+      //this.configSaved tells if there are unsaved changes
+      this.configSaved = false;
       $(this.el).find(".cancel-changes").removeClass("disabled");
 
     },
@@ -244,13 +274,18 @@ define([
     },
 
     saveConfig: function(event) {
+      var self = this;
       event.preventDefault();
-      this.SLDconfigmodel.save({},{
-        wait: true,
+      self.SLDconfigmodel.save({},{
+        success: function (model, response) {
+          self.configSaved = true;
+          self.dispatcher.trigger("configSaved");
+        },
         error: function (model, response, options) {
           alert('something went wrong!');
           console.log('Error', model, response, options);
-        }
+        },
+        wait: true
       });
     },
 
@@ -265,6 +300,11 @@ define([
           alert('Deleting template is not possible1234');
         }
       });
+    },
+
+    showInfoModal: function () {
+      console.log("infomodal should be shown");
+      //$('#informUserModal').modal();
     },
 
     renderPreview: function (params, symbolType) {
@@ -394,7 +434,24 @@ define([
         this.attributes["stroke-width"] = 3;
       }
       this.previewElement.attr(this.attributes);
+    },
+
+    logoutFromEditor: function () {
+      var self = this;
+      debugger;
+
+      if (self.configSaved === false) {
+        $('#confirmNoSave').modal('show');
+        $('#continueButton').on("click", function () {
+          $('#confirmNoSave').modal('hide');
+          self.configSaved = true;
+          //go to logout window
+        });
+      } else {
+        //go to logout window
+      }
     }
+
   });
-	return SLDEditorView;
+  return SLDEditorView;
 });

@@ -10,6 +10,8 @@ define({
 			"update": "Update",
 			"save": "Save",
 			"reset": "Reset",
+			"ok": "OK",
+			"continue": "Continue",
 			"backToSLDlist": "Back to SLDlist",
 			"searchRule": "Search rule..."
 		},
@@ -96,6 +98,10 @@ define({
 		},
 		"preview": {
 			"label": "Symbolizer preview"
+		},
+		"confirmNoSavemodal": {
+			"label": "Are you sure you want to continue without saving?",
+			"body": "You haven't saved your changes to the congif. The changes will be lost without saving."
 		}
 	}
 });

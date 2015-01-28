@@ -19,6 +19,7 @@ define([
         events: {
             'click .update': 'updateConfigName',
             'click .back-to-list': 'back',
+            'click .sld-list-signout-link': 'logoutFromPage',
         },
 
         initialize: function(params) {
@@ -34,10 +35,13 @@ define([
 
         back: function (event) {
             event.preventDefault();
-            $(event.currentTarget).addClass("hidden");
-            Backbone.history.navigate('/', true);
+            this.dispatcher.trigger("backToList");
         },
 
+        logoutFromPage: function (event) {
+            event.preventDefault();
+            this.dispatcher.trigger("logout");
+        },
         setModels: function(models) {
             this.SLDtemplatemodel = models.SLDtemplatemodel;
             this.SLDconfigmodel = models.SLDconfigmodel;
