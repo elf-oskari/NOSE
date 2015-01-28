@@ -27,8 +27,6 @@ app.set("view options", {layout: false});
 //app.use(express.methodOverride());
 //app.use(app.router);
 
-app.use('/sld-editor', router);
-
 app.use(express.static(path.join(__dirname, 'public')));
 
 // development only
@@ -71,7 +69,7 @@ var libs = {
   pg : pg
 };
 
-var routes = require('./routes/api')(app, path, client, data, libs);
+var routes = require('./routes/api')(app, path, client, data, libs, router);
 
 
 // the startup sequence is async, therefore start the server only if everything else also works

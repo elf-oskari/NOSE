@@ -1,4 +1,4 @@
-module.exports = function (app, path, client, data, libs) {
+module.exports = function (app, path, client, data, libs, router) {
 
     var formidable = require('formidable'),
         parse = libs.parse.parse,
@@ -20,11 +20,12 @@ module.exports = function (app, path, client, data, libs) {
         configIdCounter = 1,
         configs = [],
 
-        express = require('express'),
         bodyParser = require('body-parser'),
         session = require('express-session'),
         passport = require('passport'), 
-        LocalStrategy = require('passport-local').Strategy;
+        LocalStrategy = require('passport-local').Strategy,
+        router = router;
+    console.log("router", router);
 
     var users = [];
 
@@ -53,6 +54,8 @@ module.exports = function (app, path, client, data, libs) {
     app.use(passport.initialize());
     app.use(passport.session());
     app.engine('html', require('ejs').renderFile);
+    app.use('/sld-editor', router);
+
 
     // Passport session setup.
     //   To support persistent login sessions, Passport needs to be able to
@@ -110,19 +113,23 @@ module.exports = function (app, path, client, data, libs) {
         }
     }
 
+    function setResLocation (path, res) {
+        res.location(path);
+    }
+
     app.post('/login', passport.authenticate('local', { failureRedirect:'/' }), function(req, res, next) {
         res.redirect('/application.html');
     });
-    app.get('/application.html', loggedIn, function(req, res) {
+    router.get('/application.html', loggedIn, function(req, res) {
         res.render('application.html', {user: req.user ? req.user: null});                
     });
-    app.get('/logout', function(req, res){
+    router.get('/logout', function(req, res){
         console.log("logging out user "+(req.user ? req.user.user : ""));
         req.logout();
         res.redirect('/');
     });
 
-    app.get('/api/v1/templates/', loggedIn, function (req, res) {
+    router.get('/api/v1/templates/', loggedIn, function (req, res) {
         console.log('this fails ');
         // TODO: refactor -1 to something more descriptive
         try {
