@@ -8,6 +8,7 @@ var http = require('http');
 var path = require('path');
 var fs = require('fs');
 var pg = require('pg.js');
+var router = express.Router();
 
 //var mongo = require('mongodb');
 //var fs = require('fs');
@@ -26,6 +27,7 @@ app.set("view options", {layout: false});
 //app.use(express.methodOverride());
 //app.use(app.router);
 
+app.use('/sld-editor', router);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
