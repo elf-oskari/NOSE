@@ -111,7 +111,9 @@ module.exports = function (app, path, client, data, libs) {
     }
 
     function setResLocation (path, res) {
-        res.redirect((data.baseUrl || '') + path);
+        var absolutePath = (data.baseUrl || '') + path;
+        console.log('Redirecting to ' + absolutePath);
+        res.redirect(absolutePath);
     }
 
     app.post('/login', passport.authenticate('local', { failureRedirect:(data.baseUrl || '') +'/' }), function(req, res, next) {

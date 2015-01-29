@@ -21,12 +21,19 @@ app.set('port', process.env.PORT || 3300);
 // disable layout
 app.set("view options", {layout: false});
 
+app.set("views", path.join(__dirname, 'views'));
 //app.use(express.favicon());
 //app.use(express.bodyParser());
 //app.use(express.methodOverride());
 //app.use(app.router);
 
 app.use(express.static(path.join(__dirname, 'public')));
+
+// dummy error handler
+app.use(function(err, req, res, next){
+  console.error(err);
+  res.status(500);
+});
 
 // development only
 //if ('development' == app.get('env')) {
