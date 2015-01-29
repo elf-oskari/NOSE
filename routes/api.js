@@ -120,7 +120,6 @@ module.exports = function (app, path, client, data, libs) {
         setResLocation('/application.html',res);
     });
     app.get('/application.html', loggedIn, function(req, res) {
-        console.log('Handling /application html', req.user);
         res.render('application.html', {user: req.user ? req.user: null});                
     });
     app.get('/logout', function(req, res){
