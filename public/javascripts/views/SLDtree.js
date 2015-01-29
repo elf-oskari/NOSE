@@ -81,7 +81,6 @@ define([
           me.panelClickedHandler(element, panelHeadingElement);
         }
       });
-      debugger;
       var offsetTop = panelHeadingElement.offsetTop;
       $(".panel-body.sld-tree").scrollTop(offsetTop);
     }

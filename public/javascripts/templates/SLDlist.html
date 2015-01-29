@@ -3,11 +3,10 @@
   <div class="panel editor-panel list-panel">
     <div class="panel-heading editor-page-header">
       SLD Editor
-      <a href="/logout">
-        <h4 class="sld-list-signout-link">
-          <%=userName%>&nbsp;-&nbsp;<%= SLDlist_i18n.texts.logout%>
-          <i class="fa fa-sign-out pull-right"></i>
-        </h4>
+      <h4 class="sld-list-signout-link signout-list-page">
+        <%=userName%>&nbsp;-&nbsp;<%= SLDlist_i18n.texts.logout%>
+        <i class="fa fa-sign-out pull-right"></i>
+      </h4>
       </a>
     </div>
 
@@ -112,7 +111,7 @@
           <p><%= SLDlist_i18n.createConfig.body %></p>
           <form class="form-horizontal">
             <div class="form-group">
-              <label for="nameInput" class="col-md-2 control-label">Name:</label>
+              <label for="nameInput" class="col-md-2 control-label"><%= SLDlist_i18n.createConfig.label %></label>
               <div class="col-md-10">
                 <input id ="nameInput" name="Name" type="text" class="form-control" data-attribute="name">
               </div>
@@ -128,6 +127,35 @@
         </div>
       </div>
     </div>
+  </div>
+  <!-- Modal window -->
+  <div class="modal" id="informModal" tabindex="-1" role="dialog" aria-labelledby="ModalTitle" aria-hidden="true">
+      <div class="modal-dialog modal-sm">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                  <h4 class="modal-title" id="ModalTitle"></h4>
+              </div>
+              <div class="modal-body">
+                  <p></p>
+              </div>
+              <div class="modal-footer">
+                  <button id="okButton" type="button" class="btn btn-default" data-dismiss="modal"><%= SLDlist_i18n.buttons.ok %></button>
+              </div>
+          </div>
+      </div>
+  </div>
+  <!-- Modal window -->
+  <div class="modal" id="creatingModal" tabindex="-1" role="dialog" aria-labelledby="ModalTitle" aria-hidden="true">
+      <div class="modal-dialog modal-sm">
+          <div class="modal-content">
+              <div class="modal-body">
+                  <p><%= SLDlist_i18n.texts.creating %></p>
+                  <br>
+                  <i class="fa fa-spinner fa-spin"></i>
+              </div>
+          </div>
+      </div>
   </div>
 </div>
 

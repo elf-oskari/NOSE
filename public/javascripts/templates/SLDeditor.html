@@ -383,17 +383,28 @@ var toggleAdvanced = function(divClass) {
     </div>
     <!-- Modal window -->
     <div class="modal" id="informUserModal" tabindex="-1" role="dialog" aria-labelledby="ModalTitle" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-                    <h4 class="modal-title" id="ModalTitle"><%= editSLD.confirmNoSavemodal['label'] %></h4>
+                    <h4 class="modal-title" id="ModalTitle"></h4>
                 </div>
                 <div class="modal-body">
-                    <p><%= editSLD.confirmNoSavemodal['body'] %></p>
+                    <p></p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal"><%= editSLD.buttons['ok'] %></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal window -->
+    <div class="modal" id="savingModal" tabindex="-1" role="dialog" aria-labelledby="ModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p><%= editSLD.common['saving'] %></p>
+                    <i class="fa fa-spinner fa-spin"></i>
                 </div>
             </div>
         </div>

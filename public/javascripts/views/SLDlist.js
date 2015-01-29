@@ -21,7 +21,8 @@ define([
             'click .btn.edit': 'editConfig',
             'click .btn.delete-config': 'deleteConfig',
             'click .btn.download': 'downloadConfig',
-            'click .list-group-item':'listGroupItemClick'
+            'click .list-group-item':'listGroupItemClick',
+            'click .signout-list-page': 'logoutFromListView'
 
         },
         initialize: function(params) {
@@ -59,19 +60,31 @@ define([
         },
         createNewConfig: function (event) {
             event.preventDefault();
-            var self = this;
-            var name = $(event.currentTarget.offsetParent.children).find("#nameInput")[0].value;
+            var self = this,
+                localization = locale
+                name = $(event.currentTarget.offsetParent.children).find("#nameInput")[0].value;
+            $('#createConfigModal').modal('hide');
+            $('#creatingModal').modal('show');
             this.SLDconfigmodel.set('name', name);
             this.SLDconfigmodel.save({},{
-                wait: true,
-                success: function (model, response, options) {
-                    $('#createConfigModal').modal('hide');
-                    self.render();
-                },
-                error: function (model, response, options) {
-                    alert('something went wrong!');
+                wait: true
+            }).done(
+                function (model, response, options) {
+                    console.log("New config created. Model: ", model, "response: ", response, "options: ", options);
+                    $('#creatingModal').modal('hide');
+                    $('#informModal').on('show.bs.modal', function () {
+                        var modal = $(this);
+                        modal.find('.modal-title').text(locale.createConfig['informModalTitle']);
+                        modal.find('.modal-body').text(locale.createConfig['informModalBody'] + model.name);
+                    })
+                    $('#okButton').on("click", function () {
+                      $('#informModal').modal('hide');
+                      Backbone.history.navigate('/edit/' + model.id, true);
+                    });
+                    $('#informModal').modal('show');
+            }).fail(
+                function (model, response, options) {
                     console.log('Error', model, response, options);
-                }
             });
         },
 
@@ -101,6 +114,17 @@ define([
                     $('#deleteConfigModal').modal('show');
                 },
             });
+        },
+        showInfoModal: function (modalTitle, modalBody, response) {
+            if ($('#savingModal')) {
+                $('#savingModal').modal('hide');
+            }
+            $('#informUserModal').on('show.bs.modal', function () {
+                var modal = $(this);
+                modal.find('.modal-title').text(modalTitle);
+                modal.find('.modal-body').text(modalBody)
+            })
+            $('#informUserModal').modal('show');
         },
 
         editConfig: function (event) {
@@ -180,6 +204,16 @@ define([
 
             var buttonOptions = {SLDModel: sldModel, SLDConfigModel: configModel, SLDlist_i18n: locale, userrole: this.userRole};
             this.renderButtons(buttonOptions);
+        },
+
+        logoutFromListView: function() {
+            var url = window.location.href;
+            //this removes the anchor at the end, if there is one
+            url = url.substring(0, (url.indexOf("#") == -1) ? url.length : url.indexOf("#"));
+            //this removes the query after the file name, if there is one
+            url = url.substring(0, (url.indexOf("?") == -1) ? url.length : url.indexOf("?"));
+            url = url.substr(0, url.lastIndexOf('/')) + "/logout";
+            window.location.href = url;
         }
     });
     return SLDListView;

@@ -29,6 +29,7 @@ define({
 			"metre": "Metre",
 			"pixel": "Pixel",
 			"info-text": "Choose the symbolizer you want to edit from the menu on the left.",
+			"saving" : "Saving...",
 			"logout": "Sign out",
 		},
 		"point": {
@@ -102,6 +103,12 @@ define({
 		"confirmNoSavemodal": {
 			"label": "Are you sure you want to continue without saving?",
 			"body": "You haven't saved your changes to the congif. The changes will be lost without saving."
+		},
+		"infoModal": {
+			"modelSavedTitle": "Success!",
+			"modelSavedBody": "New values saved successfully!",
+			"errorWithSavingTitle": "Error!",
+			"errorWithSavingBody": "Error with saving! The following error occured: "
 		}
 	}
 });

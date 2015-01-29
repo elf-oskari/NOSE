@@ -4,6 +4,8 @@ define({
 			"title" : "SLD templates",
 			"body" : "Below is a list of SLD templates. You can also upload a new SLD.",
 			"upload" : "Import Style",
+			"saving" : "Saving...",
+			"creating" : "Creating new config...",
 			"logout": "Sign out"
 		},
 		"buttons" : {
@@ -13,6 +15,15 @@ define({
 			"download": "Create output SLD",
 			"upload": "Upload",
 			"cancel": "Cancel",
+			"ok": "OK"
+		},
+		"tooltips" : {
+			"deleteTemplate" : "Delete the highlighted template",
+			"newConfig" : "Create new config of the highlighted template",
+			"deleteConfig" : "Delete the highlighted config",
+			"editConfig" : "Edit the highlighted config",
+			"uploadSLD" : "Upload new SLD",
+			"downloadSLD" : "Download the highlighted SLD config"
 		},
 		"upload" : {
 			"title": "Upload new SLD template",
@@ -32,7 +43,10 @@ define({
 		"createConfig" : {
 			"title": "Create new config",
 			"body": "The new config will have the same values as the template",
-			"label": "Name:"
+			"label": "Name:",
+			"creatingConfig": "Creating config...",
+			"informModalTitle" : "New Config created!",
+			"informModalBody" : "Created config "
 		},
 		"internalError": "Hups, tallennus ei väliaikaisesti toimi, kokeile myöhemmin uudelleen."
 	}

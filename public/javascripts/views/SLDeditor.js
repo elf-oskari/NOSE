@@ -42,7 +42,8 @@ define([
       self.SLDconfigmodel = model;
       self.listenTo(self.SLDconfigmodel, "invalid", self.invalidValue);
       self.listenTo(self.SLDconfigmodel, "all", self.logger);
-      self.listenTo(self.SLDconfigmodel, "sync", function () { self.render();});
+      // we use promises with saving so we don't propably need this
+      //self.listenTo(self.SLDconfigmodel, "sync", self.showInfoModal);
     },
     render: function(paramlist,symbol,ruletitle) {
         var localization = locale;
@@ -110,6 +111,7 @@ define([
             uom: symbolizer.uom
           };
 
+      /**
       if (self.configSaved === false) {
         $('#confirmNoSave').modal('show');
         $('#continueButton').on("click", function () {
@@ -118,8 +120,9 @@ define([
           self.render(paramlist,symbol,ruletitle);
         });
       } else {
+        */
         self.render(paramlist,symbol,ruletitle);
-      }
+      //}
     },
 
     back: function () {
@@ -291,19 +294,26 @@ define([
     },
 
     saveConfig: function(event) {
-      var self = this;
+      var self = this,
+          localization = locale;
       event.preventDefault();
+      $('#savingModal').modal('show');
       self.SLDconfigmodel.save({},{
-        success: function (model, response) {
-          self.configSaved = true;
-          self.dispatcher.trigger("configSaved");
-        },
-        error: function (model, response, options) {
-          alert('something went wrong!');
-          console.log('Error', model, response, options);
-        },
         wait: true
-      });
+      }).done(
+        function (model, response) {
+          console.log("Model saved. model: ", model, "response: ", response);
+          var modalTitle = localization.infoModal['modelSavedTitle'];
+          var modalBody = localization.infoModal['modelSavedBody'];
+          self.showInfoModal(modalTitle, modalBody, response);
+        })
+      .fail(
+        function (model, response, options) {
+          console.log("Error with saving model values. Response: ", response, "options: ", options);
+          var modalTitle = localization.infoModal['errorWithSavingTitle'];
+          var modalBody = localization.infoModal['errorWithSavingBody'];
+          self.showInfoModal(modalTitle, modalBody, response);
+        });
     },
 
     deleteConfig: function () {
@@ -319,9 +329,16 @@ define([
       });
     },
 
-    showInfoModal: function () {
-      console.log("infomodal should be shown");
-      //$('#informUserModal').modal();
+    showInfoModal: function (modalTitle, modalBody, response) {
+      if ($('#savingModal')) {
+        $('#savingModal').modal('hide');
+      }
+      $('#informUserModal').on('show.bs.modal', function () {
+        var modal = $(this);
+        modal.find('.modal-title').text(modalTitle);
+        modal.find('.modal-body').text(modalBody)
+      })
+      $('#informUserModal').modal('show');
     },
 
     renderPreview: function (params, symbolType) {
@@ -455,18 +472,26 @@ define([
 
     logoutFromEditor: function () {
       var self = this;
-      debugger;
-
       if (self.configSaved === false) {
         $('#confirmNoSave').modal('show');
         $('#continueButton').on("click", function () {
           $('#confirmNoSave').modal('hide');
           self.configSaved = true;
-          //go to logout window
+          window.location.href = self.getLogoutUrl();
         });
       } else {
-        //go to logout window
+        window.location.href = self.getLogoutUrl();
       }
+    },
+
+    getLogoutUrl: function() {
+      var url = window.location.href;
+      //this removes the anchor at the end, if there is one
+      url = url.substring(0, (url.indexOf("#") == -1) ? url.length : url.indexOf("#"));
+      //this removes the query after the file name, if there is one
+      url = url.substring(0, (url.indexOf("?") == -1) ? url.length : url.indexOf("?"));
+      url = url.substr(0, url.lastIndexOf('/')) + "/logout";
+      return url;
     }
 
   });
