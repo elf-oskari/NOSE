@@ -18,6 +18,7 @@ define([
         'click .save': 'saveConfig',
         'change .name': 'setAttribute',
         'change .param': 'setParam',
+        'click .cancel-changes':'resetModel'
     },
     initialize: function(params) {
       this.dispatcher = params.dispatcher;
@@ -45,6 +46,16 @@ define([
       self.listenTo(self.SLDconfigmodel, "sync", function () { self.render();});
     },
     render: function(paramlist,symbol,ruletitle) {
+      //store the model's original attributes + additional rendering params to be able to reset and re-render.
+        this.resetParams = {
+          //deep copy?
+//          originalAttributes: _.map(this.SLDconfigmodel.attributes, _.clone);
+          originalAttributes: _.cloneDeep(this.SLDconfigmodel.attributes),
+          paramlist: _.cloneDeep(paramlist),
+          symbol: _.cloneDeep(symbol),
+          ruletitle: _.cloneDeep(ruletitle)
+        };
+
         var localization = locale;
         var model = this.SLDconfigmodel.pick('id', 'name');
         var params = _.isUndefined(paramlist) ? false : paramlist;
@@ -97,6 +108,7 @@ define([
         }
         return this;
     },
+
     /**
      * @method updateEditParams
      * Updates SLDeditor view with editable params
@@ -109,13 +121,15 @@ define([
             type: symbolizer.type,
             uom: symbolizer.uom
           };
-
       if (self.configSaved === false) {
         $('#confirmNoSave').modal('show');
         $('#continueButton').on("click", function () {
           $('#confirmNoSave').modal('hide');
           self.configSaved = true;
-          self.render(paramlist,symbol,ruletitle);
+
+          self.resetModel();
+          //render with the original params (discard changes)
+          self.render(self.resetParams.paramlist, self.resetParams.symbol, self.resetParams.symbolTitle);
         });
       } else {
         self.render(paramlist,symbol,ruletitle);
@@ -144,6 +158,26 @@ define([
 
       this.SLDconfigmodel.set(attribute, newvalue);
     },
+
+    //resets the changes made to the _current_ config model. Still have to implement a "reset all"-button + functionality
+    resetModel: function(event) {
+        //store the original attributes of the model
+        this.SLDconfigmodel.attributes = null;
+        this.SLDconfigmodel.attributes = _.clone(this.resetParams.originalAttributes);
+        this.SLDconfigmodel._previousAttributes = null;
+        this.render(this.resetParams.paramlist, this.resetParams.symbol, this.resetParams.ruletitle);
+
+/*
+        this.resetParams = {
+          originalAttributes: _.clone(this.SLDconfigmodel.attributes),
+          paramsList: paramsList,
+          symbol: symbol,
+          ruletitle: ruletitle
+        };
+*/
+
+    },
+
     setParam: function(event) {
       var element,
           newvalue, 
