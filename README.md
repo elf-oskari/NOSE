@@ -34,6 +34,11 @@ And constructed with the following guidelines:
 
 For more information on SemVer, please visit [http://semver.org/](http://semver.org/).
 
+
+## Known issues
+*Rule preview on map not working properly, when there are multiple symbolizers of the same kind within the same rule
+
+
 ## Copyright and license
 
 Copyright 2014 NLS under dual license MIT (included LICENSE-MIT.txt) and [EUPL](https://joinup.ec.europa.eu/software/page/eupl/licence-eupl)

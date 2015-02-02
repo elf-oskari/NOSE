@@ -47,7 +47,10 @@ define([
       var params = this.SLDtemplatemodel.getParamsBySymbolizerId(symbolizer_id);
       var symbolizer = this.SLDtemplatemodel.getSymbolizerById(symbolizer_id);
       console.log('sid', symbolizer_id, 'params', params, 'model', this.SLDtemplatemodel);
-      this.dispatcher.trigger("selectSymbolizer", params, symbolizer[0], ruletitle);
+      this.dispatcher.trigger("selectSymbolizer", params, symbolizer[0], ruletitle, this.SLDtemplatemodel);
+
+
+
     },
 
     panelClicked: function(event) {
