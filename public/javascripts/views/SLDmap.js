@@ -9,11 +9,39 @@ define([
         className: 'map',
         initialize: function (params) {
             this.dispatcher = params.dispatcher;
-            this.listenTo(this.dispatcher, "selectSymbolizer", this.setParams2MapStyle);
+//            this.listenTo(this.dispatcher, "selectSymbolizer", this.setParams2MapStyle);
+            this.listenTo(this.dispatcher, "resetVectorLayers", this.resetVectorLayers);
+            this.listenTo(this.dispatcher, "setParamsToMapStyle", this.setParams2MapStyle);
             this.listenTo(this.dispatcher, "updateMapStyle", this.updateMapStyle);
             this.listenTo(this.dispatcher, "all", this.logger);
             _.bindAll(this, 'render');
         },
+        /**
+         * @method resetVectorLayers
+         * Hide the point, line and polygon layers by default (they get toggled on as needed when symbolizers of the rule are added)
+         * Also reset the styles set previously
+         */
+        resetVectorLayers: function() {
+            var self = this;
+            this.params = null;
+            if (this.map) {
+                this.map.getLayers().forEach(function (l) {
+                    if (l.get('title') == 'Polygons') {
+                        l.setVisible(false);
+                        l.setStyle(self.getPolygonOrLineStyle(null));
+                    }
+                    if (l.get('title') == 'Lines') {
+                        l.setVisible(false);
+                        l.setStyle(self.getPolygonOrLineStyle(null));
+                    }                        
+                    if (l.get('title') == 'Points') {
+                        l.setVisible(false);
+                        l.setStyle(self.getPolygonOrLineStyle(null));
+                    }
+                });
+            }
+        },
+
         /**
          * @method updateMapStyle
          * update map style for one symbolizer parameter for visible layer
@@ -36,11 +64,7 @@ define([
             console.log('setParams2MapStyle', params);
             this.params = params;
             this.uom = symbolizer.uom;   // Symbolizer size / width unit
-            console.log('setParams2MapStyle', params, ' type: ', symbolizer.type);
-
             this.setMapLayerStyle(params, symbolizer.type.toLowerCase());
-
-
         },
         /**
          * @method setMapLayerStyle
@@ -62,29 +86,29 @@ define([
                     if (update) cur_style = polygons.getStyle();
                     polygons.setStyle(this.getPolygonOrLineStyle(cur_style));
                     polygons.setVisible(true);
-                    if (lines) lines.setVisible(false);
-                    if (points) points.setVisible(false);
+//                    if (lines) lines.setVisible(false);
+//                    if (points) points.setVisible(false);
                 }
                 else if (lines && type == 'linesymbolizer') {
                     if (update) cur_style = lines.getStyle();
                     lines.setStyle(this.getPolygonOrLineStyle(cur_style));
                     lines.setVisible(true);
-                    if (polygons) polygons.setVisible(false);
-                    if (points) points.setVisible(false);
+//                    if (polygons) polygons.setVisible(false);
+//                    if (points) points.setVisible(false);
                 }
                 else if (points && type == 'pointsymbolizer') {
                     if (update) cur_style = points.getStyle();
                     points.setStyle(this.getPointStyle(cur_style));
                     points.setVisible(true);
-                    if (lines) lines.setVisible(false);
-                    if (polygons) polygons.setVisible(false);
+//                    if (lines) lines.setVisible(false);
+//                    if (polygons) polygons.setVisible(false);
                 }
                 else if (type == 'textsymbolizer') {
                     if (update) cur_style = points.getStyle();
                     points.setStyle(this.getPointTextStyle(cur_style));
                     points.setVisible(true);
-                    if (lines) lines.setVisible(false);
-                    if (polygons) polygons.setVisible(false);
+//                    if (lines) lines.setVisible(false);
+//                    if (polygons) polygons.setVisible(false);
                 }
 
             }
@@ -426,6 +450,7 @@ define([
                     style: self.getPointStyle()
                 });
                 // mouse position in 3857
+                /*
                 var llMouse = new ol.control.MousePosition({
                     // format coords as "HDMS (x,y)"
                     coordinateFormat: function (coordinate) {
@@ -434,8 +459,10 @@ define([
                     },
                     projection: 'EPSG:3857' // by default, uses view projection
                 });
+                */
+                
                 this.map = new ol.Map({
-                    controls: ol.control.defaults().extend([llMouse]),
+                    controls: ol.control.defaults().extend([new ol.control.ScaleLine()]),
                     layers: [
                         new ol.layer.Tile({
                             source: new ol.source.MapQuest({layer: 'osm'}),

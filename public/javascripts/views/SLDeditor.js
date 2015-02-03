@@ -24,7 +24,7 @@ define([
 
     initialize: function(params) {
       this.dispatcher = params.dispatcher;
-      this.listenTo(this.dispatcher, "selectSymbolizer", this.updateEditParams);
+      this.listenTo(this.dispatcher, "selectSymbolizer", this.symbolizerChanged);
       this.listenTo(this.dispatcher, "backToList", this.back);
       this.listenTo(this.dispatcher, "configSaved", this.showInfoModal);
       this.listenTo(this.dispatcher, "logout", this.logoutFromEditor);
@@ -49,10 +49,8 @@ define([
       //self.listenTo(self.SLDconfigmodel, "sync", self.showInfoModal);
     },
     render: function(paramlist,symbol,ruletitle) {
-      //store the model's original attributes + additional rendering params to be able to reset and re-render.
+        //store the model's original attributes + additional rendering params to be able to reset and re-render.
         this.resetParams = {
-          //deep copy?
-//          originalAttributes: _.map(this.SLDconfigmodel.attributes, _.clone);
           originalAttributes: _.cloneDeep(this.SLDconfigmodel.attributes),
           paramlist: _.cloneDeep(paramlist),
           symbol: _.cloneDeep(symbol),
@@ -116,6 +114,78 @@ define([
         return this;
     },
 
+    mergeSymbolizerParamDefaultsWithConfigValues: function(defaultParams) {
+
+      var self = this;
+      //get the values corresponding to the defaults from the config model
+      var configValues = self.SLDconfigmodel.getSLDValuesByParams(defaultParams);
+      var mergedParams = [];
+      _.each(defaultParams, function(item) {
+          //item.default_value = _.where(allValuesInTheConfigModel,{param_id: param_item.id})[0].value;
+          var name = item.name;
+          var value = _.where(configValues,{param_id: item.id})[0].value;
+          mergedParams.push({name: name, value: value})
+      });
+
+      return mergedParams
+    },
+
+    /**
+     *  @method updateMapSymbolizers
+     *  Updates the map by all the symbolizers of the rule
+     *
+     */
+    updateMapSymbolizers: function(params, SLDTemplateModel) {
+      var self = this;
+
+      //get the rule id based on given params
+      var ruleid = SLDTemplateModel.getRuleIdByParams(params);
+      
+      //get all symbolizers for the given rule
+      var symbolizers_by_rule = SLDTemplateModel.getSymbolizersByRuleId(ruleid);
+
+
+      //update the map
+      _.each(symbolizers_by_rule, function(item) {
+        //get the _default_ params for the symbolizer
+        var symbolizerDefaultParams = _.cloneDeep(SLDTemplateModel.getParamsBySymbolizerId(item.id));
+        
+        //merge those with the (possibly changed) values from the config model
+        var mergedParams = self.mergeSymbolizerParamDefaultsWithConfigValues(symbolizerDefaultParams);
+        self.dispatcher.trigger("updateMapStyle", mergedParams, item.type);
+      });
+    },
+
+
+    /**
+     *
+     * @method symbolizerChanged
+     * Checks whether the symbolizer currently being edited has been saved or not and updates the map with the symbolizers of the rule. 
+     *
+     */
+    symbolizerChanged: function(params, symbolizer, ruletitle, SLDTemplateModel) {
+      var self = this;
+      if (self.configSaved === false) {
+        $('#confirmNoSave').modal('show');
+        $('#continueButton').on("click", function () {
+          $('#confirmNoSave').modal('hide');
+          self.configSaved = true;
+          self.resetModel();
+          //symbolizerchange -> toggle point, line and polygon layers off by default (they get toggled on as needed when symbolizers of the rule are added)
+          self.dispatcher.trigger("resetVectorLayers");
+          self.updateMapSymbolizers(params, SLDTemplateModel);
+          self.updateEditParams(params, symbolizer, ruletitle)
+        });
+      } else {
+          self.dispatcher.trigger("resetVectorLayers");
+          self.updateMapSymbolizers(params, SLDTemplateModel);
+          self.updateEditParams(params, symbolizer, ruletitle)
+      }
+
+      return;
+
+    },
+
     /**
      * @method updateEditParams
      * Updates SLDeditor view with editable params
@@ -128,22 +198,7 @@ define([
             type: symbolizer.type,
             uom: symbolizer.uom
           };
-
-      /**
-      if (self.configSaved === false) {
-        $('#confirmNoSave').modal('show');
-        $('#continueButton').on("click", function () {
-          $('#confirmNoSave').modal('hide');
-          self.configSaved = true;
-
-          self.resetModel();
-          //render with the original params (discard changes)
-          self.render(self.resetParams.paramlist, self.resetParams.symbol, self.resetParams.symbolTitle);
-        });
-      } else {
-        */
       self.render(paramlist,symbol,ruletitle);
-      //}
     },
 
     back: function () {
@@ -176,16 +231,6 @@ define([
         this.SLDconfigmodel.attributes = _.clone(this.resetParams.originalAttributes);
         this.SLDconfigmodel._previousAttributes = null;
         this.render(this.resetParams.paramlist, this.resetParams.symbol, this.resetParams.ruletitle);
-
-/*
-        this.resetParams = {
-          originalAttributes: _.clone(this.SLDconfigmodel.attributes),
-          paramsList: paramsList,
-          symbol: symbol,
-          ruletitle: ruletitle
-        };
-*/
-
     },
 
     setParam: function(event) {

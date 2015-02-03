@@ -72,6 +72,27 @@ define(['lodash','backbone'], function(_, Backbone) {
             var SLDsymbolizers = this.get('sld_symbolizers');
             var symbolizerlist = _.where(SLDsymbolizers, {'id': id});
             return symbolizerlist;
+        },
+        /**
+         * @method getRuleIdByParams
+         * @return {Integer} ruleid of the currently selected symbolizer
+         */
+        getRuleIdByParams: function(params) {
+			var self = this;
+			var symbolizers = [];
+			_.each(params, function(item) {
+				symbolizers.push(_.where(self.get('sld_symbolizers'), {id: item.symbolizer_id}));
+			});
+
+		  //pluck the rule id from the symbolizers' array
+	      return _.uniq(_.pluck(_.flatten(symbolizers), 'rule_id'))[0];
+        },
+        /**
+         * @method getRuleIdByParams
+         * @return {Array} all symbolizers of the currently selected rule
+         */
+        getSymbolizersByRuleId: function(ruleid) {
+			return _.where(this.get('sld_symbolizers'), {rule_id: ruleid});
         }
 	});
 
