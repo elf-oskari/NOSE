@@ -173,6 +173,17 @@ body
     cursor: pointer;
     font-size: 16px;
 }
+.invalid {
+    border-color: #CC3333;
+}
+
+.invalid-value-error {
+    padding-left: 0px;
+    padding-top: 7px;
+    color: red;
+    cursor: pointer;
+    width: 5px;
+}
 
 /*SLD-tree*/
 .sld-tree-container {

@@ -8,7 +8,9 @@ requirejs.config({
 		i18n: 'lib/i18n',
 		bootstrap: 'lib/bootstrap',
 		svg: 'lib/svg',
-		chosen: 'lib/chosen/chosen.jquery'
+		chosen: 'lib/chosen/chosen.jquery',
+		'backbone-validation': 'lib/backbone-validation'
+
 	},
 	shim: {
 		'bootstrap': {
@@ -19,6 +21,9 @@ requirejs.config({
 		},
 		'ol3': {
 			exports: 'ol'
+		},
+		'backbone-validation': {
+			deps: ['backbone', 'lodash']
 		}
 	},
 	map: {
@@ -35,7 +40,8 @@ require([
 	'router',
 	'bootstrap',
 	'collections/SLDtemplates',
-	'collections/SLDconfigs'
+	'collections/SLDconfigs',
+	'backbone-validation'
 ], function(Backbone, $, _, Router, Bootstrap, SLDTemplatesCollection, SLDConfigsCollection) {
 	var WebApp = {
 		'views': {},

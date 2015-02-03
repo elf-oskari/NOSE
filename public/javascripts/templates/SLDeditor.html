@@ -62,7 +62,7 @@ var toggleAdvanced = function(divClass) {
                             </div>
                             <div class="form-group param <%= attrData.graphic.values['wellknownname'].class %>">
                                 <label class="col-md-3 control-label edit-sld-label" for="graphic-symbol"><%= editSLD.point['symbol'] %></label>
-                                <div class="col-md-7 col-md-offset-2">
+                                <div class="col-md-7 col-md-offset-1">
                                     <select onchange="(<%= updateExternalGraphic %>)(this)" id="graphic-symbol" class="form-control" data-param-id="<%=attrData.graphic.values['wellknownname'].param_id%>">
                                         <option <%= generateOptionValue("circle",attrData.graphic.values['wellknownname'].value) %>><%= editSLD.point['circle'] %></option>
                                         <option <%= generateOptionValue("cross",attrData.graphic.values['wellknownname'].value) %>><%= editSLD.point['cross'] %></option>
@@ -77,32 +77,32 @@ var toggleAdvanced = function(divClass) {
                             </div>
                             <div class="form-group external-graphic param <%= attrData.graphic.values['external-graphic'].class %>">
                                 <label class="control-label col-md-3 edit-sld-label" for="external-graphic"><%= editSLD.point['url'] %></label>
-                                <div class="col-md-7 col-md-offset-2">
-                                    <input type="text" class="form-control"
+                                <div class="col-md-7 col-md-offset-1">
+                                    <input type="url" class="form-control"
                                             id="external-graphic" data-css-parameter="external-graphic" data-param-id="<%= attrData.graphic.values['external-graphic'].param_id %>" value="<%= attrData.graphic.values['external-graphic'].value %>">
                                 </div>
                             </div>
                             <div class="form-group param <%= attrData.graphic.values['size'].class %>">
                                 <label class="control-label col-md-3 edit-sld-label" for="size"><%= editSLD.point['size'] %></label>
-                                <div class="col-md-7 col-md-offset-2">
-                                    <input type="number" class="form-control" min="0" id="size" data-css-parameter="size" data-param-id="<%= attrData.graphic.values['size'].param_id %>" value="<%= attrData.graphic.values['size'].value %>">
+                                <div class="col-md-7 col-md-offset-1">
+                                    <input type="number" class="form-control" min="0" id="size" name="size" data-css-parameter="size" data-param-id="<%= attrData.graphic.values['size'].param_id %>" value="<%= attrData.graphic.values['size'].value %>">
                                 </div>
                             </div>
                             <div class="form-group param <%= attrData.graphic.values['rotation'].class %>">
                                 <label class="control-label col-md-3 edit-sld-label" for="rotation"><%= editSLD.point['rotation'] %></label>
-                                <div class="col-md-7 col-md-offset-2">
+                                <div class="col-md-7 col-md-offset-1">
                                     <input type="number" class="form-control" min="0" max="360" id="rotation" data-css-parameter="rotation" data-param-id="<%= attrData.graphic.values['rotation'].param_id %>" value="<%= attrData.graphic.values['rotation'].value %>">
                                 </div>
                             </div>
                             <div class="form-group param <%= attrData.graphic.values['opacity'].class %>">
                                 <label class="control-label col-md-3 edit-sld-label" for="opacity"><%= editSLD.point['opacity'] %></label>
-                                <div class="col-md-7 col-md-offset-2">
+                                <div class="col-md-7 col-md-offset-1">
                                     <input type="number" class="form-control" min="0" max="1" step="0.1" id="opacity" data-css-parameter="fill-opacity" data-param-id="<%= attrData.graphic.values['opacity'].param_id %>" value="<%= attrData.graphic.values['opacity'].value %>">
                                 </div>
                             </div>
                             <div class="form-group param <%= attrData.graphic.values['fill'].class %>">
                                 <label class="control-label col-md-3 edit-sld-label" for="point-fill"><%= editSLD.point['color'] %></label>
-                                <div class="col-md-7 col-md-offset-2">
+                                <div class="col-md-7 col-md-offset-1">
                                     <input type="color" class="form-control" id="point-fill" data-css-parameter="fill" data-param-id="<%= attrData.graphic.values['fill'].param_id %>" value="<%= attrData.graphic.values['fill'].value %>">
                                 </div>
                             </div>
@@ -114,7 +114,7 @@ var toggleAdvanced = function(divClass) {
                             <div class="form-group param <%= attrData.line.values['stroke'].class %>">
                                 <label class="control-label col-md-3 edit-sld-label"
                                        for="stroke"><%= editSLD.line['color'] %></label>
-                                <div class="col-md-7 col-md-offset-2">
+                                <div class="col-md-7 col-md-offset-1">
                                     <input type="color" class="form-control"
                                             id="stroke" data-css-parameter="stroke"
                                             data-param-id="<%= attrData.line.values['stroke'].param_id %>"
@@ -123,15 +123,15 @@ var toggleAdvanced = function(divClass) {
                             </div>
                             <div class="form-group param <%=attrData.line.values['stroke-width'].class %>">
                                 <label class="control-label col-md-3 edit-sld-label" for="stroke-width"><%= editSLD.line['width'] %></label>
-                                <div class="col-md-7 col-md-offset-2">
+                                <div class="col-md-7 col-md-offset-1">
                                     <input type="number" class="form-control" min="0"
-                                            id="stroke-width" data-css-parameter="stroke-width" data-param-id="<%= attrData.line.values['stroke-width'].param_id %>"
+                                            id="stroke-width" data-css-parameter="stroke-width" name="width" data-param-id="<%= attrData.line.values['stroke-width'].param_id %>"
                                             value="<%= attrData.line.values['stroke-width'].value %>">
                                 </div>
                             </div>
                             <div class="form-group param <%=attrData.line.values['stroke-linejoin'].class %>">
                                 <label class="control-label col-md-3 edit-sld-label" for="stroke-linejoin"><%= editSLD.line['line-join'] %></label>
-                                <div class="col-md-7 col-md-offset-2">
+                                <div class="col-md-7 col-md-offset-1">
                                     <select id="stroke-linejoin" data-css-parameter="stroke-linejoin"  data-param-id="<%= attrData.line.values['stroke-linejoin'].param_id%>" class="form-control">
                                         <option <%= generateOptionValue("miter",attrData.line.values['stroke-linejoin'].value) %>><%= editSLD.line['join-miter'] %></option>
                                         <option <%= generateOptionValue("round",attrData.line.values['stroke-linejoin'].value) %>><%= editSLD.line['join-round'] %></option>
@@ -141,7 +141,7 @@ var toggleAdvanced = function(divClass) {
                             </div>
                             <div class="form-group param <%=attrData.line.values['stroke-linecap'].class %>">
                                 <label class="control-label col-md-3 edit-sld-label" for="stroke-linecap"><%= editSLD.line['line-cap'] %></label>
-                                <div class="col-md-7 col-md-offset-2">
+                                <div class="col-md-7 col-md-offset-1">
                                     <select id="stroke-linecap" data-css-parameter="stroke-linecap" data-param-id="<%= attrData.line.values['stroke-linecap'].param_id%>" class="form-control">
                                         <option <%= generateOptionValue("butt",attrData.line.values['stroke-linecap'].value) %>><%= editSLD.line['cap-butt'] %></option>
                                         <option <%= generateOptionValue("round",attrData.line.values['stroke-linecap'].value) %>><%= editSLD.line['cap-round'] %></option>
@@ -152,7 +152,7 @@ var toggleAdvanced = function(divClass) {
                             <div class="form-group param hidden">
                                 <label class="control-label col-md-3 edit-sld-label"
                                         for="stroke-dasharray"><%= editSLD.line['dasharray'] %></label>
-                                <div class="col-md-7 col-md-offset-2">
+                                <div class="col-md-7 col-md-offset-1">
                                     <input type="text" class="form-control"
                                             id="stroke-dasharray" data-css-parameter="stroke-dasharray"
                                             data-param-id="<%= attrData.line.values['stroke-dasharray'].param_id %>" value="<%= attrData.line.values['stroke-dasharray'].value %>">
@@ -161,7 +161,7 @@ var toggleAdvanced = function(divClass) {
                             <div class="form-group param <%= attrData.line.values['stroke-dasharray'].class %>">
                                 <label class="control-label col-md-3 edit-sld-label"
                                         for="stroke-dasharray-length"><%= editSLD.line['dasharray-length'] %></label>
-                                <div class="col-md-7 col-md-offset-2">
+                                <div class="col-md-7 col-md-offset-1">
                                     <input type="number" class="form-control"
                                             min="0" id="stroke-dasharray-length" data-css-parameter="stroke-dasharray-part"
                                             data-param-id="<%= attrData.line.values['stroke-dasharray'].param_id %>" value="<%= getSplitArrayComponent(attrData.line.values['stroke-dasharray'].value,0) %>">
@@ -170,7 +170,7 @@ var toggleAdvanced = function(divClass) {
                             <div class="form-group param <%= attrData.line.values['stroke-dasharray'].class %>">
                                 <label class="control-label col-md-3 edit-sld-label"
                                         for="stroke-dasharray-space"><%= editSLD.line['dasharray-space'] %></label>
-                                <div class="col-md-7 col-md-offset-2">
+                                <div class="col-md-7 col-md-offset-1">
                                     <input type="number" class="form-control"
                                             min="0" id="stroke-dasharray-space" data-css-parameter="stroke-dasharray-part"
                                             data-param-id="<%= attrData.line.values['stroke-dasharray'].param_id %>" value="<%= getSplitArrayComponent(attrData.line.values['stroke-dasharray'].value,1) %>">
@@ -179,7 +179,7 @@ var toggleAdvanced = function(divClass) {
                             <div class="form-group param <%= attrData.line.values['stroke-dashoffset'].class %>">
                                 <label class="control-label col-md-3 edit-sld-label"
                                         for="stroke-dashoffset"><%= editSLD.line['dash-offset'] %></label>
-                                <div class="col-md-7 col-md-offset-2">
+                                <div class="col-md-7 col-md-offset-1">
                                     <input type="number" class="form-control" min="0"
                                             id="stroke-dashoffset" data-css-parameter="stroke-dashoffset" data-param-id="<%= attrData.line.values['stroke-dashoffset'].param_id %>" value="<%= attrData.line.values['stroke-dashoffset'].value %>">
                                 </div>
@@ -187,7 +187,7 @@ var toggleAdvanced = function(divClass) {
                             <div
                                     class="form-group param <%= attrData.line.values['stroke-opacity'].class %>">
                                 <label class="control-label col-md-3 edit-sld-label" for="stroke-opacity"><%= editSLD.line['opacity'] %></label>
-                                <div class="col-md-7 col-md-offset-2">
+                                <div class="col-md-7 col-md-offset-1">
                                     <input type="number" class="form-control" min="0" max="1" step="0.1"
                                             id="stroke-opacity" data-css-parameter="stroke-opacity"
                                             data-param-id="<%= attrData.line.values['stroke-opacity'].param_id %>"
@@ -202,7 +202,7 @@ var toggleAdvanced = function(divClass) {
                             <div class="form-group param <%= attrData.polygon.values['fill'].class %>">
                                 <label class="control-label col-md-3 edit-sld-label"
                                         for="fill"><%= editSLD.fill['color'] %></label>
-                                <div class="col-md-7 col-md-offset-2">
+                                <div class="col-md-7 col-md-offset-1">
                                     <input type="color" class="form-control"
                                             id="fill" data-css-parameter="fill"
                                             data-param-id="<%= attrData.polygon.values['fill'].param_id %>"
@@ -211,7 +211,7 @@ var toggleAdvanced = function(divClass) {
                             </div>
                             <div class="form-group param <%= attrData.polygon.values['fill-opacity'].class %>">
                                 <label class="control-label col-md-3 edit-sld-label" for="fill-opacity"><%= editSLD.fill['opacity'] %></label>
-                                <div class="col-md-7 col-md-offset-2">
+                                <div class="col-md-7 col-md-offset-1">
                                     <input type="number" class="form-control" min="0" max="1" step="0.1"
                                             id="fill-opacity" data-css-parameter="fill-opacity" data-param-id="<%= attrData.polygon.values['fill-opacity'].param_id %>"
                                             value="<%= attrData.polygon.values['fill-opacity'].value %>">
@@ -224,7 +224,7 @@ var toggleAdvanced = function(divClass) {
                             </div>
                             <div class="form-group param">
                                 <label class="control-label col-md-3 edit-sld-label" for="font-family"><%= editSLD.text['font'] %></label>
-                                <div class="col-md-7 col-md-offset-2">
+                                <div class="col-md-7 col-md-offset-1">
                                     <select id="font-family" data-css-parameter="font-family" class="form-control">
                                         <option <%= generateOptionValue("Arial",attrData.text.values['font-family'].value) %>>Arial</option>
                                         <option <%= generateOptionValue("Geneva",attrData.text.values['font-family'].value) %>>Geneva</option>
@@ -235,7 +235,7 @@ var toggleAdvanced = function(divClass) {
                             </div>
                             <div class="form-group param">
                                 <label class="control-label col-md-3 edit-sld-label" for="font-style"><%= editSLD.text['style'] %></label>
-                                <div class="col-md-7 col-md-offset-2">
+                                <div class="col-md-7 col-md-offset-1">
                                     <select id="font-style" data-css-parameter="font-style" class="form-control">
                                         <option <%= generateOptionValue("normal",attrData.text.values['font-style'].value) %>><%= editSLD.text['style-normal'] %></option>
                                         <option <%= generateOptionValue("italic",attrData.text.values['font-style'].value) %>><%= editSLD.text['style-italic'] %></option>
@@ -245,7 +245,7 @@ var toggleAdvanced = function(divClass) {
                             </div>
                             <div class="form-group param">
                                 <label class="control-label col-md-3 edit-sld-label" for="font-weight"><%= editSLD.text['weight'] %></label>
-                                <div class="col-md-7 col-md-offset-2">
+                                <div class="col-md-7 col-md-offset-1">
                                     <select id="font-weight" data-css-parameter="font-weight" class="form-control">
                                         <option <%= generateOptionValue("normal",attrData.text.values['font-weight'].value) %>><%= editSLD.text['weight-normal'] %></option>
                                         <option <%= generateOptionValue("bold",attrData.text.values['font-weight'].value) %>><%= editSLD.text['weight-bold'] %></option>
@@ -254,7 +254,7 @@ var toggleAdvanced = function(divClass) {
                             </div>
                             <div class="form-group param <%= attrData.text.values['font-size'].class %>">
                                 <label class="control-label col-md-3 edit-sld-label" for="font-size"><%= editSLD.text['size'] %></label>
-                                <div class="col-md-7 col-md-offset-2">
+                                <div class="col-md-7 col-md-offset-1">
                                     <input type="number" class="form-control" min="0"
                                             id="font-size" data-css-parameter="font-size" data-param-id="<%= attrData.text.values['font-size'].param_id %>"
                                             value="<%= attrData.text.values['font-size'].value %>">
@@ -262,7 +262,7 @@ var toggleAdvanced = function(divClass) {
                             </div>
                             <div class="form-group param <%= attrData.text.values['text-fill'].class %>">
                                 <label class="control-label col-md-3 edit-sld-label" for="text-fill"><%= editSLD.text['color'] %></label>
-                                <div class="col-md-7 col-md-offset-2">
+                                <div class="col-md-7 col-md-offset-1">
                                     <input type="color" class="form-control"
                                             id="text-fill" data-css-parameter="fill"
                                             data-param-id="<%= attrData.text.values['text-fill'].param_id %>"
@@ -272,7 +272,7 @@ var toggleAdvanced = function(divClass) {
                             <div class="form-group param <%= attrData.text.values['halo-color'].class %>">
                                 <label class="control-label col-md-3 edit-sld-label"
                                         for="halo-color"><%= editSLD.text['halo-color'] %></label>
-                                <div class="col-md-7 col-md-offset-2">
+                                <div class="col-md-7 col-md-offset-1">
                                     <input type="color" class="form-control"
                                             id="halo-color" data-css-parameter="halo-color"
                                             data-param-id="<%= attrData.text.values['halo-color'].param_id %>"
@@ -281,14 +281,14 @@ var toggleAdvanced = function(divClass) {
                             </div>
                             <div class="form-group param <%= attrData.text.values['halo-radius'].class %>">
                                 <label class="control-label col-md-3 edit-sld-label" for="halo-radius"><%= editSLD.text['radius'] %></label>
-                                <div class="col-md-7 col-md-offset-2">
+                                <div class="col-md-7 col-md-offset-1">
                                     <input type="number" class="form-control" min="0" id="halo-radius" data-css-parameter="halo-radius" data-param-id="<%= attrData.text.values['halo-radius'].param_id %>" value="<%= attrData.text.values['halo-radius'].value %>">
                                 </div>
                             </div>
                             <span class="label label-info" onclick="(<%= toggleAdvanced %>)('text-advanced')"><%= editSLD.text['advanced'] %></span>
                             <div class="form-group param text-advanced hidden-advanced <%= attrData.text.values['pointplacement-anchorpointx'].class %>">
                                 <label class="control-label col-md-3 edit-sld-label" for="pointplacement-anchorpointx"><%= editSLD.text['pointplacement-anchorpointx'] %></label>
-                                <div class="col-md-7 col-md-offset-2">
+                                <div class="col-md-7 col-md-offset-1">
                                     <input type="number" class="form-control"
                                             min="0" max ="1" id="pointplacement-anchorpointx" data-css-parameter="anchorpointx"
                                             data-param-id="<%= attrData.text.values['pointplacement-anchorpointx'].param_id %>"
@@ -297,7 +297,7 @@ var toggleAdvanced = function(divClass) {
                             </div>
                             <div class="form-group param text-advanced hidden-advanced <%= attrData.text.values['pointplacement-anchorpointy'].class %>">
                                 <label class="control-label col-md-3 edit-sld-label" for="pointplacement-anchorpointy"><%= editSLD.text['pointplacement-anchorpointy'] %></label>
-                                <div class="col-md-7 col-md-offset-2">
+                                <div class="col-md-7 col-md-offset-1">
                                     <input type="number" class="form-control"
                                             min="0" max ="1" id="pointplacement-anchorpointy" data-css-parameter="anchorpointy"
                                             data-param-id="<%= attrData.text.values['pointplacement-anchorpointy'].param_id %>"
@@ -306,7 +306,7 @@ var toggleAdvanced = function(divClass) {
                             </div>
                             <div class="form-group param text-advanced hidden-advanced <%= attrData.text.values['pointplacement-displacementx'].class %>">
                                 <label class="control-label col-md-3 edit-sld-label" for="pointplacement-displacementx"><%= editSLD.text['pointplacement-displacementx'] %></label>
-                                <div class="col-md-7 col-md-offset-2">
+                                <div class="col-md-7 col-md-offset-1">
                                     <input type="number" class="form-control"
                                             min="0" id="pointplacement-displacementx" data-css-parameter="displacementx"
                                             data-param-id="<%= attrData.text.values['pointplacement-displacementx'].param_id %>"
@@ -315,7 +315,7 @@ var toggleAdvanced = function(divClass) {
                             </div>
                             <div class="form-group param text-advanced hidden-advanced <%= attrData.text.values['pointplacement-displacementy'].class %>">
                                 <label class="control-label col-md-3 edit-sld-label" for="pointplacement-displacementy"><%= editSLD.text['pointplacement-displacementy'] %></label>
-                                <div class="col-md-7 col-md-offset-2">
+                                <div class="col-md-7 col-md-offset-1">
                                     <input type="number" class="form-control"
                                             min="0" id="pointplacement-displacementy" data-css-parameter="displacementy"
                                             data-param-id="<%= attrData.text.values['pointplacement-displacementy'].param_id %>"
@@ -324,7 +324,7 @@ var toggleAdvanced = function(divClass) {
                             </div>
                             <div class="form-group param text-advanced hidden-advanced <%= attrData.text.values['pointplacement-rotation'].class %>">
                                 <label class="control-label col-md-3 edit-sld-label" for="pointplacement-rotation"><%= editSLD.text['pointplacement-rotation'] %></label>
-                                <div class="col-md-7 col-md-offset-2">
+                                <div class="col-md-7 col-md-offset-1">
                                     <input type="number" class="form-contro"
                                             min="0" id="pointplacement-rotation" data-css-parameter="rotation"
                                             data-param-id="<%= attrData.text.values['pointplacement-rotation'].param_id %>"
@@ -333,7 +333,7 @@ var toggleAdvanced = function(divClass) {
                             </div>
                             <div class="form-group param text-advanced hidden-advanced <%= attrData.text.values['lineplacement-perpendicularoffset'].class %>">
                                 <label class="control-label col-md-3 edit-sld-label" for="lineplacement-perpendicularoffset"><%= editSLD.text['lineplacement-perpendicularoffset'] %></label>
-                                <div class="col-md-7 col-md-offset-2">
+                                <div class="col-md-7 col-md-offset-1">
                                     <input type="number" class="form-control"
                                             min="0" id="lineplacement-perpendicularoffset" data-css-parameter="lineplacement-perpendicularoffset"
                                             data-param-id="<%= attrData.text.values['lineplacement-perpendicularoffset'].param_id %>"

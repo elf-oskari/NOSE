@@ -5,8 +5,9 @@ define([
   'bootstrap',
   'svg',
   'i18n!localization/nls/SLDeditor',
+  'validation/validate',
   'text!templates/SLDeditor.html'
-], function(_, Backbone, $, Bootstrap, SVG, locale, editSLDTemplate) {
+], function(_, Backbone, $, Bootstrap, SVG, locale, validateFunctions, editSLDTemplate) {
   var SLDEditorView = Backbone.View.extend({
     className: 'page',
     template: _.template(editSLDTemplate),
@@ -20,6 +21,7 @@ define([
         'change .param': 'setParam',
         'click .cancel-changes':'resetModel'
     },
+
     initialize: function(params) {
       this.dispatcher = params.dispatcher;
       this.listenTo(this.dispatcher, "selectSymbolizer", this.updateEditParams);
@@ -41,7 +43,7 @@ define([
       self.stopListening(self.SLDconfigmodel, "all");
       self.stopListening(self.SLDconfigmodel, "sync");
       self.SLDconfigmodel = model;
-      self.listenTo(self.SLDconfigmodel, "invalid", self.invalidValue);
+      self.listenTo(self.SLDconfigmodel, "validated:invalid", self.invalidValue);
       self.listenTo(self.SLDconfigmodel, "all", self.logger);
       // we use promises with saving so we don't propably need this
       //self.listenTo(self.SLDconfigmodel, "sync", self.showInfoModal);
@@ -56,8 +58,9 @@ define([
           symbol: _.cloneDeep(symbol),
           ruletitle: _.cloneDeep(ruletitle)
         };
-
+        var self = this;
         var localization = locale;
+        var SLDconfigmodel = this.SLDconfigmodel;
         var model = this.SLDconfigmodel.pick('id', 'name');
         var params = _.isUndefined(paramlist) ? false : paramlist;
         var uom = _.isUndefined(symbol) ? false : symbol.uom;
@@ -101,6 +104,9 @@ define([
             data.graphic.values["wellknownname"] = "external";  // Drop-down value
         }
         this.$el.html(this.template({SLDmodel: model, editSLD: localization, attrData: data, symbolType: type, symbolUnit: uom, ruletitle: ruletitle}));
+        Backbone.Validation.bind(this, {
+          model: SLDconfigmodel
+        });
         if (paramlist) {
           this.renderPreview(paramlist, type);
           $(this.el).find(".symbolizer-chosen").removeClass("hidden");
@@ -186,25 +192,48 @@ define([
       var element,
           newvalue, 
           param_id, 
-          param_css_parameter;
+          param_css_parameter,
+          validation;
 
-      // if shape is changed
-//      if (event.currentTarget.innerText === "Symbol") {
       var param_id = null;
       var param_css_parameter = null;
 
       if (event.target.id === "graphic-symbol") {
         element = $(event.target)[0];//.find("#graphic-symbol");
         newvalue = element.value.toLowerCase();
-        // Update map style
-        this.renderWellKnownName(newvalue);
+
+        //if user leaves url invalid and changes the symbol we want to clear url
+        if ($("#external-graphic").hasClass("invalid")) {
+          var externalGraphicElement = $("#external-graphic")[0];
+          externalGraphicElement.value = "";
+          validateFunctions.handleValidParam(externalGraphicElement);
+        }
         param_id = "" + element.dataset['paramId'];
-        this.dispatcher.trigger("updateMapStyle",[{'name':'wellknownname','value': newvalue}],this.symbolType );
+        param_name = "graphic-symbol";
+        validation = validateFunctions.validateParam(element, param_name, newvalue);
+        if (validation[0] === "invalid") {
+          validateFunctions.handleInvalidParam(validation, element);
+          return;
+        } else {
+          if ($(element).hasClass("invalid")) {
+            validateFunctions.handleValidParam(element);
+          }
+          this.renderWellKnownName(newvalue);
+          this.dispatcher.trigger("updateMapStyle",[{'name':'wellknownname','value': newvalue}],this.symbolType );
+        }
       } else {
         element = $(event.currentTarget).find(".form-control")[0];
         param_id = "" + element.dataset['paramId'];
         param_css_parameter = element.dataset['cssParameter'];
         newvalue = element.value;
+        validation = validateFunctions.validateParam(element, param_css_parameter, newvalue);
+        if (validation[0] === "invalid") {
+          validateFunctions.handleInvalidParam(validation, element);
+          return;
+        }
+        if ($(element).hasClass("invalid")) {
+          validateFunctions.handleValidParam(element);
+        }
         if (param_css_parameter === "rotation") {
           this.elementRotation = newvalue;
           this.previewElement.transform({rotation: this.elementRotation});
@@ -226,8 +255,8 @@ define([
           this.attributes[param_css_parameter] = newvalue;
           this.updatePreview();
         }
-          // Update map style
-          this.dispatcher.trigger("updateMapStyle",[{'name':param_css_parameter,'value': newvalue}], this.symbolType );
+        // Update map style
+        this.dispatcher.trigger("updateMapStyle",[{'name':param_css_parameter,'value': newvalue}], this.symbolType );
       }
 
 
@@ -247,8 +276,15 @@ define([
 
     },
 
-    invalidValue: function(event) {
-      console.log('got invalid', event, arguments);
+    //TODO
+    //Check this functions that it works correctly
+    invalidValue: function(view, attr, error, selector) {
+      var self = this,
+          localization = locale;
+      $('#savingModal').modal('hide');
+      var modalTitle = localization.infoModal['errorWithSavingTitle'];
+      var modalBody = attr.name;
+      self.showInfoModal(modalTitle, modalBody);
     },
 
     initAttrData: function () {
@@ -333,22 +369,25 @@ define([
           localization = locale;
       event.preventDefault();
       $('#savingModal').modal('show');
-      self.SLDconfigmodel.save({},{
-        wait: true
-      }).done(
-        function (model, response) {
-          console.log("Model saved. model: ", model, "response: ", response);
-          var modalTitle = localization.infoModal['modelSavedTitle'];
-          var modalBody = localization.infoModal['modelSavedBody'];
-          self.showInfoModal(modalTitle, modalBody, response);
-        })
-      .fail(
-        function (model, response, options) {
-          console.log("Error with saving model values. Response: ", response, "options: ", options);
-          var modalTitle = localization.infoModal['errorWithSavingTitle'];
-          var modalBody = localization.infoModal['errorWithSavingBody'];
-          self.showInfoModal(modalTitle, modalBody, response);
+      if(self.SLDconfigmodel.isValid(true)) {
+        self.SLDconfigmodel.save({},{
+          wait: true
+        }).done(
+          function (model, response) {
+            console.log("Model saved. model: ", model, "response: ", response);
+            self.configSaved = true;
+            var modalTitle = localization.infoModal['modelSavedTitle'];
+            var modalBody = localization.infoModal['modelSavedBody'];
+            self.showInfoModal(modalTitle, modalBody, response);
+          })
+        .fail(
+          function (model, response, options) {
+            console.log("Error with saving model values. Response: ", response, "options: ", options);
+            var modalTitle = localization.infoModal['errorWithSavingTitle'];
+            var modalBody = localization.infoModal['errorWithSavingBody'];
+            self.showInfoModal(modalTitle, modalBody, response);
         });
+      }
     },
 
     deleteConfig: function () {

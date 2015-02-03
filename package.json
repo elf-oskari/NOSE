@@ -4,6 +4,7 @@
   "private": true,
   "main": "app.js",
   "dependencies": {
+    "backbone-validation" : "0.11.0",
     "body-parser": "^1.10.1",
     "ejs": "^2.1.4",
     "es6-promise": "1.0.0",

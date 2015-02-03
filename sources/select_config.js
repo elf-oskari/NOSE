@@ -150,7 +150,7 @@ SldSelecter.prototype.selectConfig=function(id, uuid) {
 SldSelecter.prototype.selectValues=function(id) {
     var self=this;
 
-    var value_sql = 'SELECT param_id, value from SLD_VALUE WHERE CONFIG_ID='+id;
+    var value_sql = 'SELECT a.param_id, c.name, a.value from SLD_VALUE as a, SLD_PARAM as b, SLD_TYPE as c  WHERE a.config_id='+id+' AND (a.param_id = b.id AND b.type_id = c.id)';
     console.log("value_sql: ", value_sql);
 
     return(self.db.queryResult(value_sql));
