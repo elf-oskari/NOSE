@@ -19,6 +19,7 @@ define([
         'click .save': 'saveConfig',
         'change .name': 'setAttribute',
         'keyup .param': 'setParam',
+        'change .param': 'setParam',
         'click .cancel-changes':'resetModel'
     },
 
@@ -303,9 +304,7 @@ define([
         // Update map style
         this.dispatcher.trigger("updateMapStyle",[{'name':param_css_parameter,'value': newvalue}], this.symbolType );
       }
-
-
-      //Update the model. But now there's a problem with reset
+      
       if (param_id) {
         var sld_param = _.findWhere(this.SLDconfigmodel.attributes.sld_values, {param_id: param_id});
 
