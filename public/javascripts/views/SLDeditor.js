@@ -18,7 +18,7 @@ define([
         'click .upload': 'showUpload',
         'click .save': 'saveConfig',
         'change .name': 'setAttribute',
-        'change .param': 'setParam',
+        'keyup .param': 'setParam',
         'click .cancel-changes':'resetModel'
     },
 

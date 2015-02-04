@@ -4,24 +4,8 @@ define([
   'i18n!localization/nls/validation'
 ], function(_, $, localeValidation) {
 	return {
-		handleInvalidParam: function (validation, element) {
-	      var self = this;
-	      $(element).addClass("invalid");
-	      $(element.parentElement).after('<div class="col-md-1 invalid-value-error"><i class="fa fa-exclamation fa-2x"></i></div>');
-	      $(".invalid-value-error").attr({'data-toggle': "tooltip", 'data-placement': "top", 'title': validation[1]});
-	      $(function () {
-	        $('[data-toggle="tooltip"]').tooltip({container: 'body'})
-	      });
-	      $(".btn.save").addClass("disabled");
-	    },
 
-	    handleValidParam: function (element) {
-	      $(element).removeClass("invalid");
-	      $(".invalid-value-error").remove();
-	      $(".btn.save").removeClass("disabled");
-	    },
-
-	    validateParam: function (element, param_name, newvalue) {
+		validateParam: function (element, param_name, newvalue) {
 	      // validateResult is an array [valid/invalid, errormessage]
 	      var validateResult;
 	      if (element.type === "number") {
@@ -46,6 +30,26 @@ define([
 	        }
 	      }
 	      return validateResult;
+	    },
+		handleInvalidParam: function (validation, element) {
+	      var self = this;
+	      if ($(element).hasClass("invalid")) {
+	      	$(".invalid-value-error").attr('data-original-title', validation[1]);
+	      	return;
+	      }
+	      $(element).addClass("invalid");
+	      $(element.parentElement).after('<div class="col-md-1 invalid-value-error"><i class="fa fa-exclamation fa-2x"></i></div>');
+	      $(".invalid-value-error").attr({'data-toggle': "tooltip", 'data-placement': "top", 'title': validation[1]});
+	      $(function () {
+	        $('[data-toggle="tooltip"]').tooltip({container: 'body'})
+	      });
+	      $(".btn.save").addClass("disabled");
+	    },
+
+	    handleValidParam: function (element) {
+	      $(element).removeClass("invalid");
+	      $(".invalid-value-error").remove();
+	      $(".btn.save").removeClass("disabled");
 	    },
 
 	    validateNumber: function (value, param_name) {
