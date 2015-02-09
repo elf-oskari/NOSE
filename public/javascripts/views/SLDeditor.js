@@ -40,7 +40,7 @@ define([
       var self = this;
 
       // we must stop listening first and then add to current model
-      self.stopListening(self.SLDconfigmodel, "invalid");
+      self.stopListening(self.SLDconfigmodel, "validated:invalid");
       self.stopListening(self.SLDconfigmodel, "all");
       self.stopListening(self.SLDconfigmodel, "sync");
       self.SLDconfigmodel = model;
@@ -304,7 +304,8 @@ define([
         // Update map style
         this.dispatcher.trigger("updateMapStyle",[{'name':param_css_parameter,'value': newvalue}], this.symbolType );
       }
-      
+      debugger;
+
       if (param_id) {
         var sld_param = _.findWhere(this.SLDconfigmodel.attributes.sld_values, {param_id: param_id});
 
@@ -323,6 +324,7 @@ define([
     //TODO
     //Check this functions that it works correctly
     invalidValue: function(view, attr, error, selector) {
+      debugger;
       var self = this,
           localization = locale;
       $('#savingModal').modal('hide');

@@ -14,20 +14,19 @@ define(['lodash','backbone'], function(_, Backbone) {
 		//TODO
 		// Validate model
 		validation: {
-			id: {
-				required: true
-			},
 			name: {
 				required: true,
 				msg: 'Model name is not valid!'
 			},
 			template_id: {
 				required: true
+			},
+			id: {
+				required: true
 			}
 			/** next are all attributes of the model, but they don't have validation yet
 			created: {
 
-			}
 			output_path: {
 
 			}

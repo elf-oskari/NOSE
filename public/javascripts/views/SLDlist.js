@@ -6,8 +6,9 @@ define([
     'text!templates/SLDlist.html',
     'text!templates/SLDListButtons.html',
     'models/sld_config',
+    'views/SLDeditor',
     'bootstrap'
-], function(_, Backbone, $, locale, SLDListTemplate, SLDListButtons, SLDconfigModel) {
+], function(_, Backbone, $, locale, SLDListTemplate, SLDListButtons, SLDconfigModel, SLDeditor) {
     var SLDListView = Backbone.View.extend({
         el: '.container-main',
         template: _.template(SLDListTemplate),
@@ -56,36 +57,60 @@ define([
             };
             this.SLDconfigmodel = this.configs.create(new_config);
             this.SLDconfigmodel;
+            Backbone.Validation.bind(this, {
+              model: this.SLDconfigmodel,
+              attributes: ['name']
+            });
+            this.stopListening(this.SLDconfigmodel, "validated:invalid");
+            this.listenTo(this.SLDconfigmodel, "validated:invalid", this.invalidValue);
             $(target).attr('data-id', template_id).modal();
         },
         createNewConfig: function (event) {
             event.preventDefault();
             var self = this,
+                modalTitle,
+                modalBody,
                 localization = locale
                 name = $(event.currentTarget.offsetParent.children).find("#nameInput")[0].value;
             $('#createConfigModal').modal('hide');
-            $('#creatingModal').modal('show');
+            modalTitle = localization.createConfig['creatingConfig'];
+            modalBody = undefined;
+            hasSpinner = true;
+            self.showInfoModal(modalTitle, modalBody, hasSpinner);
             this.SLDconfigmodel.set('name', name);
-            this.SLDconfigmodel.save({},{
-                wait: true
-            }).done(
-                function (model, response, options) {
-                    console.log("New config created. Model: ", model, "response: ", response, "options: ", options);
-                    $('#creatingModal').modal('hide');
-                    $('#informModal').on('show.bs.modal', function () {
-                        var modal = $(this);
-                        modal.find('.modal-title').text(locale.createConfig['informModalTitle']);
-                        modal.find('.modal-body').text(locale.createConfig['informModalBody'] + model.name);
-                    })
-                    $('#okButton').on("click", function () {
-                      $('#informModal').modal('hide');
-                      Backbone.history.navigate('/edit/' + model.id, true);
-                    });
-                    $('#informModal').modal('show');
-            }).fail(
-                function (model, response, options) {
-                    console.log('Error', model, response, options);
-            });
+            var isValid = this.SLDconfigmodel.isValid('name');
+            if (isValid = true) {
+                this.SLDconfigmodel.save({},{
+                    wait: true
+                }).done(
+                    function (model, response, options) {
+                        console.log("New config created. Model: ", model, "response: ", response, "options: ", options);
+                        modalTitle = locale.createConfig['creatingConfigSuccessTitle'],
+                        modalBody = locale.createConfig['creatingConfigSuccessBody'] + model.name,
+                        hasSpinner = false,
+                        goToEditor = true,
+                        self.showInfoModal(modalTitle, modalBody, hasSpinner, goToEditor, model);
+                }).fail(
+                    function (model, response, options) {
+                        console.log('Error', model, response, options);
+                        modalTitle = locale.createConfig['creatingConfigFailureTitle'],
+                        modalBody = locale.createConfig['creatingConfigFailureBody'] + model.name,
+                        hasSpinner = false,
+                        goToEditor = false,
+                        self.showInfoModal(modalTitle, modalBody, hasSpinner, goToEditor, model);
+                });
+            }
+        },
+        //TODO
+        //Check this function that it works correctly
+        invalidValue: function(view, attr, error, selector) {
+            var self = this,
+                localization = locale,
+                modalTitle = localization.createConfig['invalidConfig'],
+                modalBody = attr.name,
+                hasSpinner = false,
+                goToEditor = false;
+            self.showInfoModal(modalTitle, modalBody, hasSpinner, goToEditor);
         },
 
         deleteConfirmation: function (event) {
@@ -97,34 +122,66 @@ define([
 
         deleteConfig: function (event) {
             event.preventDefault();
+            $('#deleteConfigModal').modal('hide');
             var self = this;
             var config_id = $(event.currentTarget).closest('.modal').data('id');
             var config = this.configs.get(config_id);
+            self.configName = config.attributes.name;
+            modalTitle = locale.deleteConfig['deletingConfig'];
+            modalBody = undefined;
+            hasSpinner = true;
+            self.showInfoModal(modalTitle, modalBody, hasSpinner);
             config.destroy({
-                wait: true,
-                success: function (model, response, options) {
-                    $('#deleteConfigModal').modal('hide');
-                    self.render();
-                },
-                error: function (model, response, options) {
-                    console.log("RAMI learns jep jep! something didn't go as planned", model, response, options);
-                    $('#errorrrr').show();
-                    //alert(response.responseJSON["delete config"]);
-                    //$('#deleteConfigModal').modal('hide');
-                    $('#deleteConfigModal').modal('show');
-                },
+                wait: true
+            }).done(
+                function (model, response, options) {
+                    console.log("Config deleted. Model: ", model, "response: ", response, "options: ", options);
+                    modalTitle = locale.deleteConfig['deletingConfigSuccessTitle'];
+                    modalBody = locale.deleteConfig['deletingConfigSuccessBody'] + self.configName;
+                    hasSpinner = false;
+                    goToEditor = false;
+                    self.showInfoModal(modalTitle, modalBody, hasSpinner, goToEditor, model);
+            }).fail(
+                function (model, response, options) {
+                    console.log("Deleting config failed", model, response, options);
+                    modalTitle = locale.deleteConfig['deletingConfigFailureTitle'],
+                    modalBody = locale.deleteConfig['deletingConfigFailureBody'] + model.name,
+                    hasSpinner = false,
+                    goToEditor = false,
+                    self.showInfoModal(modalTitle, modalBody, hasSpinner, goToEditor, model);
             });
         },
-        showInfoModal: function (modalTitle, modalBody, response) {
-            if ($('#savingModal')) {
-                $('#savingModal').modal('hide');
+
+        showInfoModal: function (modalTitle, modalBody, hasSpinner, goToEditor, model) {
+            var self = this;
+            $('#informModal').modal('hide');
+            if (hasSpinner === true) {
+                $('.fa-spin').removeClass('hidden');
+                $('#okButton').addClass('hidden');
+            } else {
+                if ($('#okButton').hasClass('hidden')) {
+                    $('#okButton').removeClass('hidden')
+                }
+                if ($('.fa-spin').not(":hidden")) {
+                    $('.fa-spin').addClass('hidden');
+                }
             }
-            $('#informUserModal').on('show.bs.modal', function () {
+            $('#informModal').on('show.bs.modal', function () {
                 var modal = $(this);
                 modal.find('.modal-title').text(modalTitle);
-                modal.find('.modal-body').text(modalBody)
+                if (modalBody) {
+                    modal.find('.modal-body').text(modalBody);
+                }
+                $('#okButton').on("click", function () {
+                    $('#informModal').modal('hide');
+                    //TODO! remove self.render to render to list only when it's changes f.e. config or template is deleted
+                    self.render();
+                    if (goToEditor === true) {
+                        Backbone.history.navigate('/edit/' + model.id, true);
+                    }
+                });
             })
-            $('#informUserModal').modal('show');
+            $('#informModal').modal({'keyboard': false});
         },
 
         editConfig: function (event) {
@@ -138,28 +195,45 @@ define([
         },
         deleteTemplate: function (event) {
             event.preventDefault();
+            $('#deleteTemplateModal').modal('hide');
             var self = this;
             var template_id = $(event.currentTarget).closest('.modal').data('id');
             var template = this.templates.get(template_id);
+            self.templateName = template.attributes.name;
+            modalTitle = locale.deleteTemplate['deletingTemplate'];
+            modalBody = undefined;
+            hasSpinner = true;
+            self.showInfoModal(modalTitle, modalBody, hasSpinner);
             template.destroy({
-                wait: true,
-                success: function (model, response, options) {
-                    console.log("everything went as planned", model, response, options);
-                    $('#deleteTemplateModal').modal('hide');
-                    self.render();
-                },
-                error: function (model, response, options) {
-                    console.log("something didn't go as planned", model, response, options);
-                    alert('Deleting template is not possible');
-                    $('#deleteTemplateModal').modal('hide');
-                }
+                wait: true
+            }).done(
+                function (model, response, options) {
+                    console.log("Template deleted. Model: ", model, "response: ", response, "options: ", options);
+                    modalTitle = locale.deleteTemplate['deletingTemplateSuccessTitle'];
+                    modalBody = locale.deleteTemplate['deletingTemplateSuccessBody'] + self.templateName;
+                    hasSpinner = false;
+                    goToEditor = false;
+                    self.showInfoModal(modalTitle, modalBody, hasSpinner, goToEditor);
+            }).fail(
+                function (model, response, options) {
+                    console.log("Deleting template failed", model, response, options);
+                    modalTitle = locale.deleteConfig['deletingTemplateFailureTitle'],
+                    modalBody = locale.deleteConfig['deletingTemplateFailureBody'] + self.templateName,
+                    hasSpinner = false,
+                    goToEditor = false,
+                    self.showInfoModal(modalTitle, modalBody, hasSpinner, goToEditor);
             });
         },
         upload: function(event) {
             event.preventDefault();
+            $('#uploadModal').modal('hide');
             var self = this;
             var fd = new FormData(document.getElementById("fileinfo"));
             fd.append("CustomField", "This is some extra data");
+            modalTitle = locale.upload['uploadingSLD'];
+            modalBody = undefined;
+            hasSpinner = true;
+            self.showInfoModal(modalTitle, modalBody, hasSpinner);
             $.ajax({
                 url: "./api/v1/templates/",
                 type: "POST",
@@ -167,15 +241,21 @@ define([
                 cache: false,
                 processData: false,  // tell jQuery not to process the data
                 contentType: false,   // tell jQuery not to set contentType
-                success: function(newTemplate) {
-                    $('#uploadModal').modal('hide');
-                    self.templates.create(newTemplate);
-                    self.render();
+                success: function(newTemplate, response, options) {
+                    console.log("Uploaded SLD. Response: ", response, "options: ", options);
+                    modalTitle = locale.upload['uploadSuccessTitle'];
+                    modalBody = locale.upload['uploadSuccessBody'] + newTemplate.name;
+                    hasSpinner = false;
+                    goToEditor = false;
+                    self.showInfoModal(modalTitle, modalBody, hasSpinner, goToEditor);
                 },
-                error: function(response) {
-                    //TODO: handle error, notify user (401 for instance)
-                    $('#uploadModal').modal('hide');
-
+                error: function(newTemplate, response, options) {
+                    console.log("Uploading SLD failed", response, options);
+                    modalTitle = locale.deleteConfig['uploadFailureTitle'],
+                    modalBody = locale.deleteConfig['uploadFailureBody'] + newTemplate.name,
+                    hasSpinner = false,
+                    goToEditor = false,
+                    self.showInfoModal(modalTitle, modalBody, hasSpinner, goToEditor);
                 }
             });
         },

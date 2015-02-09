@@ -10,8 +10,6 @@
       </a>
     </div>
 
-    
-
     <div class="row sld-list-content-div">
       <div class="col-sm-12 col-md-6 col-lg-6">
         <div class="panel-heading sld-list"><h4><%= SLDlist_i18n.texts.title %></h4></div>
@@ -89,9 +87,6 @@
         <div class="modal-body">
           <p><%= SLDlist_i18n.deleteConfig.body %></p>
         </div>
-        <div class="error-message" id="errorrrr" hidden >
-          <p style="color:red"><b>&nbsp;&nbsp;&nbsp;&nbsp; Ei saatu poistettua</b></p>
-        </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-danger delete-config"><%= SLDlist_i18n.deleteConfig.delete %></button>
           <button type="button" class="btn btn-primary" data-dismiss="modal"><%= SLDlist_i18n.buttons.cancel %></button>
@@ -118,9 +113,6 @@
             </div>
           </form>
         </div>
-        <div class="error-message" id="errorrrr" hidden >
-          <p style="color:red"><b>&nbsp;&nbsp;&nbsp;&nbsp; Ei saatu poistettua</b></p>
-        </div>
         <div class="modal-footer">
           <button type="submit" class="btn btn-primary create-config"><%= SLDlist_i18n.buttons.create %></button>
           <button type="button" class="btn btn-default" data-dismiss="modal"><%= SLDlist_i18n.buttons.cancel %></button>
@@ -138,21 +130,10 @@
               </div>
               <div class="modal-body">
                   <p></p>
+                  <i class="fa fa-spinner fa-spin fa-2x hidden"></i>
               </div>
               <div class="modal-footer">
                   <button id="okButton" type="button" class="btn btn-default" data-dismiss="modal"><%= SLDlist_i18n.buttons.ok %></button>
-              </div>
-          </div>
-      </div>
-  </div>
-  <!-- Modal window -->
-  <div class="modal" id="creatingModal" tabindex="-1" role="dialog" aria-labelledby="ModalTitle" aria-hidden="true">
-      <div class="modal-dialog modal-sm">
-          <div class="modal-content">
-              <div class="modal-body">
-                  <p><%= SLDlist_i18n.texts.creating %></p>
-                  <br>
-                  <i class="fa fa-spinner fa-spin fa-2x"></i>
               </div>
           </div>
       </div>
