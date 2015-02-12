@@ -349,6 +349,7 @@ var toggleAdvanced = function(divClass) {
                             <input type="hidden" name="id" value="<%= SLDmodel.id %>"/>
                             <button type="button" data-user-id="<%= SLDmodel.id %>" class="btn cancel-changes disabled"><%= editSLD.buttons['reset'] %></button>
                             <% }; %>
+                            <button type="button" class="btn wms-preview" data-id="<%=SLDmodel.id%>"><%= editSLD.buttons['wmspreview'] %></button>
                         </div>
                     </div>
                 </form>
@@ -410,4 +411,53 @@ var toggleAdvanced = function(divClass) {
             </div>
         </div>
     </div>
+  <!-- Modal window -->
+  <div class="modal" id="wmsPreviewModal" tabindex="-1" role="dialog" aria-labelledby="ModalTitle" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                  <h4 class="modal-title" id="ModalTitle"><%=editSLD.wmsPreview.title%></h4>
+              </div>
+              <div class="modal-body">
+
+                  <p>
+                    <%=editSLD.wmsPreview.info%>
+                  </p>
+                  <form id="wmsPreviewForm" method="POST" action="wmspreview.html" target="wmspreview" class="form-horizontal">
+                    <div class="form-group">
+                      <input type="hidden" id="id" name="id"/>
+
+                      <label for="wmsUrl" class="col-md-3 control-label"><%=editSLD.wmsPreview.wmsUrl%></label>
+                      <div class="col-md-9">
+                        <input type="text" id="wmsUrl" name="wmsUrl" class="form-control"/>
+                      </div>
+
+                      <label for="wmsProxyUrl" class="col-md-3 control-label"><%=editSLD.wmsPreview.wmsProxyUrl%></label>
+                      <div class="col-md-9">
+                        <input type="text" id="wmsProxyUrl" name="wmsProxyUrl" class="form-control"/>
+                      </div>
+                      <label for="username" class="col-md-3 control-label"><%=editSLD.wmsPreview.username%></label>
+                      <div class="col-md-9">
+                        <input type="text" id="username" name="username" class="form-control"/>
+                      </div>
+
+                      <label for="password" class="col-md-3 control-label"><%=editSLD.wmsPreview.password%></label>
+                      <div class="col-md-9">
+                        <input type="password" id="password" name="password" class="form-control"/>
+                      </div>
+                    </div>
+                  </form>
+              </div>
+              <div class="modal-footer">
+                  <button id="okButton" type="button" class="btn btn-primary" data-dismiss="modal"><%= editSLD.buttons.ok %></button>
+                  <button id="cancelButton" type="button" class="btn btn-default" data-dismiss="modal"><%= editSLD.buttons.cancel %></button>
+              </div>
+          </div>
+      </div>
+  </div>
+
+
+
+
 </div>

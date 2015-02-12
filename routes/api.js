@@ -23,10 +23,12 @@ module.exports = function (app, path, client, data, libs) {
         bodyParser = require('body-parser'),
         session = require('express-session'),
         passport = require('passport'), 
-        LocalStrategy = require('passport-local').Strategy;
+        LocalStrategy = require('passport-local').Strategy,
+
+        http = require('http'),
+        querystring = require('querystring');
 
     var users = [];
-
     function findByUsername(username, fn) {
         select_user(username, client, function(error, result) {
             users = result;
@@ -310,6 +312,209 @@ module.exports = function (app, path, client, data, libs) {
     });
 
 
+
+    //parses protocol, host and path from a given url
+    //return {protocol:, host:, path:}
+    function parseUrl(url) {
+
+        var hostJSON = {};
+        var urlSplit = url.split('://');
+        var hostAndPath = "";
+        if (urlSplit.length > 1) {
+            //this.wmsProtocol = urlSplit[0];
+            hostJSON.protocol = urlSplit[0];
+            hostAndPath = urlSplit[1];
+        } else {
+            hostJSON.protocol = 'http';
+            hostAndPath = urlSplit[0];
+        }
+
+        //url contains a path?
+        if (hostAndPath.indexOf('/') > -1) {
+            
+            var hostPart = hostAndPath.substring(0, hostAndPath.indexOf('/'));
+            var pathPart = hostAndPath.substring(hostAndPath.indexOf('/'), hostAndPath.length);
+            var hostSplit = hostPart.split(':');
+            
+            hostJSON.host = hostSplit[0];
+            hostJSON.port = hostSplit[1] ? hostSplit[1] : 80;
+            hostJSON.path = pathPart;
+        } else {
+            var hostPart = hostAndPath;
+            var pathPart = "";
+            var hostSplit = hostPart.split(':');
+            
+            hostJSON.host = hostSplit[0];
+            hostJSON.port = hostSplit[1] ? hostSplit[1] : 80;
+            hostJSON.path = pathPart;
+        }
+
+        return hostJSON;
+    }
+    app.post('/wmspreview.html', loggedIn, function(req, res) {
+
+//        console.log('POST /wmspreview.html '+req.body.id+" "+req.body.wmsUrl+" "+req.body.wmsHost+" "+req.body.wmsPath+" "+req.body.wmsPort+" "+req.body.wmsProxyHost+" "+req.body.wmsProxyPort);
+
+        /*in case of a regular user the uuid must also be provided*/
+        var uuid = (req.user && req.user.uuid) ? req.user.uuid : 0;        
+
+        check_config_ownership(req.body.id, client,function(err, result) {
+            configOwnerUUID = result[0]['uuid'];
+            if (uuid != configOwnerUUID) {
+                //user is admin -> allow operation but use the existing uid. Otherwise send 401.
+                if (checkAdmin(req.user)) {
+                    uuid = configOwnerUUID;
+                } else {
+                    res.status("401").send("");
+                }
+            }
+
+            //owner or admin. Go ahead.
+            if (uuid == configOwnerUUID) {
+                var urlComponents = parseUrl(req.body.wmsUrl);
+                if (!urlComponents) {
+                    res.status(500).send("Bad url.");
+                    return;
+                } else {
+                    this.wmsProtocol = urlComponents.protocol;
+                    this.wmsPort = urlComponents.port;
+                    this.wmsHost = urlComponents.host;
+                    this.wmsPath = urlComponents.path;
+                }
+
+                if (req.body.wmsProxyUrl) {
+                    var proxyUrlComponents = parseUrl(req.body.wmsProxyUrl);
+                    if (proxyUrlComponents) {
+                        this.wmsProxyHost = proxyUrlComponents.host;
+                        this.wmsProxyPort = proxyUrlComponents.port;
+                    }
+                }
+//                console.log("after parsing: "+this.wmsProtocol+" "+this.wmsHost+" "+this.wmsPath+" "+this.wmsProxyHost+" "+this.wmsProxyPort);
+
+                if (req.body.username && req.body.password) {
+                    this.wmsUserName = req.body.username;
+                    this.wmsUserPassword = req.body.password;
+                } else {
+                    this.wmsUserName = null;
+                    this.wmsUserPassword = null;
+                }
+
+                res.render("wmspreview.html", {
+                    id: req.body.id ? req.body.id : null
+                });
+
+            }
+        });
+
+    });
+
+    //get the sld xml for config
+    app.post('/api/v1/configs/:id/wmspreview', loggedIn, function(req, res) {
+            console.log('app.post(/api/v1/configs/:id/wmspreview');
+            var self = this;
+            download_config(req.params.id, client, function(error, result) {
+                if (result) {
+                    //get rid of the <?undefined ... xml declaration
+                    try {
+                        self.xml = result.substring(result.indexOf('<StyledLayerDescriptor'), result.length);
+                    } catch(e) {
+                        console.log(e);
+                    }
+                    res.status(200);
+                    res.send("");
+                } else {
+                    res.status(500);
+                    res.send("");
+                }
+            });
+
+    });
+
+    app.get('/api/v1/configs/:id/wmspreview/getmap', function(req, res) {
+        //console.log("/api/v1/configs/:id/wmspreview/getmap "+req.query.id);
+        var dataParams = {};
+        for (var key in req.query) {
+            dataParams[key] = req.query[key];
+        }
+        dataParams.SLD_BODY = this.xml;
+        var query = querystring.stringify(dataParams);
+        
+        var options = {};
+        var authorizationString = null;
+        if (this.wmsUserName && this.wmsUserPassword) {
+            authorizationString  = new Buffer(this.wmsUserName+":"+this.wmsUserPassword).toString('base64');
+        }
+
+//        console.log("Authentication? "+this.wmsUserName+" "+this.wmsUserPassword+" "+authorizationString);
+
+        //use proxy
+        if (this.wmsProxyHost) {
+  
+//            console.log("using proxy")          
+//            var pathString = 'http://'+this.wmsHost;
+            var pathString = this.wmsProtocol+'://'+this.wmsHost;
+            if (this.wmsPort) {
+                pathString += ":"+this.wmsPort;
+            }
+            pathString += this.wmsPath+'?'+query
+
+            var hostString = this.wmsHost;
+            if (this.wmsPort) {
+                hostString += ":"+this.wmsPort;
+            }
+            hostString += '/'+this.wmsPath
+//            console.log("pathstring: "+pathString+" hostString "+hostString); 
+            options = {
+              host: this.wmsProxyHost,
+              port: this.wmsProxyPort ? this.wmsProxyPort : 80,
+              path: pathString,
+              method: 'POST',
+              headers: {
+                 'Content-Type': 'application/x-www-form-urlencoded',
+                 'Content-Length': Buffer.byteLength(query),
+                 'Host':hostString
+
+              }
+            };
+        } else {
+            //no proxy
+            options = {
+              host: this.wmsHost,
+              path: this.wmsPath,
+              port: this.wmsPort ? this.wmsPort: 80,
+              method: 'POST',
+              headers: {
+                 'Content-Type': 'application/x-www-form-urlencoded',
+                 'Content-Length': Buffer.byteLength(query),
+              }
+            };
+        }
+
+        if (authorizationString) {
+            options.headers['Authorization'] = 'Basic '+authorizationString;
+        }
+
+        var response = [];
+        var request = http.request(options, function(resp){
+          resp.on('data', function(chunk){
+            response.push(chunk);
+          });
+
+          resp.on('end', function() {
+            var buffer = Buffer.concat(response);
+            res.status(200).send(buffer);
+          })
+        }).on("error", function(e){
+          console.log("Got error: " + e.message);
+          res.send();
+        });
+
+        //POST
+        request.write(query);
+        request.end();
+    });
+
+
     app.get('/api/v1/configs/', loggedIn, function (req, res) {
         console.log('getting config without id --> ALL');
         console.log('GET /api/v1/configs/');
@@ -343,25 +548,19 @@ module.exports = function (app, path, client, data, libs) {
         form.parse(req, function (err, fields, files) {
 
 
-        //    var configOwnerUUID = null;
-        //    return check_config_ownership(fields.id, client, callback);
- 
             check_config_ownership(fields.id, client,function(err, result) {
                 configOwnerUUID = result[0]['uuid'];
                 console.log("Config id "+fields.id+" owner uuid "+result[0]['uuid']+" logged in user uuid "+uuid+" "+configOwnerUUID);
                 if (uuid != configOwnerUUID) {
-                    console.log("Different owner!");
                     //user is admin -> allow operation but use the existing uid. Otherwise send 401.
                     if (checkAdmin(req.user)) {
                         uuid = configOwnerUUID;
-                        console.log("Admin editing somebody elses conf. Let him.")
                     } else {
                         res("401");
                     }
 
                 }
 
-                console.log('Getting this far? ', fields);
                 update_config(fields, uuid, client,
                     function (err) {
                         if (err) {
@@ -437,24 +636,3 @@ app.get('*', loggedIn, function(req, res) {
 });
 };
 
-
-
-
-
-
-/*
-    app.get('/login',
-        function (req, res) {
-            console.log("0");
-            console.log(req.query.username);
-            for (var key in req.params) {
-                console.log("get: "+key+" "+req.params[key]);
-            }
-        },
-        passport.authenticate('local', { failureRedirect:'/' }),
-        function(req, res, next) {
-            console.log('trying to redirect');
-            res.render('application.html', {user: req.user ? req.user: null});                
-        }
-    );
-*/    

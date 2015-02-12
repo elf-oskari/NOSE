@@ -118,7 +118,7 @@ SldDownloader.prototype.connect = function (client) {
 SldDownloader.prototype.readValues = function (id) {
     var self = this,
         sql = 'SELECT param_id, value FROM sld_value WHERE config_id=' + id;
-    console.log("readValues SQL: ", sql);
+    //console.log("readValues SQL: ", sql);
     return (self.db.queryResult(sql));
 };
 
@@ -130,7 +130,7 @@ SldDownloader.prototype.readValues = function (id) {
 SldDownloader.prototype.readOffset = function (id) {
     var self = this,
         sql = 'SELECT template_offset FROM sld_param WHERE id=' + id;
-    console.log("readOffset SQL: ", sql);
+    //console.log("readOffset SQL: ", sql);
     return (self.db.queryResult(sql));
 };
 
@@ -142,7 +142,7 @@ SldDownloader.prototype.readOffset = function (id) {
 SldDownloader.prototype.readTemplateId = function (id) {
     var self = this,
         sql = 'SELECT template_id FROM sld_config WHERE id=' + id;
-    console.log("readTemplateId SQL: ", sql);
+    //console.log("readTemplateId SQL: ", sql);
     return (self.db.queryResult(sql));
 };
 
@@ -154,7 +154,7 @@ SldDownloader.prototype.readTemplateId = function (id) {
 SldDownloader.prototype.readTemplate = function (id) {
     var self = this,
         sql = 'SELECT content FROM sld_template WHERE id=' + id;
-    console.log("readTemplate SQL: ", sql);
+    //console.log("readTemplate SQL: ", sql);
     return (self.db.queryResult(sql));
 };
 
