@@ -371,7 +371,11 @@ module.exports = function (app, path, client, data, libs) {
 
             //owner or admin. Go ahead.
             if (uuid == configOwnerUUID) {
-                var urlComponents = parseUrl(req.body.wmsUrl);
+                var urlComponents = null;
+                if (req.body.wmsUrl) {
+                    urlComponents = parseUrl(req.body.wmsUrl);
+                }
+
                 if (!urlComponents) {
                     res.status(500).send("Bad url.");
                     return;
@@ -388,6 +392,9 @@ module.exports = function (app, path, client, data, libs) {
                         this.wmsProxyHost = proxyUrlComponents.host;
                         this.wmsProxyPort = proxyUrlComponents.port;
                     }
+                } else {
+                    this.wmsProxyHost = null;
+                    this.wmsProxyPort = null;
                 }
 //                console.log("after parsing: "+this.wmsProtocol+" "+this.wmsHost+" "+this.wmsPath+" "+this.wmsProxyHost+" "+this.wmsProxyPort);
 
