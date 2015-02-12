@@ -19,7 +19,7 @@ define([
         'change .name': 'setAttribute',
         'keyup .param': 'setParam',
         'change .param': 'setParam',
-        'click .cancel-changes':'resetModel'
+        'click .cancel-changes':'resetModel',
     },
 
     initialize: function(params) {
@@ -29,6 +29,7 @@ define([
       this.listenTo(this.dispatcher, "saveConfig", this.saveConfig);
       this.listenTo(this.dispatcher, "configSaved", this.showInfoModal);
       this.listenTo(this.dispatcher, "resetModel", this.resetModel);
+      this.listenTo(this.dispatcher, "wmsPreview", this.wmsPreview);
       this.listenTo(this.dispatcher, "logout", this.logoutFromEditor);
       this.listenTo(this.dispatcher, "all", this.logger);
       this.setModel(params.SLDconfigmodel);
@@ -446,6 +447,32 @@ define([
           alert('Deleting template is not possible1234');
         }
       });
+    },
+    wmsPreview: function(event) {
+        console.log("wmsPreview")
+        event.preventDefault();
+        var apiUrl = "./api/v1/configs/";
+        
+        var wmsPreviewModal = $('#wmsPreviewModal');
+        $(wmsPreviewModal).find('#okButton').on("click", function () {
+            if (window.localStorage) {
+                window.localStorage.setItem('wmsUrl', $(wmsPreviewModal).find('#wmsUrl').val());
+                window.localStorage.setItem('wmsProxyUrl', $(wmsPreviewModal).find('#wmsProxyUrl').val());
+            }
+            $(wmsPreviewModal).find("#wmsPreviewForm").submit();
+            $(wmsPreviewModal).modal('hide');
+        });
+
+        var wmsHost, wmsPath, wmsPort, wmsProxyHost, wmsProxyPort = null;
+        if (window.localStorage) {
+            wmsUrl = window.localStorage.getItem('wmsUrl') ? window.localStorage.getItem('wmsUrl') : null;
+            wmsProxyUrl = window.localStorage.getItem('wmsProxyUrl') ? window.localStorage.getItem('wmsProxyUrl') : null;
+        }
+
+        $(wmsPreviewModal).find('input[id=id]').val($(event.currentTarget).data('id'));
+        $(wmsPreviewModal).find('input[id=wmsUrl]').val(wmsUrl);
+        $(wmsPreviewModal).find('input[id=wmsProxyUrl]').val(wmsProxyUrl);
+        $(wmsPreviewModal).modal('show');
     },
 
     showInfoModal: function (modalTitle, modalBody, response) {

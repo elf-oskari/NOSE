@@ -21,6 +21,7 @@ define([
             'click .back-to-list': 'back',
             'click .btn.save': 'saveConfig',
             'click .btn.cancel-changes': 'resetModel',
+            'click .wms-preview':'wmsPreview',
             'click .sld-list-signout-link': 'logoutFromPage',
         },
 
@@ -48,6 +49,11 @@ define([
         resetModel: function (event) {
             event.preventDefault();
             this.dispatcher.trigger("resetModel", event);
+        },
+
+        wmsPreview: function (event) {
+            event.preventDefault();
+            this.dispatcher.trigger("wmsPreview", event);
         },
 
         logoutFromPage: function (event) {

@@ -15,7 +15,9 @@ define({
 			"ok": "OK",
 			"continue": "Continue",
 			"backToSLDlist": "Back to SLDlist",
-			"searchRule": "Search rule..."
+			"searchRule": "Search rule...",
+			"wmspreview":"WMS Preview"
+
 		},
 		"common": {
 			"SLD-editor": "SLD Editor",
@@ -115,6 +117,14 @@ define({
 			"modelSavedBody": "New values saved successfully!",
 			"errorWithSavingTitle": "Error!",
 			"errorWithSavingBody": "Error with saving! The following error occured: "
+		},
+		"wmsPreview": {
+			"title":"WMS Preview",
+			"info":"The service must support EPSG:3857 and contain a layer corresponding to that defined in the SLD. Only changes made before the last save will be visible.",
+			"wmsUrl": "Service URL",
+			"wmsProxyUrl": "Proxy URL",
+			"username": "Username",
+			"password": "Password"
 		}
 	}
 });
