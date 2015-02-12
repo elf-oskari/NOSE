@@ -342,15 +342,6 @@ var toggleAdvanced = function(divClass) {
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-sm-12 col-md-12 button-tools">
-                            <button type="submit" class="btn save"><%= SLDmodel.id ? editSLD.buttons['save'] : editSLD.buttons['create'] %></button>
-                            <% if(SLDmodel.id) { %>
-                            <input type="hidden" name="id" value="<%= SLDmodel.id %>"/>
-                            <button type="button" data-user-id="<%= SLDmodel.id %>" class="btn cancel-changes disabled"><%= editSLD.buttons['reset'] %></button>
-                            <% }; %>
-                        </div>
-                    </div>
                 </form>
             </div>
         </div>
@@ -376,6 +367,24 @@ var toggleAdvanced = function(divClass) {
                 </div>
                 <div class="modal-footer">
                     <button id="continueButton" type="submit" class="btn btn-primary"><%= editSLD.buttons['continue'] %></button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><%= editSLD.buttons['cancel'] %></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal window -->
+    <div class="modal" id="confirmResetModel" tabindex="-1" role="dialog" aria-labelledby="ModalTitle" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="ModalTitle"><%= editSLD.confirmResetModel['title'] %></h4>
+                </div>
+                <div class="modal-body">
+                    <p><%= editSLD.confirmResetModel['body'] %></p>
+                </div>
+                <div class="modal-footer">
+                    <button id="continue" type="submit" class="btn btn-primary"><%= editSLD.buttons['continue'] %></button>
                     <button type="button" class="btn btn-default" data-dismiss="modal"><%= editSLD.buttons['cancel'] %></button>
                 </div>
             </div>

@@ -19,6 +19,8 @@ define([
         events: {
             'click .update': 'updateConfigName',
             'click .back-to-list': 'back',
+            'click .btn.save': 'saveConfig',
+            'click .btn.cancel-changes': 'resetModel',
             'click .sld-list-signout-link': 'logoutFromPage',
         },
 
@@ -36,6 +38,16 @@ define([
         back: function (event) {
             event.preventDefault();
             this.dispatcher.trigger("backToList");
+        },
+
+        saveConfig: function (event) {
+            event.preventDefault();
+            this.dispatcher.trigger("saveConfig", event);
+        },
+
+        resetModel: function (event) {
+            event.preventDefault();
+            this.dispatcher.trigger("resetModel", event);
         },
 
         logoutFromPage: function (event) {

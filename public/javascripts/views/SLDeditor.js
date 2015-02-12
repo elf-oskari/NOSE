@@ -16,7 +16,6 @@ define([
     events: {
         'click .delete': 'deleteConfig',
         'click .upload': 'showUpload',
-        'click .save': 'saveConfig',
         'change .name': 'setAttribute',
         'keyup .param': 'setParam',
         'change .param': 'setParam',
@@ -27,10 +26,13 @@ define([
       this.dispatcher = params.dispatcher;
       this.listenTo(this.dispatcher, "selectSymbolizer", this.symbolizerChanged);
       this.listenTo(this.dispatcher, "backToList", this.back);
+      this.listenTo(this.dispatcher, "saveConfig", this.saveConfig);
       this.listenTo(this.dispatcher, "configSaved", this.showInfoModal);
+      this.listenTo(this.dispatcher, "resetModel", this.resetModel);
       this.listenTo(this.dispatcher, "logout", this.logoutFromEditor);
       this.listenTo(this.dispatcher, "all", this.logger);
       this.setModel(params.SLDconfigmodel);
+      this.originalValuesStored = false;
       _.bindAll(this, 'render');
     },
     logger: function() {
@@ -50,13 +52,10 @@ define([
       //self.listenTo(self.SLDconfigmodel, "sync", self.showInfoModal);
     },
     render: function(paramlist,symbol,ruletitle) {
-        //store the model's original attributes + additional rendering params to be able to reset and re-render.
-        this.resetParams = {
-          originalAttributes: _.cloneDeep(this.SLDconfigmodel.attributes),
-          paramlist: _.cloneDeep(paramlist),
-          symbol: _.cloneDeep(symbol),
-          ruletitle: _.cloneDeep(ruletitle)
-        };
+        if (this.originalValuesStored === false) {
+          this.originalAttributes = _.cloneDeep(this.SLDconfigmodel.attributes);
+          this.originalValuesStored = true;
+        }
         var self = this;
         var localization = locale;
         var SLDconfigmodel = this.SLDconfigmodel;
@@ -166,25 +165,10 @@ define([
      */
     symbolizerChanged: function(params, symbolizer, ruletitle, SLDTemplateModel) {
       var self = this;
-      if (self.configSaved === false) {
-        $('#confirmNoSave').modal('show');
-        $('#continueButton').on("click", function () {
-          $('#confirmNoSave').modal('hide');
-          self.configSaved = true;
-          self.resetModel();
-          //symbolizerchange -> toggle point, line and polygon layers off by default (they get toggled on as needed when symbolizers of the rule are added)
-          self.dispatcher.trigger("resetVectorLayers");
-          self.updateMapSymbolizers(params, SLDTemplateModel);
-          self.updateEditParams(params, symbolizer, ruletitle)
-        });
-      } else {
-          self.dispatcher.trigger("resetVectorLayers");
-          self.updateMapSymbolizers(params, SLDTemplateModel);
-          self.updateEditParams(params, symbolizer, ruletitle)
-      }
-
-      return;
-
+      //symbolizerchange -> toggle point, line and polygon layers off by default (they get toggled on as needed when symbolizers of the rule are added)
+      self.dispatcher.trigger("resetVectorLayers");
+      self.updateMapSymbolizers(params, SLDTemplateModel);
+      self.updateEditParams(params, symbolizer, ruletitle);
     },
 
     /**
@@ -210,9 +194,17 @@ define([
         $('#continueButton').on("click", function () {
           $('#confirmNoSave').modal('hide');
           self.configSaved = true;
+          self.originalValuesStored = false;
+          self.SLDconfigmodel.attributes = null;
+          self.SLDconfigmodel.attributes = _.clone(self.originalAttributes);
+          self.SLDconfigmodel._previousAttributes = null;
           Backbone.history.navigate('/', true);
         });
       } else {
+        self.originalValuesStored = false;
+        self.SLDconfigmodel.attributes = null;
+        self.SLDconfigmodel.attributes = _.clone(self.originalAttributes);
+        self.SLDconfigmodel._previousAttributes = null;
         Backbone.history.navigate('/', true);
       }
     },
@@ -227,11 +219,19 @@ define([
 
     //resets the changes made to the _current_ config model. Still have to implement a "reset all"-button + functionality
     resetModel: function(event) {
-        //store the original attributes of the model
-        this.SLDconfigmodel.attributes = null;
-        this.SLDconfigmodel.attributes = _.clone(this.resetParams.originalAttributes);
-        this.SLDconfigmodel._previousAttributes = null;
-        this.render(this.resetParams.paramlist, this.resetParams.symbol, this.resetParams.ruletitle);
+      var self = this;
+      if (self.configSaved === false) {
+        $('#is-config-saved').addClass("hidden");
+        $('#confirmResetModel').modal('show');
+        $('#continue').on("click", function () {
+            $('#confirmResetModel').modal('hide');
+            self.SLDconfigmodel.attributes = null;
+            self.SLDconfigmodel.attributes = _.clone(self.originalAttributes);
+            self.SLDconfigmodel._previousAttributes = null;
+            self.dispatcher.trigger("resetVectorLayers");
+            self.render();
+        });
+      }
     },
 
     setParam: function(event) {
@@ -304,7 +304,6 @@ define([
         // Update map style
         this.dispatcher.trigger("updateMapStyle",[{'name':param_css_parameter,'value': newvalue}], this.symbolType );
       }
-      debugger;
 
       if (param_id) {
         var sld_param = _.findWhere(this.SLDconfigmodel.attributes.sld_values, {param_id: param_id});
@@ -317,14 +316,12 @@ define([
       this.SLDconfigmodel.set('sld_values', sld_values);
       //this.configSaved tells if there are unsaved changes
       this.configSaved = false;
-      $(this.el).find(".cancel-changes").removeClass("disabled");
-
+      $('#is-config-saved').removeClass("hidden");
     },
 
     //TODO
     //Check this functions that it works correctly
     invalidValue: function(view, attr, error, selector) {
-      debugger;
       var self = this,
           localization = locale;
       $('#savingModal').modal('hide');
@@ -422,9 +419,11 @@ define([
           function (model, response) {
             console.log("Model saved. model: ", model, "response: ", response);
             self.configSaved = true;
+            $('#is-config-saved').addClass("hidden");
             var modalTitle = localization.infoModal['modelSavedTitle'];
             var modalBody = localization.infoModal['modelSavedBody'];
             self.showInfoModal(modalTitle, modalBody, response);
+            self.originalAttributes = _.cloneDeep(self.SLDconfigmodel.attributes);
           })
         .fail(
           function (model, response, options) {

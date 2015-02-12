@@ -164,15 +164,17 @@ body
     padding-left: 10px;
 }
 
-.SLD-config-name {
-    margin-left: 15px;
-    margin-bottom: 15px;
-}
 .back-to-list {
     color: #FFFFFF;
     cursor: pointer;
     font-size: 16px;
+    float: left;
 }
+
+.sld-button-group {
+    float: right;
+}
+
 .invalid {
     border-color: #CC3333;
 }
@@ -336,16 +338,6 @@ body
 .button-tools {
     margin-left: 15px;
     margin-top: 30px;
-}
-
-.btn.save {
-    background-color: #2EA9E2;
-    color: #FFFFFF;
-}
-
-.btn.cancel-changes {
-    background-color: #B8B8B8;
-    color: #FFFFFF;
 }
 
 /*Map panel*/

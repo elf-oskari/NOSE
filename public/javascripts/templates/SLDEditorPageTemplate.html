@@ -2,21 +2,22 @@
 	<div class="col-md-12">
 		<div class="panel editor-page-header-panel">
 			<div class="panel-heading editor-page-header">
-				<%= locale.common['SLD-editor'] %>
-			       <h4 class="sld-list-signout-link">
-			         <%=userName%>&nbsp;-&nbsp;<%= locale.common.logout%>
-			         <i class="fa fa-sign-out pull-right"></i>
-			       </h4>
+				<span class="config-name"><%= locale.common['SLD-editor'] + "    -    " + SLDconfigmodel.name %></span><span id="is-config-saved" class="hidden"> *</span>
+		       	<h4 class="sld-list-signout-link">
+		         	<%=userName%>&nbsp;-&nbsp;<%= locale.common.logout%>
+		         	<i class="fa fa-sign-out pull-right"></i>
+		       	</h4>
 			</div>
 			<div class="panel-body editor-page-header-body">
-				<h4 class="back-to-list"><i class="fa fa-chevron-left pull-left"></i><%= locale.buttons['backToSLDlist'] %></h4>
+					<h4 class="back-to-list"><i class="fa fa-chevron-left pull-left"></i><%= locale.buttons['backToSLDlist'] %></h4>
+					<div class="sld-button-group">
+						<button type="submit" class="btn btn-default save" title="Save all SLD config values"><%= locale.buttons['saveChanges'] %></button>
+                        <input type="hidden" name="id" value="<%= SLDconfigmodel.id %>"/>
+                        <button type="button" data-user-id="<%= SLDconfigmodel.id %>" class="btn btn-default cancel-changes" title="Reset all SLD config values"><%= locale.buttons['resetAll'] %></button>
+					</div>
+				</div>
 			</div>
 		</div>
-	</div>
-</div>
-<div class="row">
-	<div class="col-md-4">
-		<h4 class="SLD-config-name"><%= locale.common['SLD-features-heading'] + " - " + SLDconfigmodel.name %></h4>
 	</div>
 </div>
 <div class="row">
