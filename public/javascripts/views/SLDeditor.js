@@ -222,10 +222,10 @@ define([
     resetModel: function(event) {
       var self = this;
       if (self.configSaved === false) {
-        $('#is-config-saved').addClass("hidden");
         $('#confirmResetModel').modal('show');
         $('#continue').on("click", function () {
             $('#confirmResetModel').modal('hide');
+            $('#is-config-saved').addClass("hidden");
             self.SLDconfigmodel.attributes = null;
             self.SLDconfigmodel.attributes = _.clone(self.originalAttributes);
             self.SLDconfigmodel._previousAttributes = null;
