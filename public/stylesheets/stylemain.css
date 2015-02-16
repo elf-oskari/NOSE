@@ -188,8 +188,8 @@ body
 }
 
 /*SLD-tree*/
-.sld-tree-container {
-    padding-left: 25px;
+.sld-editor-tree-panel {
+    margin-bottom: 10px;
 }
 
 .sld-tree-panel {
@@ -208,9 +208,10 @@ body
 
 .sld-tree
 {
-    height: 723px;
     overflow: auto;
     padding: 0px;
+    border-top: 1px solid #B8B8B8;
+    height: 670px;
 }
 
 .panel-heading {
@@ -261,6 +262,12 @@ body
 .chosen-container {
     width: 100%!important;
     font-size:inherit;
+}
+
+.chosen-single {
+    height: 30px!important;
+    border-radius: 0px!important;
+    margin: 5px!important;
 }
 
 /*Symbolizer*/
@@ -332,7 +339,7 @@ body
 
 .preview-panel {
     height: 230px;
-    margin-bottom: 0px;
+    margin-bottom: 10px;
 }
 
 .button-tools {
@@ -344,7 +351,7 @@ body
 
 .map-panel {
     height: 750px;
-    margin-bottom: 0px;
+    margin-bottom: 10px;
 }
 
 .map {
