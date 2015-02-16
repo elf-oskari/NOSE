@@ -362,7 +362,7 @@ define([
          * ol3 style methods are not optimal - No set functions in ol3 style ???
          * @param {Object} stylein;  current ol3 style
          * @return {Object} edited ol3 style  */
-        getTextStyle: function (stylein) {
+        getTextStyle: function (stylein, params) {
             // Default text params
             var def_params = { 'align': 'Center',
                     'baseline': 'Middle',
@@ -388,12 +388,23 @@ define([
                 if (tstyle) def_params = this.getCurrentTextParams(def_params, tstyle);
             }
             // pass updated param value
+            /*
             if (this.params) {
                 this.params.forEach(function (param) {
                     if (param['name'])  def_params[param['name']] = !stylein ? param['default_value'] : param['value'];
                     if (param['name'] === 'font-size' && param['name'].indexOf('px') === -1) def_params[param['name']] = def_params[param['name']] + 'px'
                 });
             }
+            */
+            if (params) {
+                params.forEach(function (param) {
+                    if (param['name']) {
+                        def_params[param['name']] = param['value'];
+                    }  
+                    if (param['name'] === 'font-size' && param['name'].indexOf('px') === -1) def_params[param['name']] = def_params[param['name']] + 'px'
+                });
+            }
+
             style = new ol.style.Text({
                 textAlign: def_params['align'],
                 textBaseline: def_params['baseline'],
