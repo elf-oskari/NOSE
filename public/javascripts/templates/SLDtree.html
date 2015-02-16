@@ -1,43 +1,46 @@
 <!-- List template -->
 <div class="view" id="sld-tree-view">
-    <select id="rule-select" class="chosen-select form-control" data-placeholder="<%= locale.buttons['searchRule'] %>">
-      <option></option>
-        <% _.forEach(SLDfeaturetypeTree, function(SLDfeatureType) { %>
-              <% _.forEach(SLDfeatureType.rules, function(SLDrule) { %>
-                      <option value="featuretype-id-<%=SLDfeatureType.id%>,rule-id-<%=SLDrule.id%>" data-featuretype-id="<%= SLDfeatureType.id %>"><%= SLDrule.title %></option>
+    <div class="panel editor-panel sld-editor-tree-panel">
+      <div class="panel-heading main-heading">Features</div>
+        <div class="panel sld-tree-panel">
+          <select id="rule-select" class="chosen-select form-control" data-placeholder="<%= locale.buttons['searchRule'] %>">
+            <option></option>
+              <% _.forEach(SLDfeaturetypeTree, function(SLDfeatureType) { %>
+                    <% _.forEach(SLDfeatureType.rules, function(SLDrule) { %>
+                            <option value="featuretype-id-<%=SLDfeatureType.id%>,rule-id-<%=SLDrule.id%>" data-featuretype-id="<%= SLDfeatureType.id %>"><%= SLDrule.title %></option>
+                    <% }); %>
               <% }); %>
-        <% }); %>
-    </select>
-    <div class="panel sld-tree-panel">
-      <div class="panel-body sld-tree">
-        <% _.forEach(SLDfeaturetypeTree, function(SLDfeatureType) { %>
-        <div class="panel panel-default sld-tree-panel">
-          <div class="panel-heading cursor-pointer">
-            <h4 class="panel-title collapse-panel" data-toggle="collapse" data-target="#featuretype-id-<%=SLDfeatureType.id%>"><i class="fa fa-caret-right pull-left"></i><%= locale.common.featuretype_id %> : <%=SLDfeatureType.id %></h4>
-          </div>
-          <div id="featuretype-id-<%=SLDfeatureType.id%>" class="panel-collapse collapse">
-            <div class="panel-body">
-              <% _.forEach(SLDfeatureType.rules, function(SLDrule) { %>
-              <div class="panel second-level sld-tree-panel">
-                <div class="panel-heading cursor-pointer second-level">
-                  <h4 class="panel-title collapse-panel <%=SLDrule.id%>" data-toggle="collapse" data-target="#rule-id-<%=SLDrule.id%>"><i class="fa fa-caret-right pull-left"></i><%= SLDrule.title %></h4>
-                </div>
-                <div id="rule-id-<%=SLDrule.id%>" class="panel-collapse collapse">
-                  <div class="panel-body second-level">
-                      <% _.forEach(SLDrule.symbolizers, function(symbolizer) { %>
-                        <button type="button" data-symbolizerid="<%=symbolizer.id %>"
-                                data-symbolizertype="<%=symbolizer.type %>" data-ruletitle="<%=SLDrule.title %>"
-                                class="btn btn-block sld_symbolizer"><%= symbolizer.type %></button>
-                      <% }); %>
+          </select>
+          <div class="panel-body sld-tree">
+            <% _.forEach(SLDfeaturetypeTree, function(SLDfeatureType) { %>
+            <div class="panel panel-default sld-tree-panel">
+              <div class="panel-heading cursor-pointer">
+                <h4 class="panel-title collapse-panel" data-toggle="collapse" data-target="#featuretype-id-<%=SLDfeatureType.id%>"><i class="fa fa-caret-right pull-left"></i><%= locale.common.featuretype_id %> : <%=SLDfeatureType.id %></h4>
+              </div>
+              <div id="featuretype-id-<%=SLDfeatureType.id%>" class="panel-collapse collapse">
+                <div class="panel-body">
+                  <% _.forEach(SLDfeatureType.rules, function(SLDrule) { %>
+                  <div class="panel second-level sld-tree-panel">
+                    <div class="panel-heading cursor-pointer second-level">
+                      <h4 class="panel-title collapse-panel <%=SLDrule.id%>" data-toggle="collapse" data-target="#rule-id-<%=SLDrule.id%>"><i class="fa fa-caret-right pull-left"></i><%= SLDrule.title %></h4>
+                    </div>
+                    <div id="rule-id-<%=SLDrule.id%>" class="panel-collapse collapse">
+                      <div class="panel-body second-level">
+                          <% _.forEach(SLDrule.symbolizers, function(symbolizer) { %>
+                            <button type="button" data-symbolizerid="<%=symbolizer.id %>"
+                                    data-symbolizertype="<%=symbolizer.type %>" data-ruletitle="<%=SLDrule.title %>"
+                                    class="btn btn-block sld_symbolizer"><%= symbolizer.type %></button>
+                          <% }); %>
+                      </div>
+                    </div>
                   </div>
+                  <% }); %>
                 </div>
               </div>
-              <% }); %>
             </div>
+            <% }); %>
           </div>
         </div>
-        <% }); %>
-      </div>
     </div>
   </div>
 </div>
