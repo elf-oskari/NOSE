@@ -11,7 +11,8 @@ define([
             this.dispatcher = params.dispatcher;
 //            this.listenTo(this.dispatcher, "selectSymbolizer", this.setParams2MapStyle);
             this.listenTo(this.dispatcher, "resetVectorLayers", this.resetVectorLayers);
-            this.listenTo(this.dispatcher, "setParamsToMapStyle", this.setParams2MapStyle);
+//            this.listenTo(this.dispatcher, "setParamsToMapStyle", this.setParams2MapStyle);
+            this.listenTo(this.dispatcher, "updateMapStyleByParam", this.updateMapStyleByParam);
             this.listenTo(this.dispatcher, "updateMapStyle", this.updateMapStyle);
             this.listenTo(this.dispatcher, "all", this.logger);
             _.bindAll(this, 'render');
@@ -36,22 +37,68 @@ define([
                     }                        
                     if (l.get('title') == 'Points') {
                         l.setVisible(false);
-                        l.setStyle(self.getPolygonOrLineStyle(null));
+                        l.setStyle(self.getPointStyle(null));
                     }
                 });
             }
         },
 
         /**
-         * @method updateMapStyle
-         * update map style for one symbolizer parameter for visible layer
+         * @method updateMapStyleByParam
+         * update map style for only updated parameters of a given symbolizer for visible layer
          * Triggered in SLDEditor
          * @param {Object<json>} params; updated style parameters in UI.
          * @param {String} type; type of symbolizer.
+         * @param {int} symbolizerId; id of the symbolizer
          */
-        updateMapStyle: function (params, type) {
-            this.params = params;
-            this.setMapLayerStyle(params, type.toLowerCase(), true);
+        updateMapStyleByParam: function(newParams, type, symbolizerId) {
+            var self = this;
+            type = type.toLowerCase();
+            if (this.params && this.params[type] && this.params[type][symbolizerId]) {
+
+                _.each(newParams, function(item) {
+
+
+                    //TODO: "elegantify" this...
+                    var found = false;
+                    for (var i = 0; i < self.params[type][symbolizerId].length; i++) {
+                        if (item.name == self.params[type][symbolizerId][i].name) {
+                            self.params[type][symbolizerId][i] = item;
+                            found = true;
+                        }
+                    }
+                    if (!found) {
+                        self.params[type][symbolizerId].push(item);
+                    }
+                    
+                });
+
+            }
+
+            this.setMapLayerStyle(this.params, type, symbolizerId, true);
+
+        },
+        /**
+         * @method updateMapStyle
+         * update map style for one symbolizer for visible layer
+         * Triggered in SLDEditor
+         * @param {Object<json>} params; updated style parameters in UI.
+         * @param {String} type; type of symbolizer.
+         * @param {int} symbolizerId; id of the symbolizer
+         */
+        updateMapStyle: function (params, type, symbolizerId) {
+//            this.params = params;
+            type = type.toLowerCase();
+            if (!this.params) {
+                this.params = {};
+            }
+            if (!this.params[type]) {
+                this.params[type] = {};
+            }
+
+            this.params[type][symbolizerId] = params;
+
+            this.setMapLayerStyle(this.params, type, symbolizerId, true);
         },
         /**
          * @method setParams2MapStyle
@@ -60,21 +107,24 @@ define([
          * @param {Object<json>} params; style params of default values of selected symbolizer in sld template (SLDtree)
          * @param {Object} symbolizer; symbolizer.type:symbolizer type, .uom: measurement unit on size, width values
          */
+         /*
         setParams2MapStyle: function (params, symbolizer) {
             console.log('setParams2MapStyle', params);
             this.params = params;
             this.uom = symbolizer.uom;   // Symbolizer size / width unit
             this.setMapLayerStyle(params, symbolizer.type.toLowerCase());
         },
+        */
         /**
          * @method setMapLayerStyle
          * Set or update map layer style for ol3 layers
          * @param {Object<json>} params; updated style parameter(s) in UI or default values in SLD template symbolizer
          * @param {String} type; type of symbolizer.
+         * @param {int} symbolizerId; id of symbolizer.
          * @param {Boolean} update; true:update case, false: init case (sld template symbolizer default values).
          */
-        setMapLayerStyle: function (params, type, update) {
-
+        setMapLayerStyle: function (params, type, symbolizerId, update) {
+            var self = this;
             if (this.map) {
                 var polygons, points, lines, cur_style;
                 this.map.getLayers().forEach(function (l) {
@@ -83,33 +133,67 @@ define([
                     if (l.get('title') == 'Points') points = l;
                 });
                 if (polygons && type == 'polygonsymbolizer') {
-                    if (update) cur_style = polygons.getStyle();
-                    polygons.setStyle(this.getPolygonOrLineStyle(cur_style));
+                    var stylesArray = [];
+                    if (update) {
+                        for (var key in this.params[type]) {
+                            var style = this.getPolygonOrLineStyle(null, this.params[type][key]);
+                            stylesArray.push(style);
+                        }
+                    }
+                    //no styles -> use default.
+                    if (stylesArray.length === 0) {
+                        stylesArray.push(polygons.getStyle());
+                    }
+
+                    polygons.setStyle(stylesArray);
                     polygons.setVisible(true);
-//                    if (lines) lines.setVisible(false);
-//                    if (points) points.setVisible(false);
                 }
                 else if (lines && type == 'linesymbolizer') {
-                    if (update) cur_style = lines.getStyle();
-                    lines.setStyle(this.getPolygonOrLineStyle(cur_style));
+                    var stylesArray = [];
+                    if (update) {
+                        for (var key in this.params[type]) {
+                            var style = this.getPolygonOrLineStyle(null, this.params[type][key]);
+                            stylesArray.push(style);
+                        }
+                    }
+                    //no styles -> use default.
+                    if (stylesArray.length === 0) {
+                        stylesArray.push(lines.getStyle());
+                    }
+                    lines.setStyle(stylesArray);
                     lines.setVisible(true);
-//                    if (polygons) polygons.setVisible(false);
-//                    if (points) points.setVisible(false);
                 }
                 else if (points && type == 'pointsymbolizer') {
-                    if (update) cur_style = points.getStyle();
-                    points.setStyle(this.getPointStyle(cur_style));
+                    var stylesArray = [];
+                    if (update) {
+                        for (var key in this.params[type]) {
+                            var style = this.getPointStyle(null, this.params[type][key]);
+                            stylesArray.push(style);
+                        }
+                    }
+                    //no styles -> use default.
+                    if (stylesArray.length === 0) {
+                        stylesArray.push(points.getStyle());
+                    }
+                    points.setStyle(stylesArray);
                     points.setVisible(true);
-//                    if (lines) lines.setVisible(false);
-//                    if (polygons) polygons.setVisible(false);
                 }
                 else if (type == 'textsymbolizer') {
-                    if (update) cur_style = points.getStyle();
-                    points.setStyle(this.getPointTextStyle(cur_style));
+                    var stylesArray = [];
+                    if (update) {
+                        for (var key in this.params[type]) {
+                            var style = this.getPointTextStyle(null, this.params[type][key]);
+                            stylesArray.push(style);
+                        }
+                    }
+                    //no styles -> use default.
+                    if (stylesArray.length === 0) {
+                        stylesArray.push(points.getStyle());
+                    }
+                    points.setStyle(stylesArray);
                     points.setVisible(true);
-//                    if (lines) lines.setVisible(false);
-//                    if (polygons) polygons.setVisible(false);
                 }
+                
 
             }
 
@@ -121,7 +205,7 @@ define([
         * ol3 style methods are not optimal - No set functions in ol3 style API ???
         * @param {Object} stylein;  current ol3 style
         * @return {Object} edited ol3 style  */
-         getPolygonOrLineStyle: function (stylein) {
+         getPolygonOrLineStyle: function (stylein, params) {
             // Default fill stroke params
             var def_params = {
                     'fill': 'rgba(255,255,255,0.0)',
@@ -140,9 +224,10 @@ define([
                 stroke,
                 self = this;
             // pass updated value to current values
-            if (stylein) def_params = this.getCurrentPolylineParams(def_params, stylein);
+            //if (stylein) def_params = this.getCurrentPolylineParams(def_params, stylein);
 
             // pass updated param value
+            /*
             if (this.params) {
                 this.params.forEach(function (param) {
                     if (param['name'])  def_params[param['name']] = !stylein ? param['default_value'] : param['value'];
@@ -153,6 +238,24 @@ define([
                     }
                 });
             }
+            */
+            if (params) {
+                params.forEach(function (param) {
+//                    if (param['name'])  def_params[param['name']] = !stylein ? param['default_value'] : param['value'];
+                    if (param['name']) {
+                        def_params[param['name']] = param['value'];
+                    }  
+
+                    // fix size unit
+                    if (param['name'] === 'stroke-width') {
+                        def_params[param['name']] = self.transformUnit(def_params[param['name']]);
+                        if (def_params[param['name']] < 1)def_params[param['name']] = 1;
+                    }
+                });
+            }
+
+
+
             // Create style
             fill = new ol.style.Fill({color: def_params['fill'], opacity: def_params['fill-opacity'] });
             stroke = new ol.style.Stroke({color: def_params['stroke'],
@@ -177,7 +280,7 @@ define([
         * ol3 style methods are not optimal - No set functions in ol3 style API ???
         * @param {Object} stylein;  current ol3 style
         * @return {Object} edited ol3 style   */
-        getPointStyle: function (stylein) {
+        getPointStyle: function (stylein, params) {
             // Default point params
             var def_params = {
                     'size': 1,
@@ -205,6 +308,7 @@ define([
             if (stylein) def_params = this.getCurrentPointParams(def_params, stylein);
 
             // pass updated param value
+            /*
             if (this.params) {
                 this.params.forEach(function (param) {
                     if (param['name'])  def_params[param['name']] = !stylein ? param['default_value'] : param['value'];
@@ -215,6 +319,22 @@ define([
                     }
                 });
             }
+            */
+            if (params) {
+                params.forEach(function (param) {
+//                    if (param['name'])  def_params[param['name']] = !stylein ? param['default_value'] : param['value'];
+                    if (param['name']) {
+                        def_params[param['name']] = param['value'];
+                    }  
+
+                    // fix size unit
+                    if (param['name'] === 'size' || param['name'] === 'stroke-width') {
+                        def_params[param['name']] = self.transformUnit(def_params[param['name']]);
+                        if (def_params[param['name']] < 1)def_params[param['name']] = 1;
+                    }
+                });
+            }
+
             // Create style
             fill = new ol.style.Fill({color: def_params['fill'], opacity: def_params['fill-opacity'] });
             stroke = new ol.style.Stroke({color: def_params['stroke'],
@@ -422,7 +542,7 @@ define([
             var self = this;
             if (!this.map) {
 
-                console.log('setParams2MapStyle --Map');
+                console.log('render --Map');
                 var vectorPolygons = new ol.layer.Vector({
                     source: new ol.source.GeoJSON({
                         projection: 'EPSG:3857',
@@ -492,7 +612,11 @@ define([
                 // map node has been detached.
                 // Note! event handling might not function properly, but since we currently do not have any map specific
                 // event handling, this is not tested. Look at assign in SLDEditorPage for more details.
-                this.$el.replaceWith(this.map.getViewport());
+                //this.$el.replaceWith(this.map.getViewport());
+                var vp = this.map.getViewport();
+                $(this.el).append(vp);
+                //reset the previous styles and set vector layers invisible
+                this.resetVectorLayers();
                 // reset map view
                 this.map.getView().setCenter([2776000, 8444000], 13);
             }
