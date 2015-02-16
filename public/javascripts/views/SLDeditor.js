@@ -153,7 +153,7 @@ define([
         
         //merge those with the (possibly changed) values from the config model
         var mergedParams = self.mergeSymbolizerParamDefaultsWithConfigValues(symbolizerDefaultParams);
-        self.dispatcher.trigger("updateMapStyle", mergedParams, item.type);
+        self.dispatcher.trigger("updateMapStyle", mergedParams, item.type, item.id);
       });
     },
 
@@ -161,11 +161,15 @@ define([
     /**
      *
      * @method symbolizerChanged
-     * Checks whether the symbolizer currently being edited has been saved or not and updates the map with the symbolizers of the rule. 
+     * updates the map with all the symbolizers of the rule. 
      *
      */
     symbolizerChanged: function(params, symbolizer, ruletitle, SLDTemplateModel) {
       var self = this;
+
+      //preserve the currently active symbolizer -> will be needed when updating params to map...
+      this.activeSymbolizer = symbolizer;
+
       //symbolizerchange -> toggle point, line and polygon layers off by default (they get toggled on as needed when symbolizers of the rule are added)
       self.dispatcher.trigger("resetVectorLayers");
       self.updateMapSymbolizers(params, SLDTemplateModel);
@@ -303,7 +307,12 @@ define([
           this.updatePreview();
         }
         // Update map style
-        this.dispatcher.trigger("updateMapStyle",[{'name':param_css_parameter,'value': newvalue}], this.symbolType );
+        this.dispatcher.trigger("updateMapStyleByParam",[{'name':param_css_parameter,'value': newvalue}], this.activeSymbolizer.type, this.activeSymbolizer.id );
+
+        //console.log(paramId);
+
+//        this.updateMapSymbolizers([{'name':param_css_parameter,'value': newvalue}], this.SLDTemplateModel);
+//        this.updateMapSingleParam([{'name':param_css_parameter,'value': newvalue}], this.activeSymbolizer.id);
       }
 
       if (param_id) {
