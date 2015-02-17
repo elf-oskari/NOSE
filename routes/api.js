@@ -26,7 +26,8 @@ module.exports = function (app, path, client, data, libs) {
         LocalStrategy = require('passport-local').Strategy,
 
         http = require('http'),
-        querystring = require('querystring');
+        querystring = require('querystring'),
+        fs = require('fs');
 
     var users = [];
     function findByUsername(username, fn) {
@@ -55,6 +56,11 @@ module.exports = function (app, path, client, data, libs) {
     app.use(passport.session());
     app.engine('html', require('ejs').renderFile);
 
+    //read proxy settings
+    var proxySettingsFile = fs.readFileSync(path.resolve('./', 'proxy_config.json'),'utf-8');
+    console.log('got file:', proxySettingsFile);
+    var data = JSON.parse(proxySettingsFile);
+    this.wmsProxyUrl = data.wmsProxyUrl;
 
     // Passport session setup.
     //   To support persistent login sessions, Passport needs to be able to
@@ -387,13 +393,15 @@ module.exports = function (app, path, client, data, libs) {
                     this.wmsPath = urlComponents.path;
                 }
 
-                if (req.body.wmsProxyUrl) {
-                    var proxyUrlComponents = parseUrl(req.body.wmsProxyUrl);
+                if (this.wmsProxyUrl) {
+                    console.log('FOUND wms proxy host '+this.wmsProxyUrl);
+                    var proxyUrlComponents = parseUrl(this.wmsProxyUrl);
                     if (proxyUrlComponents) {
                         this.wmsProxyHost = proxyUrlComponents.host;
                         this.wmsProxyPort = proxyUrlComponents.port;
                     }
                 } else {
+                    console.log('no proxy url!!!');
                     this.wmsProxyHost = null;
                     this.wmsProxyPort = null;
                 }
@@ -458,8 +466,8 @@ module.exports = function (app, path, client, data, libs) {
         //use proxy
         if (this.wmsProxyHost) {
   
-//            console.log("using proxy")          
-//            var pathString = 'http://'+this.wmsHost;
+            console.log("using proxy")          
+            var pathString = 'http://'+this.wmsHost;
             var pathString = this.wmsProtocol+'://'+this.wmsHost;
             if (this.wmsPort) {
                 pathString += ":"+this.wmsPort;

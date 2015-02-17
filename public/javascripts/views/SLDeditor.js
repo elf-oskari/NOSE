@@ -466,21 +466,18 @@ define([
         $(wmsPreviewModal).find('#okButton').on("click", function () {
             if (window.localStorage) {
                 window.localStorage.setItem('wmsUrl', $(wmsPreviewModal).find('#wmsUrl').val());
-                window.localStorage.setItem('wmsProxyUrl', $(wmsPreviewModal).find('#wmsProxyUrl').val());
             }
             $(wmsPreviewModal).find("#wmsPreviewForm").submit();
             $(wmsPreviewModal).modal('hide');
         });
 
-        var wmsHost, wmsPath, wmsPort, wmsProxyHost, wmsProxyPort = null;
+        var wmsUrl = null;
         if (window.localStorage) {
             wmsUrl = window.localStorage.getItem('wmsUrl') ? window.localStorage.getItem('wmsUrl') : null;
-            wmsProxyUrl = window.localStorage.getItem('wmsProxyUrl') ? window.localStorage.getItem('wmsProxyUrl') : null;
         }
 
         $(wmsPreviewModal).find('input[id=id]').val($(event.currentTarget).data('id'));
         $(wmsPreviewModal).find('input[id=wmsUrl]').val(wmsUrl);
-        $(wmsPreviewModal).find('input[id=wmsProxyUrl]').val(wmsProxyUrl);
         $(wmsPreviewModal).modal('show');
     },
 
