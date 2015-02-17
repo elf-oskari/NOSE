@@ -57,7 +57,7 @@ module.exports = function (app, path, client, data, libs) {
     app.engine('html', require('ejs').renderFile);
 
     //read proxy settings
-    var proxySettingsFile = fs.readFileSync(path.resolve('./', 'proxy_config.json'),'utf-8');
+    var proxySettingsFile = fs.readFileSync(path.join(__dirname, '../proxy_config.json'),'utf-8');
     console.log('got file:', proxySettingsFile);
     var data = JSON.parse(proxySettingsFile);
     this.wmsProxyUrl = data.wmsProxyUrl;
