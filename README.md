@@ -1,22 +1,51 @@
 # SLD-Editor
 
-SLD-Editor is an Node.js based SLD backend.
+SLD-Editor is a Node.js based web application for editing SLD-files easily and visually. User can import own SLD-files, create new configurations based on imported SLD-files, edit configurations visually with SLD-editor and download the edited configurations as SLD-files.
 
-## Getting started
+## Requirements
 
-1. Install [Node.js](http://nodejs.org/download/) locally
-2. Follow the installation guides and if special permissions are needed, ask your Admin to add usage rights to the folders
-3. npm install
-4. node parse.js original.sld template.sld > fields.csv
-5. Modify fields.csv
-6. node build.js template.sld fields.csv > new.sld
+* [Node.js](http://nodejs.org/download/)
+* [PostgreSQL](http://www.postgresql.org/) 
 
-If you want to store an SLD template in a PostgreSQL database after creating it:
+## Install
 
-1. Use sql/sld_styles_create_tables_script.sql to set up your database
-2. To avoid accidentally publishing database credentials, use: git update-index --assume-unchanged db.json
-3. Modify db.json
-4. node store.js template.sld fields.csv
+1. Download source code from [GitHub](https://github.com/elf-oskari/NOSE)
+2. Install dependencies
+`npm install` 
+
+## Configure
+
+Database connection should be configured to file `db.json`. By default `db.json` looks like this:
+
+	{
+		"host":"database-server.example.invalid",
+		"port":5432,
+		"database":"sld_styles",
+		"user":"root",
+		"password":"secret"
+	}
+
+Applications base url can be also configured to `db.json` as follows:
+	"baseUrl": "/example"
+
+WMS service is called via Node so the proxy might be required to be able to access to the service. If so, proxy can be configured to `db.json`as follows:
+	"wmsProxy": "http://example"
+
+## Create database tables
+
+Create database tables by running `sld_styles_create_tables_script.sql`, which is found under sql folder.
+
+## Add users
+
+SLD-editor application requires authentication before it can be used. Every user has username, password and role. There are two roles available: ADMIN and USER. Admin has all the rights in the application, but user can't delete SLD templates and can edit and delete only SLD configurations created by himself/herself.
+Users should be added to database table `sld_users`.  It can be done by running the following sql lines with information of users:
+
+	INSERT INTO sld_users("user", pw, role)   VALUES ('','','');
+	INSERT INTO sld_users("user", pw, role)   VALUES ('','',''); 
+
+## Run SLD-editor
+
+Run `node app` to get SLD-editor up and running.
 
 ## Versioning
 
@@ -34,10 +63,13 @@ And constructed with the following guidelines:
 
 For more information on SemVer, please visit [http://semver.org/](http://semver.org/).
 
-
 ## Known issues
-*Rule preview on map not working properly, when there are multiple symbolizers of the same kind within the same rule
 
+* [Backbone.Validation](https://github.com/thedersen/backbone.validation) is used to validate the model before saving, but it's still unfinished. Backbone.Validation is planned to be used also in server side validation.
+
+## Report bugs
+
+If any bugs are found, please report them using GitHub issues.
 
 ## Copyright and license
 
