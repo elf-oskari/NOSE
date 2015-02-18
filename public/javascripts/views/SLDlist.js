@@ -145,7 +145,7 @@ define([
                 function (model, response, options) {
                     console.log("Deleting config failed", model, response, options);
                     modalTitle = locale.deleteConfig['deletingConfigFailureTitle'],
-                    modalBody = locale.deleteConfig['deletingConfigFailureBody'] + model.name,
+                    modalBody = locale.deleteConfig['deletingConfigFailureBody'] + self.configName,
                     hasSpinner = false,
                     goToEditor = false,
                     self.showInfoModal(modalTitle, modalBody, hasSpinner, goToEditor, model);
