@@ -1,3 +1,7 @@
+/**
+* This is used to validate symbolizer params in SLD editor view. 
+*
+*/
 define([
   'lodash',
   'jquery',
