@@ -66,12 +66,6 @@ ON sld_users
 FOR EACH ROW
 EXECUTE PROCEDURE procedure_sld_users_update();
 
-INSERT INTO sld_users("user", pw, role)   VALUES ('admin','oskari','ADMIN');
-INSERT INTO sld_users("user", pw, role)   VALUES ('user','user','USER');
-INSERT INTO sld_users("user", pw, role)   VALUES ('pekka','pekka','ADMIN');
-INSERT INTO sld_users("user", pw, role)   VALUES ('oskari','oskari','USER');
-
-
 
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ sld_template
 
