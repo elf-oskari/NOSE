@@ -174,7 +174,7 @@ define([
                 }
                 $('#okButton').on("click", function () {
                     $('#informModal').modal('hide');
-                    //TODO! remove self.render to render to list only when it's changes f.e. config or template is deleted
+                    //TODO! remove self.render to render the list only when it's changes f.e. config or template is deleted
                     self.render();
                     if (goToEditor === true) {
                         Backbone.history.navigate('/edit/' + model.id, true);
@@ -247,6 +247,7 @@ define([
                     modalBody = locale.upload['uploadSuccessBody'] + newTemplate.name;
                     hasSpinner = false;
                     goToEditor = false;
+                    self.SLDtemplatemodel = self.templates.create(newTemplate);
                     self.showInfoModal(modalTitle, modalBody, hasSpinner, goToEditor);
                 },
                 error: function(newTemplate, response, options) {
