@@ -149,6 +149,7 @@ var SldDeleter=function() {
 
 /** @param {string} dbPath Name of JSON file with database address and credentials. */
 SldDeleter.prototype.connect=function(dbPath) {
+	console.log("SLDDeleter.connect dbPath", dbPath);
 	console.log("connecting to db");
 	var defer=new Deferred();
 
@@ -156,6 +157,7 @@ SldDeleter.prototype.connect=function(dbPath) {
 
 	try {
 		var dbJson=fs.readFileSync(dbPath,'utf-8');
+		console.log("var dbJson", dbJson);
 		this.dbConf=JSON.parse(dbJson);
 		defer.resolve();
 	} catch(e) {
