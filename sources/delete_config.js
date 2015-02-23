@@ -44,11 +44,13 @@ var PgDatabase=function() {
 /** @param {Object} client:
   * host, port, database, user and password. */
 PgDatabase.prototype.connect=function(client) {
+	console.log("pg connect");
 	var defer=new Deferred();
 
 	this.client=client;
 
     defer.resolve();
+    console.log("db connect defer resolve");
 	return(defer.promise);
 };
 
@@ -58,6 +60,7 @@ PgDatabase.prototype.close=function(conf) {
 
 /** Execute query without reading any results. */
 PgDatabase.prototype.exec=function() {
+	console.log("pg exec");
 	var query=this.client.query.apply(this.client,arguments);
 	var defer=new Deferred();
 
@@ -95,8 +98,8 @@ PgDatabase.prototype.querySingle=function() {
 };
 
 /** Send query to database and read a single result row. */
-/** Send query to database and read a single result row. */
 PgDatabase.prototype.queryResult=function() {
+	console.log("queryResult, this.client", this.client);
 	var query=this.client.query.apply(this.client,arguments);
 
 	var defer=new Deferred();
@@ -119,6 +122,7 @@ PgDatabase.prototype.queryResult=function() {
 }
 
 PgDatabase.prototype.begin=function() {
+	console.log("db.begin");
 	return(this.exec('BEGIN TRANSACTION'));
 };
 
@@ -129,6 +133,7 @@ PgDatabase.prototype.commit=function() {
 PgDatabase.prototype.rollback=function() {
 	return(this.exec('ROLLBACK'));
 };
+
 /** @constructor
   * SldInserter stores a parsed SLD template and field configuration
   * into an SQL database. */
@@ -195,7 +200,7 @@ exports.delete_config = function(client, id, uuid, cb) {
 	console.log("IN DELETE CONFIG....");
 	var deletes=new SldDeleter(),
         cb = cb;
-
+    console.log("client", client);
 	var connected=deletes.connect(client);
 
     var ready=connected.then(function() {
