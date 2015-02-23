@@ -226,7 +226,7 @@ module.exports = function (app, path, client, data, libs) {
     app.delete('/api/v1/templates/:id', loggedIn, isAdmin, function(req, res) {
         console.log('DELETE /api/v1/templates/' +req.params.id);
 
-        delete_template(req.params.id,
+        delete_template(client, req.params.id,
             function (err) {
                 if (err) {
                     console.log("API ERROR!!!", err);
@@ -249,7 +249,7 @@ module.exports = function (app, path, client, data, libs) {
         var uuid = checkAdmin(req.user) ? -1 : req.user.uuid;        
         
         //console.log(uuid+" "+req.user.uuid); return;
-        delete_config(req.params.id, uuid, 
+        delete_config(client, req.params.id, uuid, 
             function (err) {
                 if (err) {
                     console.log("API ERROR!!!", err);
