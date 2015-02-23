@@ -12,14 +12,16 @@ var filename = '';
 /** @constructor
   * Deferred encapsulates a promise that gets fulfilled by outside code. */
 var Deferred=function() {
-	console.log(" deferred constructor");
 	var self=this;
 
 	this.promise=new Promise(function(resolve,reject) {
 		self.resolve=resolve;
-		self.reject=reject;
+		self.reject=function(err, arg ) {
+            console.log(err);
+            if(arg) console.log(arg[0]);
+
+        }
 	});
-	console.log("/deferred constructor");
 };
 
 /** Return a new function that calls fn making it see the desired scope
@@ -30,41 +32,32 @@ function bindToScope(scope, fn) {
 	return function() {
 		fn.apply(scope, arguments);
 	};
-	console.log("binded to scope");
-};
+}
 
 /** @constructor
   * PostgreSQL database interface.
   * Simple wrapper to use promises with pg.js. */
-var PgDatabase2=function() {
+var PgDatabase=function() {
 	this.client=null;
-	console.log("done db constructor");
 };
 
-/** @param {Object} conf Contains attributes:
+/** @param {Object} client:
   * host, port, database, user and password. */
-PgDatabase2.prototype.connect=function(conf) {
-
-	console.log(" getting connection");
-
+PgDatabase.prototype.connect=function(client) {
 	var defer=new Deferred();
 
-	this.client=new pg.Client(conf);
-	this.client.connect(function(err) {
-		if(err) return(defer.reject('Unable to connect to database: '+err));
-		defer.resolve();
-	});
+	this.client=client;
 
-	console.log("/getting connection");
+    defer.resolve();
 	return(defer.promise);
-}
+};
 
-PgDatabase2.prototype.close=function(conf) {
+PgDatabase.prototype.close=function(conf) {
 	return(Promise.resolve(this.client.end()));
-}
+};
 
 /** Execute query without reading any results. */
-PgDatabase2.prototype.exec=function() {
+PgDatabase.prototype.exec=function() {
 	var query=this.client.query.apply(this.client,arguments);
 	var defer=new Deferred();
 
@@ -77,10 +70,10 @@ PgDatabase2.prototype.exec=function() {
 	});
 
 	return(defer.promise);
-}
+};
 
 /** Send query to database and read a single result row. */
-PgDatabase2.prototype.querySingle=function() {
+PgDatabase.prototype.querySingle=function() {
 	var query=this.client.query.apply(this.client,arguments);
 	var defer=new Deferred();
 	var result;
@@ -94,16 +87,18 @@ PgDatabase2.prototype.querySingle=function() {
 	});
 
 	query.on('end',function(state) {
-		if(!result) return(defer.reject('Not found'));
+		if(!result) return(defer.reject('Not found: ',arguments));
 		defer.resolve(result);
 	});
 
 	return(defer.promise);
-}
+};
 
 /** Send query to database and read a single result row. */
-PgDatabase2.prototype.queryResult=function() {
+/** Send query to database and read a single result row. */
+PgDatabase.prototype.queryResult=function() {
 	var query=this.client.query.apply(this.client,arguments);
+
 	var defer=new Deferred();
 	var result = [];
 
@@ -123,20 +118,17 @@ PgDatabase2.prototype.queryResult=function() {
 	return(defer.promise);
 }
 
-
-PgDatabase2.prototype.begin=function() {
+PgDatabase.prototype.begin=function() {
 	return(this.exec('BEGIN TRANSACTION'));
-}
+};
 
-PgDatabase2.prototype.commit=function() {
+PgDatabase.prototype.commit=function() {
 	return(this.exec('COMMIT'));
-}
+};
 
-PgDatabase2.prototype.rollback=function() {
+PgDatabase.prototype.rollback=function() {
 	return(this.exec('ROLLBACK'));
-}
-
-
+};
 /** @constructor
   * SldInserter stores a parsed SLD template and field configuration
   * into an SQL database. */
@@ -148,34 +140,30 @@ var SldDeleter=function() {
 }
 
 /** @param {string} dbPath Name of JSON file with database address and credentials. */
-SldDeleter.prototype.connect=function(dbPath) {
-	console.log("SLDDeleter.connect dbPath", dbPath);
+SldDeleter.prototype.connect=function(client) {
 	console.log("connecting to db");
+
 	var defer=new Deferred();
 
-	this.db=new PgDatabase2();
+	this.db=new PgDatabase();
 
-	try {
-		var dbJson=fs.readFileSync(dbPath,'utf-8');
-		console.log("var dbJson", dbJson);
-		this.dbConf=JSON.parse(dbJson);
-		defer.resolve();
-	} catch(e) {
-		defer.reject('Unable to read database configuration: '+e);
-	}
 	console.log("got connection");
 
-	return(defer.promise.then(this.db.connect(this.dbConf)).then(this.db.begin()));
+	return(this.db.connect(client)).then(this.db.begin());
 };
 
 /** Roll back current transaction and close connection. */
 SldDeleter.prototype.abort=function() {
-	return(this.db.rollback().then(bindToScope(this.db,this.db.close)));
+	return(this.db.rollback());
+
+	//.then(bindToScope(this.db,this.db.close)));
 };
 
 /** Commit current transaction and close connection. */
 SldDeleter.prototype.finish=function() {
-	return(this.db.commit().then(bindToScope(this.db,this.db.close)));
+	return(this.db.commit());
+	
+	//.then(bindToScope(this.db,this.db.close)));
 };
 
 /** Select templates with all data
@@ -202,13 +190,13 @@ SldDeleter.prototype.deleteConfig=function(id, uuid) {
  * @param id  templates id to be deleted
  * @param cb {function} status cb
  * */
-exports.delete_config = function(id, uuid, cb) {
+exports.delete_config = function(client, id, uuid, cb) {
 
 	console.log("IN DELETE CONFIG....");
 	var deletes=new SldDeleter(),
         cb = cb;
 
-	var connected=deletes.connect('db.json');
+	var connected=deletes.connect(client);
 
     var ready=connected.then(function() {
         return(deletes.deleteConfig(id, uuid));

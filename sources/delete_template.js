@@ -32,7 +32,7 @@ function bindToScope(scope, fn) {
 	return function() {
 		fn.apply(scope, arguments);
 	};
-	console.log("binided to scope");
+	console.log("binded to scope");
 };
 
 /** @constructor
@@ -45,28 +45,21 @@ var PgDatabase2=function() {
 
 /** @param {Object} conf Contains attributes:
   * host, port, database, user and password. */
-PgDatabase2.prototype.connect=function(conf) {
-
-	console.log(" getting connection");
-
+PgDatabase.prototype.connect=function(client) {
 	var defer=new Deferred();
 
-	this.client=new pg.Client(conf);
-	this.client.connect(function(err) {
-		if(err) return(defer.reject('Unable to connect to database: '+err));
-		defer.resolve();
-	});
+	this.client=client;
+    defer.resolve();
 
-	console.log("/getting connection");
 	return(defer.promise);
 }
 
-PgDatabase2.prototype.close=function(conf) {
+PgDatabase.prototype.close=function(conf) {
 	return(Promise.resolve(this.client.end()));
 }
 
 /** Execute query without reading any results. */
-PgDatabase2.prototype.exec=function() {
+PgDatabase.prototype.exec=function() {
 	var query=this.client.query.apply(this.client,arguments);
 	var defer=new Deferred();
 
@@ -82,7 +75,7 @@ PgDatabase2.prototype.exec=function() {
 }
 
 /** Send query to database and read a single result row. */
-PgDatabase2.prototype.querySingle=function() {
+PgDatabase.prototype.querySingle=function() {
 	var query=this.client.query.apply(this.client,arguments);
 	var defer=new Deferred();
 	var result;
@@ -104,7 +97,8 @@ PgDatabase2.prototype.querySingle=function() {
 }
 
 /** Send query to database and read a single result row. */
-PgDatabase2.prototype.queryResult=function() {
+PgDatabase.prototype.queryResult=function() {
+	console.log("queryResult, this.client", this.client, "arguments", arguments)
 	var query=this.client.query.apply(this.client,arguments);
 	var defer=new Deferred();
 	var result = [];
@@ -126,15 +120,15 @@ PgDatabase2.prototype.queryResult=function() {
 }
 
 
-PgDatabase2.prototype.begin=function() {
+PgDatabase.prototype.begin=function() {
 	return(this.exec('BEGIN TRANSACTION'));
 }
 
-PgDatabase2.prototype.commit=function() {
+PgDatabase.prototype.commit=function() {
 	return(this.exec('COMMIT'));
 }
 
-PgDatabase2.prototype.rollback=function() {
+PgDatabase.prototype.rollback=function() {
 	return(this.exec('ROLLBACK'));
 }
 
@@ -149,22 +143,15 @@ var SldDeleter=function() {
 }
 
 /** @param {string} dbPath Name of JSON file with database address and credentials. */
-SldDeleter.prototype.connect=function(dbPath) {
+SldDeleter.prototype.connect=function(client) {
 	console.log("connecting to db");
 	var defer=new Deferred();
 
-	this.db=new PgDatabase2();
+	this.db=new PgDatabase();
 
-	try {
-		var dbJson=fs.readFileSync(dbPath,'utf-8');
-		this.dbConf=JSON.parse(dbJson);
-		defer.resolve();
-	} catch(e) {
-		defer.reject('Unable to read database configuration: '+e);
-	}
 	console.log("got connection");
 
-	return(defer.promise.then(this.db.connect(this.dbConf)).then(this.db.begin()));
+	return(this.db.connect(client)).then(this.db.begin());
 };
 
 /** Roll back current transaction and close connection. */
@@ -192,13 +179,13 @@ SldDeleter.prototype.selectTestDelete=function(id) {
  * @param id  templates id to be deleted
  * @param cb {function} status cb
  * */
-exports.delete_template = function(id, cb) {
+exports.delete_template = function(client, id, cb) {
 
-	console.log("IN DELETE TEMPLATE....");
+	console.log("IN DELETE TEMPLATE...., client:", client);
 	var deletes=new SldDeleter(),
         cb = cb;
 
-	var connected=deletes.connect('db.json');
+	var connected=deletes.connect(client);
     var ready=connected.then(function() {
         return(deletes.selectTestDelete(id));
     });
