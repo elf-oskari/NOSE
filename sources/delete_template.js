@@ -38,7 +38,7 @@ function bindToScope(scope, fn) {
 /** @constructor
   * PostgreSQL database interface.
   * Simple wrapper to use promises with pg.js. */
-var PgDatabase2=function() {
+var PgDatabase=function() {
 	this.client=null;
 	console.log("done db constructor");
 };
