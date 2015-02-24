@@ -33,7 +33,7 @@ define({
 			"uploadSuccessTitle": "SLD uploaded!",
 			"uploadSuccessBody": "Uploaded SLD ",
 			"uploadFailureTitle": "Error!",
-			"uploadFailureBody": "Could not upload SLD "
+			"uploadFailureBody": "Something went wrong! Could not upload SLD."
 		},
 		"deleteConfig" : {
 			"title": "Are you sure you want to delete this config?",
