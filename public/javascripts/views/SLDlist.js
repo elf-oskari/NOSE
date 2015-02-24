@@ -169,7 +169,6 @@ define([
                 }
             }
             informModal.on('show.bs.modal', function () {
-                debugger;
                 var modal = $(this);
                 modal.find('.modal-title').text(modalTitle);
                 if (modalBody) {
