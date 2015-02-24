@@ -363,7 +363,10 @@ body
 /* SLDList */
 .list-group-item {
     cursor: pointer;
+    border-left: none;
+    border-right: none;
 }
+
 .list-group-item:hover, .list-group-item:focus {
     font-weight:bold;
 }
@@ -372,9 +375,27 @@ body
     padding-left: 3em;
 }
 
+.list-group-item:first-child {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    border-top: none;
+}
+
+.list-group-item:last-child {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom: none;
+}
+
 .list-group-item-selected {
     font-weight: bold;
     background-color: #f5f5f5;
+}
+
+.list-group {
+    overflow: auto;
+    max-height: 60%;
+    border: 1px solid #ddd;
 }
 
 .panel-heading.sld-list {
@@ -406,9 +427,6 @@ body
     border-radius:4px!important;
 }
 
-
-
-
 html, body {
     height:100%;
 }
@@ -422,7 +440,13 @@ html, body {
 .list-panel {
     height: 100%;
     max-height:100%;
+    overflow: auto;
 
+}
+
+.sld-list-second-panel {
+    border: none;
+    box-shadow: none;
 }
 
 #sld-list {
@@ -431,12 +455,9 @@ html, body {
     overflow: hidden;
 }
 
-
 .sld-list-content-div {
 /*    height:80%;*/
     max-height:80%;
-    overflow-y:auto;
-    overflow-x:hidden;
     margin-left: auto;
     margin-right: auto;
     padding-left: 15px;
@@ -445,7 +466,6 @@ html, body {
 
 .sld-list-footer-div {
     height:10%;
-    max-height:10%;
     padding-right: 30px;
 }
 

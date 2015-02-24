@@ -1,3 +1,4 @@
+
 <!-- List template -->
 <div class="view" id="sld-tree-view">
     <div class="panel editor-panel sld-editor-tree-panel">
@@ -19,6 +20,9 @@
               </div>
               <div id="featuretype-id-<%=SLDfeatureType.id%>" class="panel-collapse collapse">
                 <div class="panel-body">
+                  <% if (SLDfeatureType.rules.length === 0) { %>
+                      <p><%= locale.sldtree.noRules %></p>
+                  <%  } else { %>
                   <% _.forEach(SLDfeatureType.rules, function(SLDrule) { %>
                   <div class="panel second-level sld-tree-panel">
                     <div class="panel-heading cursor-pointer second-level">
@@ -26,15 +30,20 @@
                     </div>
                     <div id="rule-id-<%=SLDrule.id%>" class="panel-collapse collapse">
                       <div class="panel-body second-level">
+                        <% if (SLDrule.symbolizers.length === 0) { %>
+                          <p><%= locale.sldtree.noSymbolizers %></p>
+                        <%  } else { %>
                           <% _.forEach(SLDrule.symbolizers, function(symbolizer) { %>
                             <button type="button" data-symbolizerid="<%=symbolizer.id %>"
                                     data-symbolizertype="<%=symbolizer.type %>" data-ruletitle="<%=SLDrule.title %>"
                                     class="btn btn-block sld_symbolizer"><%= symbolizer.type %></button>
-                          <% }); %>
+                          <% });
+                          } %>
                       </div>
                     </div>
                   </div>
-                  <% }); %>
+                  <% }); 
+                  }%>
                 </div>
               </div>
             </div>
