@@ -47,11 +47,9 @@ var toggleAdvanced = function(divClass) {
                     <div class="form-group">
                         <label for="unit" class="col-md-3 control-label edit-sld-label"><%= editSLD.common['unit'] %></label>
                         <div class="col-md-9">
-                            <select id="unit" class="form-control">
-                                <option <%= generateOptionValue("pixel",symbolUnit) %>><%= editSLD.common['pixel'] %></option>
-                                <option <%= generateOptionValue("metre",symbolUnit) %>><%= editSLD.common['metre'] %></option>
-                                <option <%= generateOptionValue("foot",symbolUnit) %>><%= editSLD.common['foot'] %></option>
-                            </select>
+                            
+                            <input type="hidden" id="unit" class="form-control" <%=generateOptionValue("metre",symbolUnit) %>/>
+                            <input type="text" class="form-control" disabled="true" value="<%= editSLD.common['metre'] %>"/>
                         </div>
                     </div>
                     <br>
