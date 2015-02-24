@@ -65,6 +65,8 @@ For more information on SemVer, please visit [http://semver.org/](http://semver.
 
 ## Known issues
 
+* Rule preview doesn't render other point symbolizer symbols than circle.
+* User passwords are as clear text in database.
 * [Backbone.Validation](https://github.com/thedersen/backbone.validation) is used to validate the model before saving, but it's still unfinished. Backbone.Validation is planned to be used also in server side validation.
 
 ## Report bugs
