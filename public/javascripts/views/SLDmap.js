@@ -73,8 +73,6 @@ define([
                 });
 
             }
-
-//            this.setMapLayerStyle(this.params, type, symbolizerId, true);
             this.setMapLayerStyle(type, true);
 
         },
@@ -96,33 +94,14 @@ define([
             }
 
             this.params[type][symbolizerId] = params;
-//            this.setMapLayerStyle(this.params, type, symbolizerId, true);
             this.setMapLayerStyle(type, true);
         },
         /**
-         * @method setParams2MapStyle
-         * Set map style for one symbolizer - default values in sld-template file
-         * Triggered in SLDtree
-         * @param {Object<json>} params; style params of default values of selected symbolizer in sld template (SLDtree)
-         * @param {Object} symbolizer; symbolizer.type:symbolizer type, .uom: measurement unit on size, width values
-         */
-         /*
-        setParams2MapStyle: function (params, symbolizer) {
-            console.log('setParams2MapStyle', params);
-            this.params = params;
-            this.uom = symbolizer.uom;   // Symbolizer size / width unit
-            this.setMapLayerStyle(params, symbolizer.type.toLowerCase());
-        },
-        */
-        /**
          * @method setMapLayerStyle
          * Set or update map layer style for ol3 layers
-         * @param {Object<json>} params; updated style parameter(s) in UI or default values in SLD template symbolizer
          * @param {String} type; type of symbolizer.
-         * @param {int} symbolizerId; id of symbolizer.
          * @param {Boolean} update; true:update case, false: init case (sld template symbolizer default values).
          */
-//        setMapLayerStyle: function (params, type, symbolizerId, update) {
         setMapLayerStyle: function (type, update) {
             var self = this;
             if (this.map) {
@@ -223,25 +202,8 @@ define([
                 fill,
                 stroke,
                 self = this;
-            // pass updated value to current values
-            //if (stylein) def_params = this.getCurrentPolylineParams(def_params, stylein);
-
-            // pass updated param value
-            /*
-            if (this.params) {
-                this.params.forEach(function (param) {
-                    if (param['name'])  def_params[param['name']] = !stylein ? param['default_value'] : param['value'];
-                    // fix size unit
-                    if (param['name'] === 'stroke-width') {
-                        def_params[param['name']] = self.transformUnit(def_params[param['name']]);
-                        if (def_params[param['name']] < 1)def_params[param['name']] = 1;
-                    }
-                });
-            }
-            */
             if (params) {
                 params.forEach(function (param) {
-//                    if (param['name'])  def_params[param['name']] = !stylein ? param['default_value'] : param['value'];
                     if (param['name']) {
                         def_params[param['name']] = param['value'];
                     }  
@@ -307,22 +269,8 @@ define([
             // pass updated value to current values
             if (stylein) def_params = this.getCurrentPointParams(def_params, stylein);
 
-            // pass updated param value
-            /*
-            if (this.params) {
-                this.params.forEach(function (param) {
-                    if (param['name'])  def_params[param['name']] = !stylein ? param['default_value'] : param['value'];
-                    // fix size unit
-                    if (param['name'] === 'size' || param['name'] === 'stroke-width') {
-                        def_params[param['name']] = self.transformUnit(def_params[param['name']]);
-                        if (def_params[param['name']] < 1)def_params[param['name']] = 1;
-                    }
-                });
-            }
-            */
             if (params) {
                 params.forEach(function (param) {
-//                    if (param['name'])  def_params[param['name']] = !stylein ? param['default_value'] : param['value'];
                     if (param['name']) {
                         def_params[param['name']] = param['value'];
                     }  
@@ -387,15 +335,6 @@ define([
                 tstyle = stylein.getText();
                 if (tstyle) def_params = this.getCurrentTextParams(def_params, tstyle);
             }
-            // pass updated param value
-            /*
-            if (this.params) {
-                this.params.forEach(function (param) {
-                    if (param['name'])  def_params[param['name']] = !stylein ? param['default_value'] : param['value'];
-                    if (param['name'] === 'font-size' && param['name'].indexOf('px') === -1) def_params[param['name']] = def_params[param['name']] + 'px'
-                });
-            }
-            */
             if (params) {
                 params.forEach(function (param) {
                     if (param['name']) {
@@ -551,7 +490,9 @@ define([
         render: function () {
             // create a map in the "map" div, set the view to a given place and zoom
             var self = this;
-            if (!this.map) {
+
+            //IE10 seems to lose map viewport content in some cases...So gotta check for that as well...sigh...
+            if (!this.map || !this.map.getViewport() || this.map.getViewport().childNodes.length == 0) {
 
                 console.log('render --Map');
                 var vectorPolygons = new ol.layer.Vector({
@@ -580,17 +521,6 @@ define([
                     title: 'Points',
                     style: self.getPointStyle()
                 });
-                // mouse position in 3857
-                /*
-                var llMouse = new ol.control.MousePosition({
-                    // format coords as "HDMS (x,y)"
-                    coordinateFormat: function (coordinate) {
-                        return ol.coordinate.toStringHDMS(coordinate) + ' (' +
-                            ol.coordinate.toStringXY(coordinate, 4) + ')'; // 4 decimal places
-                    },
-                    projection: 'EPSG:3857' // by default, uses view projection
-                });
-                */
                 
                 this.map = new ol.Map({
                     controls: ol.control.defaults().extend([new ol.control.ScaleLine()]),
@@ -614,11 +544,6 @@ define([
                 this.map.addControl(zoomslider);
                 var layerSwitcher = new ol.control.LayerSwitcher();
                 this.map.addControl(layerSwitcher);
-                /*  this.map.addInteraction(new ol.interaction.Select({
-                 condition: ol.events.condition.mouseMove
-                 }));  */
-
-
 
                 this.map.getView().on('change:resolution', function(event) {
                     self.mapResolutionChanged(event);
@@ -628,22 +553,21 @@ define([
                 // Note! event handling might not function properly, but since we currently do not have any map specific
                 // event handling, this is not tested. Look at assign in SLDEditorPage for more details.
                 //this.$el.replaceWith(this.map.getViewport());
-                var vp = this.map.getViewport();
-                $(this.el).append(vp);
+                $(this.el).append(this.map.getViewport());
+
                 //reset the previous styles and set vector layers invisible
                 this.resetVectorLayers();
                 // reset map view
-                this.map.getView().setCenter([2776000, 8444000], 13);
+                this.map.getView().setCenter([2776000, 8444000]);
+                this.map.getView().setZoom(13);
+                this.map.render();
             }
         },
         mapResolutionChanged: function(event) {
 
             var self = this;
             _.each(this.params, function(symbolizer, key) {
-//                console.log(symbolizer.id+" "+key);
-
                 self.setMapLayerStyle(key, true);
-
             });
 
         }
