@@ -7,11 +7,10 @@ define([
 ], function (_, Backbone, $, ol, locale) {
     var SLDMapView = Backbone.View.extend({
         className: 'map',
+        uom:"metre",
         initialize: function (params) {
             this.dispatcher = params.dispatcher;
-//            this.listenTo(this.dispatcher, "selectSymbolizer", this.setParams2MapStyle);
             this.listenTo(this.dispatcher, "resetVectorLayers", this.resetVectorLayers);
-//            this.listenTo(this.dispatcher, "setParamsToMapStyle", this.setParams2MapStyle);
             this.listenTo(this.dispatcher, "updateMapStyleByParam", this.updateMapStyleByParam);
             this.listenTo(this.dispatcher, "updateMapStyle", this.updateMapStyle);
             this.listenTo(this.dispatcher, "all", this.logger);
@@ -75,7 +74,8 @@ define([
 
             }
 
-            this.setMapLayerStyle(this.params, type, symbolizerId, true);
+//            this.setMapLayerStyle(this.params, type, symbolizerId, true);
+            this.setMapLayerStyle(type, true);
 
         },
         /**
@@ -87,7 +87,6 @@ define([
          * @param {int} symbolizerId; id of the symbolizer
          */
         updateMapStyle: function (params, type, symbolizerId) {
-//            this.params = params;
             type = type.toLowerCase();
             if (!this.params) {
                 this.params = {};
@@ -97,8 +96,8 @@ define([
             }
 
             this.params[type][symbolizerId] = params;
-
-            this.setMapLayerStyle(this.params, type, symbolizerId, true);
+//            this.setMapLayerStyle(this.params, type, symbolizerId, true);
+            this.setMapLayerStyle(type, true);
         },
         /**
          * @method setParams2MapStyle
@@ -123,7 +122,8 @@ define([
          * @param {int} symbolizerId; id of symbolizer.
          * @param {Boolean} update; true:update case, false: init case (sld template symbolizer default values).
          */
-        setMapLayerStyle: function (params, type, symbolizerId, update) {
+//        setMapLayerStyle: function (params, type, symbolizerId, update) {
+        setMapLayerStyle: function (type, update) {
             var self = this;
             if (this.map) {
                 var polygons, points, lines, cur_style;
@@ -619,6 +619,10 @@ define([
                  }));  */
 
 
+
+                this.map.getView().on('change:resolution', function(event) {
+                    self.mapResolutionChanged(event);
+                });
             } else {
                 // map node has been detached.
                 // Note! event handling might not function properly, but since we currently do not have any map specific
@@ -631,6 +635,17 @@ define([
                 // reset map view
                 this.map.getView().setCenter([2776000, 8444000], 13);
             }
+        },
+        mapResolutionChanged: function(event) {
+
+            var self = this;
+            _.each(this.params, function(symbolizer, key) {
+//                console.log(symbolizer.id+" "+key);
+
+                self.setMapLayerStyle(key, true);
+
+            });
+
         }
     });
     return SLDMapView;
