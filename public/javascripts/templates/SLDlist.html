@@ -10,10 +10,17 @@
       </a>
     </div>
 
-    <div class="panel-body">
-      <div class="panel col-sm-12 col-md-6 col-lg-6 sld-list-second-panel">
-        <div class="panel-heading sld-list"><h4><%= SLDlist_i18n.texts.title %></h4></div>
-        <div class="panel-body sld-list-panel-body">
+    <div class="panel-body list-page-panel-body">
+      <div class="row">
+        <div class="col-sm-4 col-md-2 col-lg-2">
+          <h4><%= SLDlist_i18n.texts.title %></h4>
+        </div>
+        <div class="col-sm-8 col-md-4 col-lg-4">
+          <nav id="sld_buttons_navbar" class="navbar navbar-default sld-list-button-navbar navbar-right navbar-no-border"></nav>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-12 col-md-6 col-lg-6">
           <div class="list-group">
             <% _.forEach(SLDtemplates, function(SLDtemplateModel) { %>
                 <a data-id="<%=SLDtemplateModel.id%>" class="list-group-item"><%= SLDtemplateModel.name %></a>
@@ -21,9 +28,6 @@
                       <a class="list-group-item list-group-item-config" data-id="<%=SLDconfigModel.id%>"><%= SLDconfigModel.name %></a>
                     <% }); %>
             <% }); %>
-          </div>
-          <div class="sld-list-footer-div">
-            <nav id="sld_buttons_navbar" class="navbar navbar-default sld-list-button-navbar navbar-right navbar-no-border"></nav>
           </div>
         </div>
       </div>
