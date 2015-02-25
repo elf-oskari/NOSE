@@ -46,6 +46,7 @@ define([
             $("#sld_buttons_navbar").html(_.template(SLDListButtons, options));
         },
         newConfig: function (event) {
+            debugger;
             var element = $(event.currentTarget);
             var target = element.data('target');
             var template_id = element.data('id');
@@ -178,7 +179,7 @@ define([
                     informModal.modal('hide');
                     self.render();
                     //TODO! remove self.render to render the list only when it's changes f.e. config or template is deleted
-                    if (model) {
+                    if (_.has(model, 'id')) {
                         var element = $('.list-group').find("[data-id='" + model.id +"']");
                         var offsetTop = element[0].offsetTop;
                         $(".list-group").scrollTop(offsetTop);
