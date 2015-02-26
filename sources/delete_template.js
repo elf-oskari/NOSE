@@ -132,9 +132,7 @@ PgDatabase.prototype.rollback=function() {
 	return(this.exec('ROLLBACK'));
 }
 
-/** @constructor
-  * SldInserter stores a parsed SLD template and field configuration
-  * into an SQL database. */
+/** @constructor */
 var SldDeleter=function() {
 	console.log(" SLD deleter constructor");
 	this.db=null;
@@ -156,12 +154,14 @@ SldDeleter.prototype.connect=function(client) {
 
 /** Roll back current transaction and close connection. */
 SldDeleter.prototype.abort=function() {
-	return(this.db.rollback().then(bindToScope(this.db,this.db.close)));
+	return(this.db.rollback());
+	//.then(bindToScope(this.db,this.db.close)));
 };
 
 /** Commit current transaction and close connection. */
 SldDeleter.prototype.finish=function() {
-	return(this.db.commit().then(bindToScope(this.db,this.db.close)));
+	return(this.db.commit());
+	//.then(bindToScope(this.db,this.db.close)));
 };
 
 /** Select templates with all data

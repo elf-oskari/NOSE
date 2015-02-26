@@ -22,7 +22,7 @@ define([
             'click .btn.edit': 'editConfig',
             'click .btn.delete-config': 'deleteConfig',
             'click .btn.download': 'downloadConfig',
-            'click .list-group-item':'listGroupItemClick',
+            'click .list-group-item':'getListItemElement',
             'click .signout-list-page': 'logoutFromListView'
 
         },
@@ -46,6 +46,7 @@ define([
             $("#sld_buttons_navbar").html(_.template(SLDListButtons, options));
         },
         newConfig: function (event) {
+            debugger;
             var element = $(event.currentTarget);
             var target = element.data('target');
             var template_id = element.data('id');
@@ -88,13 +89,13 @@ define([
                         modalTitle = locale.createConfig['creatingConfigSuccessTitle'],
                         modalBody = locale.createConfig['creatingConfigSuccessBody'] + model.name,
                         hasSpinner = false,
-                        goToEditor = true,
+                        goToEditor = false,
                         self.showInfoModal(modalTitle, modalBody, hasSpinner, goToEditor, model);
                 }).fail(
                     function (model, response, options) {
                         console.log('Error', model, response, options);
                         modalTitle = locale.createConfig['creatingConfigFailureTitle'],
-                        modalBody = locale.createConfig['creatingConfigFailureBody'] + model.name,
+                        modalBody = locale.createConfig['creatingConfigFailureBody'] + name,
                         hasSpinner = false,
                         goToEditor = false,
                         self.showInfoModal(modalTitle, modalBody, hasSpinner, goToEditor, model);
@@ -153,35 +154,45 @@ define([
         },
 
         showInfoModal: function (modalTitle, modalBody, hasSpinner, goToEditor, model) {
-            var self = this;
-            $('#informModal').modal('hide');
+            var self = this,
+                informModal = $('#informModal'),
+                okButton = informModal.find('#okButton');
+            informModal.modal('hide');
             if (hasSpinner === true) {
                 $('.fa-spin').removeClass('hidden');
-                $('#okButton').addClass('hidden');
+                okButton.addClass('hidden');
             } else {
-                if ($('#okButton').hasClass('hidden')) {
-                    $('#okButton').removeClass('hidden')
+                if (okButton.hasClass('hidden')) {
+                    okButton.removeClass('hidden')
                 }
                 if ($('.fa-spin').not(":hidden")) {
                     $('.fa-spin').addClass('hidden');
                 }
             }
-            $('#informModal').on('show.bs.modal', function () {
+            informModal.on('show.bs.modal', function () {
                 var modal = $(this);
                 modal.find('.modal-title').text(modalTitle);
                 if (modalBody) {
                     modal.find('.modal-body').text(modalBody);
                 }
-                $('#okButton').on("click", function () {
-                    $('#informModal').modal('hide');
-                    //TODO! remove self.render to render the list only when it's changes f.e. config or template is deleted
+                okButton.on("click", function () {
+                    informModal.modal('hide');
                     self.render();
-                    if (goToEditor === true) {
-                        Backbone.history.navigate('/edit/' + model.id, true);
+                    //TODO! remove self.render to render the list only when it's changes f.e. config or template is deleted
+                    if (_.has(model, 'id')) {
+                        var element = $('.list-group').find("[data-id='" + model.id +"']");
+                        var offsetTop = element[0].offsetTop;
+                        $(".list-group").scrollTop(offsetTop);
+                        self.listGroupItemClick(element);
+                        /* Use function below if you want to go to the editor page after config has been created
+                        if (goToEditor === true) {
+                            Backbone.history.navigate('/edit/' + model.id, true);
+                        }
+                        */
                     }
                 });
             })
-            $('#informModal').modal({'keyboard': false});
+            informModal.modal({'keyboard': false});
         },
 
         editConfig: function (event) {
@@ -217,8 +228,8 @@ define([
             }).fail(
                 function (model, response, options) {
                     console.log("Deleting template failed", model, response, options);
-                    modalTitle = locale.deleteConfig['deletingTemplateFailureTitle'],
-                    modalBody = locale.deleteConfig['deletingTemplateFailureBody'] + self.templateName,
+                    modalTitle = locale.deleteTemplate['deletingTemplateFailureTitle'],
+                    modalBody = locale.deleteTemplate['deletingTemplateFailureBody'] + self.templateName,
                     hasSpinner = false,
                     goToEditor = false,
                     self.showInfoModal(modalTitle, modalBody, hasSpinner, goToEditor);
@@ -247,21 +258,26 @@ define([
                     modalBody = locale.upload['uploadSuccessBody'] + newTemplate.name;
                     hasSpinner = false;
                     goToEditor = false;
-                    self.SLDtemplatemodel = self.templates.create(newTemplate);
-                    self.showInfoModal(modalTitle, modalBody, hasSpinner, goToEditor);
+                    self.templates.create(newTemplate);
+                    self.showInfoModal(modalTitle, modalBody, hasSpinner, goToEditor, newTemplate);
                 },
                 error: function(newTemplate, response, options) {
                     console.log("Uploading SLD failed", response, options);
-                    modalTitle = locale.deleteConfig['uploadFailureTitle'],
-                    modalBody = locale.deleteConfig['uploadFailureBody'] + newTemplate.name,
+                    modalTitle = locale.upload['uploadFailureTitle'],
+                    modalBody = locale.upload['uploadFailureBody'],
                     hasSpinner = false,
                     goToEditor = false,
                     self.showInfoModal(modalTitle, modalBody, hasSpinner, goToEditor);
                 }
             });
         },
-        listGroupItemClick: function(event) {
+
+        getListItemElement: function (event) {
             var element = $(event.currentTarget);
+            this.listGroupItemClick(element);
+        },
+
+        listGroupItemClick: function(element) {
             var wasSelected = $(element).hasClass('list-group-item-selected');
             //Remove selection from the previously selected list item, if any
             $('.list-group-item-selected').removeClass('list-group-item-selected');

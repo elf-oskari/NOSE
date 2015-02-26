@@ -10,10 +10,17 @@
       </a>
     </div>
 
-    <div class="row sld-list-content-div">
-      <div class="col-sm-12 col-md-6 col-lg-6">
-        <div class="panel-heading sld-list"><h4><%= SLDlist_i18n.texts.title %></h4></div>
-        <div class="panel-body sld-editor-page">
+    <div class="panel-body list-page-panel-body">
+      <div class="row">
+        <div class="col-sm-4 col-md-2 col-lg-2">
+          <h4><%= SLDlist_i18n.texts.title %></h4>
+        </div>
+        <div class="col-sm-8 col-md-4 col-lg-4">
+          <nav id="sld_buttons_navbar" class="navbar navbar-default sld-list-button-navbar navbar-right navbar-no-border"></nav>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-12 col-md-6 col-lg-6">
           <div class="list-group">
             <% _.forEach(SLDtemplates, function(SLDtemplateModel) { %>
                 <a data-id="<%=SLDtemplateModel.id%>" class="list-group-item"><%= SLDtemplateModel.name %></a>
@@ -23,12 +30,6 @@
             <% }); %>
           </div>
         </div>
-      </div>
-    </div>
-    <div class="row sld-list-footer-div">
-      <div class="col-sm-12 col-md-6 col-lg-6">
-        <nav id="sld_buttons_navbar" class="navbar navbar-default sld-list-button-navbar navbar-right navbar-no-border">
-        </nav>
       </div>
     </div>
   </div>
@@ -133,7 +134,7 @@
                   <i class="fa fa-spinner fa-spin fa-2x hidden"></i>
               </div>
               <div class="modal-footer">
-                  <button id="okButton" type="button" class="btn btn-default" data-dismiss="modal"><%= SLDlist_i18n.buttons.ok %></button>
+                  <button id="okButton" type="button" class="btn btn-default"><%= SLDlist_i18n.buttons.ok %></button>
               </div>
           </div>
       </div>

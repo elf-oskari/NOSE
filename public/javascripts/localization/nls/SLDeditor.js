@@ -34,7 +34,11 @@ define({
 			"pixel": "Pixel",
 			"info-text": "Choose the symbolizer you want to edit from the menu on the left.",
 			"saving" : "Saving...",
-			"logout": "Sign out",
+			"logout": "Sign out"
+		},
+		"sldtree": {
+			"noRules": "No rules defined",
+			"noSymbolizers": "No symbolizers defined"
 		},
 		"point": {
 			"label": "Point",
