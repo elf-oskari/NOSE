@@ -404,7 +404,7 @@ XmlEncoder.prototype.encodeCapturedTag = function(node, childList, outputCharPos
 		txt += this.encodeCapturedNode(childList[childNum], outputCharPos + txt.length);
 	}
 
-	txt += this.encodeClosingTag( node.localName);
+	if (!node.isSelfClosing)	txt += this.encodeClosingTag( node.localName);
 
 	return txt;
 };
