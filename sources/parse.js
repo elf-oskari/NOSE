@@ -353,7 +353,7 @@ XmlEncoder.prototype.encodeOpeningTag = function(node) {
 	var attr,value;
 	var txt;
 
-	txt = '<' +  node.localName;
+	txt = '<' +  node.name;
 
 	for (attr in node.attributes) {
 		if (!node.attributes.hasOwnProperty(attr)) continue;
@@ -404,7 +404,7 @@ XmlEncoder.prototype.encodeCapturedTag = function(node, childList, outputCharPos
 		txt += this.encodeCapturedNode(childList[childNum], outputCharPos + txt.length);
 	}
 
-	if (!node.isSelfClosing)	txt += this.encodeClosingTag( node.localName);
+	if (!node.isSelfClosing)	txt += this.encodeClosingTag( node.name);
 
 	return txt;
 };
@@ -525,7 +525,7 @@ SldParser.prototype.captureComment = function(txt) {
 
 /** @param {Object} node Sax node object. */
 SldParser.prototype.handleXmlHeader = function(node) {
-	this.writeOut('<?' + node.localName + ' ' + node.body + '?>');
+	this.writeOut('<?' + node.name + ' ' + node.body + '?>');
 };
 
 /** Check if the node is an SLD rule, which needs to be read temporarily into
@@ -590,9 +590,13 @@ SldParser.prototype.handleOpeningTag = function(node) {
 SldParser.prototype.handleClosingTag = function(tagName) {
 	if (this.capturing) {
 		this.captureClosingTag();
-	} else {
-		this.writeOut(this.xmlEncoder.encodeClosingTag(tagName));
+	} else if ( tagName.split(':')[tagName.split(':').length-1] == "Rule"){
+		// dirty fix - sync problem ?
+		// nop
 	}
+    else {
+	this.writeOut(this.xmlEncoder.encodeClosingTag(tagName));
+    }
 
 	this.latestComment=null;
 	this.nestingDepth--;
