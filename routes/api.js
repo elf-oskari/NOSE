@@ -135,7 +135,6 @@ module.exports = function (app, path, client, data, libs) {
     });
 
     app.get('/api/v1/templates/', loggedIn, function (req, res) {
-        console.log('this fails ');
         // TODO: refactor -1 to something more descriptive
         try {
             select(-1, client,
@@ -166,7 +165,7 @@ module.exports = function (app, path, client, data, libs) {
 
             console.log("fields", fields);
             console.log("file name", fname);
-
+            
             select_fields(client,
                 function (error, rfields) {
                     if (error) {
