@@ -424,3 +424,10 @@ INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'anchorp
 INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'displacementx', 'LabelPlacement/PointPlacement/Displacement/DisplacementX', '"LabelPlacement","PointPlacement","Displacement","DisplacementX"');
 INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'displacementy', 'LabelPlacement/PointPlacement/Displacement/DisplacementY', '"LabelPlacement","PointPlacement","Displacement","DisplacementY"');
 
+INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'fill', 'Fill/SvgParameter(fill)', '"Fill","SvgParameter",{"name":"fill"}');
+INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'fill-opacity', 'Fill/SvgParameter(fill-opacity)', '"Fill","SvgParameter",{"name":"fill-opacity"}');
+INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'stroke-linecal', 'Stroke/SvgParameter(stroke-linecap)', '"Stroke","SvgParameter",{"name":"stroke-linecap"}');
+INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'stroke', 'Fill/GraphicFill/Graphic/Mark/Stroke/SvgParameter(stroke)', '"Fill","GraphicFill","Graphic","Mark","Stroke","SvgParameter",{"name":"stroke"}');
+INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'stroke-width', 'Fill/GraphicFill/Graphic/Mark/Stroke/SvgParameter(stroke-width)', '"Fill","GraphicFill","Graphic","Mark","Stroke","SvgParameter",{"name":"stroke-width"}');
+INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'stroke-width', 'Stroke/SvgParameter(stroke-width)', '"Stroke","SvgParameter",{"name":"stroke-width"}');
+INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'stroke', 'Stroke/SvgParameter(stroke)', '"Stroke","SvgParameter",{"name":"stroke"}');
