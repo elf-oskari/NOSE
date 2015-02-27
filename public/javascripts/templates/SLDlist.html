@@ -12,15 +12,15 @@
 
     <div class="panel-body list-page-panel-body">
       <div class="row">
-        <div class="col-sm-4 col-md-2 col-lg-2">
+        <div class="col-sm-4 col-md-4 col-lg-2">
           <h4><%= SLDlist_i18n.texts.title %></h4>
         </div>
-        <div class="col-sm-8 col-md-4 col-lg-4">
+        <div class="col-sm-8 col-md-8 col-lg-5">
           <nav id="sld_buttons_navbar" class="navbar navbar-default sld-list-button-navbar navbar-right navbar-no-border"></nav>
         </div>
       </div>
       <div class="row">
-        <div class="col-sm-12 col-md-6 col-lg-6">
+        <div class="col-sm-12 col-md-12 col-lg-7">
           <div class="list-group">
             <% _.forEach(SLDtemplates, function(SLDtemplateModel) { %>
                 <a data-id="<%=SLDtemplateModel.id%>" class="list-group-item"><%= SLDtemplateModel.name %></a>
