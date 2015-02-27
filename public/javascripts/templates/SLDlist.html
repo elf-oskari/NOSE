@@ -1,0 +1,143 @@
+<!-- List template -->
+<div class="view" id="sld-list">
+  <div class="panel editor-panel list-panel">
+    <div class="panel-heading editor-page-header">
+      SLD Editor
+      <h4 class="sld-list-signout-link signout-list-page">
+        <%=userName%>&nbsp;-&nbsp;<%= SLDlist_i18n.texts.logout%>
+        <i class="fa fa-sign-out pull-right"></i>
+      </h4>
+      </a>
+    </div>
+
+    <div class="panel-body list-page-panel-body">
+      <div class="row">
+        <div class="col-sm-4 col-md-4 col-lg-2">
+          <h4><%= SLDlist_i18n.texts.title %></h4>
+        </div>
+        <div class="col-sm-8 col-md-8 col-lg-5">
+          <nav id="sld_buttons_navbar" class="navbar navbar-default sld-list-button-navbar navbar-right navbar-no-border"></nav>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-7">
+          <div class="list-group">
+            <% _.forEach(SLDtemplates, function(SLDtemplateModel) { %>
+                <a data-id="<%=SLDtemplateModel.id%>" class="list-group-item"><%= SLDtemplateModel.name %></a>
+                    <% _.forEach(SLDtemplateModel.configs, function(SLDconfigModel) { %>
+                      <a class="list-group-item list-group-item-config" data-id="<%=SLDconfigModel.id%>"><%= SLDconfigModel.name %></a>
+                    <% }); %>
+            <% }); %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal window upload-->
+  <div class="modal" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="ModalTitle" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+          <h4 class="modal-title" id="ModalTitle"><%= SLDlist_i18n.upload.title %></h4>
+        </div>
+        <div class="modal-body">
+          <form id="fileinfo" action="/api/v1/sld_upload" role="form" enctype="multipart/form-data" method="post">
+            <div class="form-group">
+              <label for="userFileInput"><%= SLDlist_i18n.upload.fileInput %></label>
+              <input type="file" id="userFileInput" class="form-control" name="sldfile" required />
+            </div>
+            <div class="form-group">
+              <label for="fileName"><%= SLDlist_i18n.upload.fileName %></label>
+              <input type="text" id="fileName" class="form-control" name="tname" required />
+              <hr>
+              <button type="submit" class="btn btn-primary upload"><%= SLDlist_i18n.buttons.upload %></button>
+            </div>
+         </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal window -->
+  <div class="modal" id="deleteTemplateModal" tabindex="-1" role="dialog" aria-labelledby="ModalTitle" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+          <h4 class="modal-title" id="ModalTitle"><%= SLDlist_i18n.deleteTemplate.title %></h4>
+        </div>
+        <div class="modal-body">
+          <p><%= SLDlist_i18n.deleteTemplate.body %></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger delete-template"><%= SLDlist_i18n.deleteTemplate.delete %></button>
+          <button type="button" class="btn btn-primary" data-dismiss="modal"><%= SLDlist_i18n.buttons.cancel %></button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal window -->
+  <div class="modal" id="deleteConfigModal" tabindex="-1" role="dialog" aria-labelledby="ModalTitle" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+          <h4 class="modal-title" id="ModalTitle"><%= SLDlist_i18n.deleteConfig.title %></h4>
+        </div>
+        <div class="modal-body">
+          <p><%= SLDlist_i18n.deleteConfig.body %></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger delete-config"><%= SLDlist_i18n.deleteConfig.delete %></button>
+          <button type="button" class="btn btn-primary" data-dismiss="modal"><%= SLDlist_i18n.buttons.cancel %></button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal window -->
+  <div class="modal" id="createConfigModal" tabindex="-1" role="dialog" aria-labelledby="ModalTitle" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+          <h4 class="modal-title" id="ModalTitle"><%= SLDlist_i18n.createConfig.title %></h4>
+        </div>
+        <div class="modal-body">
+          <p><%= SLDlist_i18n.createConfig.body %></p>
+          <form class="form-horizontal">
+            <div class="form-group">
+              <label for="nameInput" class="col-md-2 control-label"><%= SLDlist_i18n.createConfig.label %></label>
+              <div class="col-md-10">
+                <input id ="nameInput" name="Name" type="text" class="form-control" data-attribute="name">
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary create-config"><%= SLDlist_i18n.buttons.create %></button>
+          <button type="button" class="btn btn-default" data-dismiss="modal"><%= SLDlist_i18n.buttons.cancel %></button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal window -->
+  <div class="modal" id="informModal" tabindex="-1" role="dialog" aria-labelledby="ModalTitle" aria-hidden="true">
+      <div class="modal-dialog modal-sm">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                  <h4 class="modal-title" id="ModalTitle"></h4>
+              </div>
+              <div class="modal-body">
+                  <p></p>
+                  <i class="fa fa-spinner fa-spin fa-2x hidden"></i>
+              </div>
+              <div class="modal-footer">
+                  <button id="okButton" type="button" class="btn btn-default"><%= SLDlist_i18n.buttons.ok %></button>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+

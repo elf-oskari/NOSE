@@ -1,0 +1,464 @@
+<%
+var generateOptionValue = function(itemValue,selectedValue) {
+    var optionValue = 'value="'+itemValue+'"';
+    if (itemValue === selectedValue) {
+        optionValue = optionValue+' selected';
+    }
+    return optionValue;
+};
+
+var updateExternalGraphic = function(target) {
+    if (target.value !== 'external') {
+        jQuery('div.external-graphic').addClass('hidden');
+    } else {
+        jQuery('div.external-graphic').removeClass('hidden');;
+    }
+};
+
+var getSplitArrayComponent = function(line,index) {
+    if (typeof line === "undefined") {
+        return "";
+    }
+    var parts = line.split(" ");
+    if (parts.length > index) {
+        return parts[index];
+    } else {
+        return parts.length;
+    }
+};
+
+var toggleAdvanced = function(divClass) {
+    jQuery('div.'+divClass).toggleClass('hidden-advanced');
+}
+
+%>
+<div class="view" id="edit-sld">
+    <div class="panel editor-panel upper-panel">
+        <div class="panel-heading main-heading"><%= editSLD.common['SLDeditor-heading'] %></div>
+        <div class="panel-body sld-editor-page">
+            <div class="info-text">
+                <p><%= editSLD.common['info-text'] %></p>
+            </div>
+            <div class="symbolizer-chosen hidden">
+                <form class="form-horizontal edit-sld-form">
+                    <div class="form-group">
+                        <label for="SLDConfigName" class="col-md-12 editor-label-heading"><%= ruletitle + ":  " + symbolType%></label>
+                    </div>
+                    <div class="form-group">
+                        <label for="unit" class="col-md-3 control-label edit-sld-label"><%= editSLD.common['unit'] %></label>
+                        <div class="col-md-9">
+                            
+                            <input type="hidden" id="unit" class="form-control" <%=generateOptionValue("metre",symbolUnit) %>/>
+                            <input type="text" class="form-control" disabled="true" value="<%= editSLD.common['metre'] %>"/>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="symbolizer-column">
+                        <div class="<%= attrData.graphic[symbolType] %>">
+                            <div class="form-group <%= attrData.graphic.class %>">
+                                <label class="col-md-3 editor-label"><%= editSLD.point['label'] %></label>
+                            </div>
+                            <div class="form-group param <%= attrData.graphic.values['wellknownname'].class %>">
+                                <label class="col-md-3 control-label edit-sld-label" for="graphic-symbol"><%= editSLD.point['symbol'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <select onchange="(<%= updateExternalGraphic %>)(this)" id="graphic-symbol" class="form-control" data-param-id="<%=attrData.graphic.values['wellknownname'].param_id%>">
+                                        <option <%= generateOptionValue("circle",attrData.graphic.values['wellknownname'].value) %>><%= editSLD.point['circle'] %></option>
+                                        <option <%= generateOptionValue("cross",attrData.graphic.values['wellknownname'].value) %>><%= editSLD.point['cross'] %></option>
+                                        <option <%= generateOptionValue("square",attrData.graphic.values['wellknownname'].value) %>><%= editSLD.point['square'] %></option>
+                                        <option <%= generateOptionValue("star",attrData.graphic.values['wellknownname'].value) %>><%= editSLD.point['star'] %></option>
+                                        <option <%= generateOptionValue("triangle",attrData.graphic.values['wellknownname'].value) %>><%= editSLD.point['triangle'] %></option>
+                                        <option <%= generateOptionValue("x",attrData.graphic.values['wellknownname'].value) %>><%= editSLD.point['x'] %></option>
+                                        <option value="" disabled="disabled">────────────&nbsp;&nbsp;&nbsp;&nbsp;</option>
+                                        <option <%= generateOptionValue("external",attrData.graphic.values['wellknownname'].value) %>><%= editSLD.point['external-graphic'] %></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group external-graphic param <%= attrData.graphic.values['external-graphic'].class %>">
+                                <label class="control-label col-md-3 edit-sld-label" for="external-graphic"><%= editSLD.point['url'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <input type="url" class="form-control"
+                                            id="external-graphic" data-css-parameter="external-graphic" data-param-id="<%= attrData.graphic.values['external-graphic'].param_id %>" value="<%= attrData.graphic.values['external-graphic'].value %>">
+                                </div>
+                            </div>
+                            <div class="form-group param <%= attrData.graphic.values['size'].class %>">
+                                <label class="control-label col-md-3 edit-sld-label" for="size"><%= editSLD.point['size'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <input type="number" class="form-control" min="0" id="size" name="size" data-css-parameter="size" data-param-id="<%= attrData.graphic.values['size'].param_id %>" value="<%= attrData.graphic.values['size'].value %>">
+                                </div>
+                            </div>
+                            <div class="form-group param <%= attrData.graphic.values['rotation'].class %>">
+                                <label class="control-label col-md-3 edit-sld-label" for="rotation"><%= editSLD.point['rotation'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <input type="number" class="form-control" min="0" max="360" id="rotation" data-css-parameter="rotation" data-param-id="<%= attrData.graphic.values['rotation'].param_id %>" value="<%= attrData.graphic.values['rotation'].value %>">
+                                </div>
+                            </div>
+                            <div class="form-group param <%= attrData.graphic.values['opacity'].class %>">
+                                <label class="control-label col-md-3 edit-sld-label" for="opacity"><%= editSLD.point['opacity'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <input type="number" class="form-control" min="0" max="1" step="0.1" id="opacity" data-css-parameter="fill-opacity" data-param-id="<%= attrData.graphic.values['opacity'].param_id %>" value="<%= attrData.graphic.values['opacity'].value %>">
+                                </div>
+                            </div>
+                            <div class="form-group param <%= attrData.graphic.values['fill'].class %>">
+                                <label class="control-label col-md-3 edit-sld-label" for="point-fill"><%= editSLD.point['color'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <input type="color" class="form-control" id="point-fill" data-css-parameter="fill" data-param-id="<%= attrData.graphic.values['fill'].param_id %>" value="<%= attrData.graphic.values['fill'].value %>">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="<%= attrData.line[symbolType] %>">
+                            <div class="form-group <%= attrData.line.class %>">
+                                <label class="col-md-3 editor-label"><%= editSLD.line['label'] %></label>
+                            </div>
+                            <div class="form-group param <%= attrData.line.values['stroke'].class %>">
+                                <label class="control-label col-md-3 edit-sld-label"
+                                       for="stroke"><%= editSLD.line['color'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <input type="color" class="form-control"
+                                            id="stroke" data-css-parameter="stroke"
+                                            data-param-id="<%= attrData.line.values['stroke'].param_id %>"
+                                            value="<%= attrData.line.values['stroke'].value %>">
+                                </div>
+                            </div>
+                            <div class="form-group param <%=attrData.line.values['stroke-width'].class %>">
+                                <label class="control-label col-md-3 edit-sld-label" for="stroke-width"><%= editSLD.line['width'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <input type="number" class="form-control" min="0"
+                                            id="stroke-width" data-css-parameter="stroke-width" name="width" data-param-id="<%= attrData.line.values['stroke-width'].param_id %>"
+                                            value="<%= attrData.line.values['stroke-width'].value %>">
+                                </div>
+                            </div>
+                            <div class="form-group param <%=attrData.line.values['stroke-linejoin'].class %>">
+                                <label class="control-label col-md-3 edit-sld-label" for="stroke-linejoin"><%= editSLD.line['line-join'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <select id="stroke-linejoin" data-css-parameter="stroke-linejoin"  data-param-id="<%= attrData.line.values['stroke-linejoin'].param_id%>" class="form-control">
+                                        <option <%= generateOptionValue("miter",attrData.line.values['stroke-linejoin'].value) %>><%= editSLD.line['join-miter'] %></option>
+                                        <option <%= generateOptionValue("round",attrData.line.values['stroke-linejoin'].value) %>><%= editSLD.line['join-round'] %></option>
+                                        <option <%= generateOptionValue("bevel",attrData.line.values['stroke-linejoin'].value) %>><%= editSLD.line['join-bevel'] %></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group param <%=attrData.line.values['stroke-linecap'].class %>">
+                                <label class="control-label col-md-3 edit-sld-label" for="stroke-linecap"><%= editSLD.line['line-cap'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <select id="stroke-linecap" data-css-parameter="stroke-linecap" data-param-id="<%= attrData.line.values['stroke-linecap'].param_id%>" class="form-control">
+                                        <option <%= generateOptionValue("butt",attrData.line.values['stroke-linecap'].value) %>><%= editSLD.line['cap-butt'] %></option>
+                                        <option <%= generateOptionValue("round",attrData.line.values['stroke-linecap'].value) %>><%= editSLD.line['cap-round'] %></option>
+                                        <option <%= generateOptionValue("square",attrData.line.values['stroke-linecap'].value) %>><%= editSLD.line['cap-square'] %></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group param hidden">
+                                <label class="control-label col-md-3 edit-sld-label"
+                                        for="stroke-dasharray"><%= editSLD.line['dasharray'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <input type="text" class="form-control"
+                                            id="stroke-dasharray" data-css-parameter="stroke-dasharray"
+                                            data-param-id="<%= attrData.line.values['stroke-dasharray'].param_id %>" value="<%= attrData.line.values['stroke-dasharray'].value %>">
+                                </div>
+                            </div>
+                            <div class="form-group param <%= attrData.line.values['stroke-dasharray'].class %>">
+                                <label class="control-label col-md-3 edit-sld-label"
+                                        for="stroke-dasharray-length"><%= editSLD.line['dasharray-length'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <input type="number" class="form-control"
+                                            min="0" id="stroke-dasharray-length" data-css-parameter="stroke-dasharray-part"
+                                            data-param-id="<%= attrData.line.values['stroke-dasharray'].param_id %>" value="<%= getSplitArrayComponent(attrData.line.values['stroke-dasharray'].value,0) %>">
+                                </div>
+                            </div>
+                            <div class="form-group param <%= attrData.line.values['stroke-dasharray'].class %>">
+                                <label class="control-label col-md-3 edit-sld-label"
+                                        for="stroke-dasharray-space"><%= editSLD.line['dasharray-space'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <input type="number" class="form-control"
+                                            min="0" id="stroke-dasharray-space" data-css-parameter="stroke-dasharray-part"
+                                            data-param-id="<%= attrData.line.values['stroke-dasharray'].param_id %>" value="<%= getSplitArrayComponent(attrData.line.values['stroke-dasharray'].value,1) %>">
+                                </div>
+                            </div>
+                            <div class="form-group param <%= attrData.line.values['stroke-dashoffset'].class %>">
+                                <label class="control-label col-md-3 edit-sld-label"
+                                        for="stroke-dashoffset"><%= editSLD.line['dash-offset'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <input type="number" class="form-control" min="0"
+                                            id="stroke-dashoffset" data-css-parameter="stroke-dashoffset" data-param-id="<%= attrData.line.values['stroke-dashoffset'].param_id %>" value="<%= attrData.line.values['stroke-dashoffset'].value %>">
+                                </div>
+                            </div>
+                            <div
+                                    class="form-group param <%= attrData.line.values['stroke-opacity'].class %>">
+                                <label class="control-label col-md-3 edit-sld-label" for="stroke-opacity"><%= editSLD.line['opacity'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <input type="number" class="form-control" min="0" max="1" step="0.1"
+                                            id="stroke-opacity" data-css-parameter="stroke-opacity"
+                                            data-param-id="<%= attrData.line.values['stroke-opacity'].param_id %>"
+                                            value="<%= attrData.line.values['stroke-opacity'].value %>">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="<%= attrData.polygon[symbolType] %>">
+                            <div class="form-group <%= attrData.polygon.class %>">
+                                <label class="col-md-3 editor-label"><%= editSLD.fill['label'] %></label>
+                            </div>
+                            <div class="form-group param <%= attrData.polygon.values['fill'].class %>">
+                                <label class="control-label col-md-3 edit-sld-label"
+                                        for="fill"><%= editSLD.fill['color'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <input type="color" class="form-control"
+                                            id="fill" data-css-parameter="fill"
+                                            data-param-id="<%= attrData.polygon.values['fill'].param_id %>"
+                                            value="<%= attrData.polygon.values['fill'].value %>">
+                                </div>
+                            </div>
+                            <div class="form-group param <%= attrData.polygon.values['fill-opacity'].class %>">
+                                <label class="control-label col-md-3 edit-sld-label" for="fill-opacity"><%= editSLD.fill['opacity'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <input type="number" class="form-control" min="0" max="1" step="0.1"
+                                            id="fill-opacity" data-css-parameter="fill-opacity" data-param-id="<%= attrData.polygon.values['fill-opacity'].param_id %>"
+                                            value="<%= attrData.polygon.values['fill-opacity'].value %>">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="<%= attrData.text[symbolType] %>">
+                            <div class="form-group <%= attrData.text.class %>">
+                                <label class="col-md-3 editor-label"><%= editSLD.text['label'] %></label>
+                            </div>
+                            <div class="form-group param">
+                                <label class="control-label col-md-3 edit-sld-label" for="font-family"><%= editSLD.text['font'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <select id="font-family" data-css-parameter="font-family" class="form-control">
+                                        <option <%= generateOptionValue("Arial",attrData.text.values['font-family'].value) %>>Arial</option>
+                                        <option <%= generateOptionValue("Geneva",attrData.text.values['font-family'].value) %>>Geneva</option>
+                                        <option <%= generateOptionValue("sans-serif",attrData.text.values['font-family'].value) %>>sans-serif</option>
+                                        <option <%= generateOptionValue("Verdana",attrData.text.values['font-family'].value) %>>Verdana</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group param">
+                                <label class="control-label col-md-3 edit-sld-label" for="font-style"><%= editSLD.text['style'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <select id="font-style" data-css-parameter="font-style" class="form-control">
+                                        <option <%= generateOptionValue("normal",attrData.text.values['font-style'].value) %>><%= editSLD.text['style-normal'] %></option>
+                                        <option <%= generateOptionValue("italic",attrData.text.values['font-style'].value) %>><%= editSLD.text['style-italic'] %></option>
+                                        <option <%= generateOptionValue("oblique",attrData.text.values['font-style'].value) %>><%= editSLD.text['style-oblique'] %></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group param">
+                                <label class="control-label col-md-3 edit-sld-label" for="font-weight"><%= editSLD.text['weight'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <select id="font-weight" data-css-parameter="font-weight" class="form-control">
+                                        <option <%= generateOptionValue("normal",attrData.text.values['font-weight'].value) %>><%= editSLD.text['weight-normal'] %></option>
+                                        <option <%= generateOptionValue("bold",attrData.text.values['font-weight'].value) %>><%= editSLD.text['weight-bold'] %></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group param <%= attrData.text.values['font-size'].class %>">
+                                <label class="control-label col-md-3 edit-sld-label" for="font-size"><%= editSLD.text['size'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <input type="number" class="form-control" min="0"
+                                            id="font-size" data-css-parameter="font-size" data-param-id="<%= attrData.text.values['font-size'].param_id %>"
+                                            value="<%= attrData.text.values['font-size'].value %>">
+                                </div>
+                            </div>
+                            <div class="form-group param <%= attrData.text.values['text-fill'].class %>">
+                                <label class="control-label col-md-3 edit-sld-label" for="text-fill"><%= editSLD.text['color'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <input type="color" class="form-control"
+                                            id="text-fill" data-css-parameter="fill"
+                                            data-param-id="<%= attrData.text.values['text-fill'].param_id %>"
+                                            value="<%= attrData.text.values['text-fill'].value %>">
+                                </div>
+                            </div>
+                            <div class="form-group param <%= attrData.text.values['halo-color'].class %>">
+                                <label class="control-label col-md-3 edit-sld-label"
+                                        for="halo-color"><%= editSLD.text['halo-color'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <input type="color" class="form-control"
+                                            id="halo-color" data-css-parameter="halo-color"
+                                            data-param-id="<%= attrData.text.values['halo-color'].param_id %>"
+                                            value="<%= attrData.text.values['halo-color'].value %>">
+                                </div>
+                            </div>
+                            <div class="form-group param <%= attrData.text.values['halo-radius'].class %>">
+                                <label class="control-label col-md-3 edit-sld-label" for="halo-radius"><%= editSLD.text['radius'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <input type="number" class="form-control" min="0" id="halo-radius" data-css-parameter="halo-radius" data-param-id="<%= attrData.text.values['halo-radius'].param_id %>" value="<%= attrData.text.values['halo-radius'].value %>">
+                                </div>
+                            </div>
+                            <span class="label label-info" onclick="(<%= toggleAdvanced %>)('text-advanced')"><%= editSLD.text['advanced'] %></span>
+                            <div class="form-group param text-advanced hidden-advanced <%= attrData.text.values['pointplacement-anchorpointx'].class %>">
+                                <label class="control-label col-md-3 edit-sld-label" for="pointplacement-anchorpointx"><%= editSLD.text['pointplacement-anchorpointx'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <input type="number" class="form-control"
+                                            min="0" max ="1" id="pointplacement-anchorpointx" data-css-parameter="anchorpointx"
+                                            data-param-id="<%= attrData.text.values['pointplacement-anchorpointx'].param_id %>"
+                                            value="<%= attrData.text.values['pointplacement-anchorpointx'].value %>">
+                                </div>
+                            </div>
+                            <div class="form-group param text-advanced hidden-advanced <%= attrData.text.values['pointplacement-anchorpointy'].class %>">
+                                <label class="control-label col-md-3 edit-sld-label" for="pointplacement-anchorpointy"><%= editSLD.text['pointplacement-anchorpointy'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <input type="number" class="form-control"
+                                            min="0" max ="1" id="pointplacement-anchorpointy" data-css-parameter="anchorpointy"
+                                            data-param-id="<%= attrData.text.values['pointplacement-anchorpointy'].param_id %>"
+                                            value="<%= attrData.text.values['pointplacement-anchorpointy'].value %>">
+                                </div>
+                            </div>
+                            <div class="form-group param text-advanced hidden-advanced <%= attrData.text.values['pointplacement-displacementx'].class %>">
+                                <label class="control-label col-md-3 edit-sld-label" for="pointplacement-displacementx"><%= editSLD.text['pointplacement-displacementx'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <input type="number" class="form-control"
+                                            min="0" id="pointplacement-displacementx" data-css-parameter="displacementx"
+                                            data-param-id="<%= attrData.text.values['pointplacement-displacementx'].param_id %>"
+                                            value="<%= attrData.text.values['pointplacement-displacementx'].value %>">
+                                </div>
+                            </div>
+                            <div class="form-group param text-advanced hidden-advanced <%= attrData.text.values['pointplacement-displacementy'].class %>">
+                                <label class="control-label col-md-3 edit-sld-label" for="pointplacement-displacementy"><%= editSLD.text['pointplacement-displacementy'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <input type="number" class="form-control"
+                                            min="0" id="pointplacement-displacementy" data-css-parameter="displacementy"
+                                            data-param-id="<%= attrData.text.values['pointplacement-displacementy'].param_id %>"
+                                            value="<%= attrData.text.values['pointplacement-displacementy'].value %>">
+                                </div>
+                            </div>
+                            <div class="form-group param text-advanced hidden-advanced <%= attrData.text.values['pointplacement-rotation'].class %>">
+                                <label class="control-label col-md-3 edit-sld-label" for="pointplacement-rotation"><%= editSLD.text['pointplacement-rotation'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <input type="number" class="form-contro"
+                                            min="0" id="pointplacement-rotation" data-css-parameter="rotation"
+                                            data-param-id="<%= attrData.text.values['pointplacement-rotation'].param_id %>"
+                                            value="<%= attrData.text.values['pointplacement-rotation'].value %>">
+                                </div>
+                            </div>
+                            <div class="form-group param text-advanced hidden-advanced <%= attrData.text.values['lineplacement-perpendicularoffset'].class %>">
+                                <label class="control-label col-md-3 edit-sld-label" for="lineplacement-perpendicularoffset"><%= editSLD.text['lineplacement-perpendicularoffset'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <input type="number" class="form-control"
+                                            min="0" id="lineplacement-perpendicularoffset" data-css-parameter="lineplacement-perpendicularoffset"
+                                            data-param-id="<%= attrData.text.values['lineplacement-perpendicularoffset'].param_id %>"
+                                            value="<%= attrData.text.values['lineplacement-perpendicularoffset'].value %>">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="panel editor-panel preview-panel">
+        <div class="panel-heading main-heading"><%= editSLD.preview['label'] %></div>
+        <div class="panel-body sld-editor-page">
+            <div class="col-xs-4 col-xs-offset-3 preview-frame hidden">
+                <div id="preview"></div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal window -->
+    <div class="modal" id="confirmNoSave" tabindex="-1" role="dialog" aria-labelledby="ModalTitle" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="ModalTitle"><%= editSLD.confirmNoSavemodal['label'] %></h4>
+                </div>
+                <div class="modal-body">
+                    <p><%= editSLD.confirmNoSavemodal['body'] %></p>
+                </div>
+                <div class="modal-footer">
+                    <button id="continueButton" type="submit" class="btn btn-primary"><%= editSLD.buttons['continue'] %></button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><%= editSLD.buttons['cancel'] %></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal window -->
+    <div class="modal" id="confirmResetModel" tabindex="-1" role="dialog" aria-labelledby="ModalTitle" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="ModalTitle"><%= editSLD.confirmResetModel['title'] %></h4>
+                </div>
+                <div class="modal-body">
+                    <p><%= editSLD.confirmResetModel['body'] %></p>
+                </div>
+                <div class="modal-footer">
+                    <button id="continue" type="submit" class="btn btn-primary"><%= editSLD.buttons['continue'] %></button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><%= editSLD.buttons['cancel'] %></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal window -->
+    <div class="modal" id="informUserModal" tabindex="-1" role="dialog" aria-labelledby="ModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title" id="ModalTitle"></h4>
+                </div>
+                <div class="modal-body">
+                  <p></p>
+                  <i class="fa fa-spinner fa-spin fa-2x hidden"></i>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><%= editSLD.buttons['ok'] %></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal window -->
+    <div class="modal" id="savingModal" tabindex="-1" role="dialog" aria-labelledby="ModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p><%= editSLD.common['saving'] %></p>
+                    <i class="fa fa-spinner fa-spin fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+  <!-- Modal window -->
+  <div class="modal" id="wmsPreviewModal" tabindex="-1" role="dialog" aria-labelledby="ModalTitle" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                  <h4 class="modal-title" id="ModalTitle"><%=editSLD.wmsPreview.title%></h4>
+              </div>
+              <div class="modal-body">
+
+                  <p>
+                    <%=editSLD.wmsPreview.info%>
+                  </p>
+                  <form id="wmsPreviewForm" method="POST" action="wmspreview.html" target="wmspreview" class="form-horizontal">
+                    <div class="form-group">
+                      <input type="hidden" id="id" name="id"/>
+
+                      <label for="wmsUrl" class="col-md-3 control-label"><%=editSLD.wmsPreview.wmsUrl%></label>
+                      <div class="col-md-9">
+                        <input type="text" id="wmsUrl" name="wmsUrl" class="form-control"/>
+                      </div>
+                      <label for="username" class="col-md-3 control-label"><%=editSLD.wmsPreview.username%></label>
+                      <div class="col-md-9">
+                        <input type="text" id="username" name="username" class="form-control"/>
+                      </div>
+
+                      <label for="password" class="col-md-3 control-label"><%=editSLD.wmsPreview.password%></label>
+                      <div class="col-md-9">
+                        <input type="password" id="password" name="password" class="form-control"/>
+                      </div>
+                    </div>
+                  </form>
+              </div>
+              <div class="modal-footer">
+                  <button id="okButton" type="button" class="btn btn-primary" data-dismiss="modal"><%= editSLD.buttons.ok %></button>
+                  <button id="cancelButton" type="button" class="btn btn-default" data-dismiss="modal"><%= editSLD.buttons.cancel %></button>
+              </div>
+          </div>
+      </div>
+  </div>
+
+
+
+
+</div>
