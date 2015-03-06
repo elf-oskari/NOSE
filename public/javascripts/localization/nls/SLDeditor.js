@@ -23,7 +23,7 @@ define({
 			"SLD-editor": "SLD Editor",
 			"SLDeditor-heading": "Symbolizer",
 			"SLDtree-heading": "SLD Featuretypes",
-			"Config-name": "SLD config name:",
+			"Config-name": "SLD visualization name:",
 			"SLDmap-heading": "Rule preview",
 			"SLDtree-name": "name",
 			"featuretype_id": "Featuretype id",
@@ -110,10 +110,10 @@ define({
 		},
 		"confirmNoSavemodal": {
 			"label": "Are you sure you want to continue without saving?",
-			"body": "You haven't saved your changes to the config. The changes will be lost without saving."
+			"body": "You haven't saved your changes to the visualization. The changes will be lost without saving."
 		},
 		"confirmResetModel": {
-			"title": "Are you sure you want to reset SLD config values?",
+			"title": "Are you sure you want to reset SLD visualization values?",
 			"body": "Resetting the values will set the model the latest saved values. You will loose all the changes that are not saved."
 		},
 		"infoModal": {

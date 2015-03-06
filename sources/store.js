@@ -91,6 +91,7 @@ PgDatabase.prototype.exec=function() {
 
 /** Send query to database and read a single result row. */
 PgDatabase.prototype.querySingle=function() {
+	console.log("querySingle, arguments", arguments);
 	var query=this.client.query.apply(this.client,arguments);
 	var defer=new Deferred();
 	var result;

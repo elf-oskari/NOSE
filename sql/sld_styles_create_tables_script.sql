@@ -412,10 +412,10 @@ INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'size', 
 INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'size', 'Graphic/Size', '"Graphic","Size"');
 INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'stroke-linecal', 'Stroke/CssParameter(stroke-linecap)', '"Stroke","CssParameter",{"name":"stroke-linecap"}');
 INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'fill', 'Fill/CssParameter(fill)', '"Fill","CssParameter",{"name":"fill"}');
-INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'font-family', 'Fill/CssParameter(font-family)', '"Font","CssParameter",{"name":"font-family"}');
-INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'font-size', 'Fill/CssParameter(font-size)', '"Font","CssParameter",{"name":"font-size"}');
-INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'font-style', 'Fill/CssParameter(font-style)', '"Font","CssParameter",{"name":"font-style"}');
-INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'font-weight', 'Fill/CssParameter(font-weight)', '"Font","CssParameter",{"name":"font-weight"}');
+INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'font-family', 'Font/CssParameter(font-family)', '"Font","CssParameter",{"name":"font-family"}');
+INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'font-size', 'Font/CssParameter(font-size)', '"Font","CssParameter",{"name":"font-size"}');
+INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'font-style', 'Font/CssParameter(font-style)', '"Font","CssParameter",{"name":"font-style"}');
+INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'font-weight', 'Font/CssParameter(font-weight)', '"Font","CssParameter",{"name":"font-weight"}');
 INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'fill-opacity', 'Fill/CssParameter(fill-opacity)', '"Fill","CssParameter",{"name":"fill-opacity"}');
 
 INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'label', 'Label/PropertyName', '"Label","PropertyName"');

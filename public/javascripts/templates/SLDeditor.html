@@ -283,7 +283,8 @@ var toggleAdvanced = function(divClass) {
                                     <input type="number" class="form-control" min="0" id="halo-radius" data-css-parameter="halo-radius" data-param-id="<%= attrData.text.values['halo-radius'].param_id %>" value="<%= attrData.text.values['halo-radius'].value %>">
                                 </div>
                             </div>
-                            <span class="label label-info" onclick="(<%= toggleAdvanced %>)('text-advanced')"><%= editSLD.text['advanced'] %></span>
+                            <!-- The next is for text advanced settings. It is hidden for now because we don't have yet processing for it-->
+                            <span class="label label-info hidden" onclick="(<%= toggleAdvanced %>)('text-advanced')"><%= editSLD.text['advanced'] %></span>
                             <div class="form-group param text-advanced hidden-advanced <%= attrData.text.values['pointplacement-anchorpointx'].class %>">
                                 <label class="control-label col-md-3 edit-sld-label" for="pointplacement-anchorpointx"><%= editSLD.text['pointplacement-anchorpointx'] %></label>
                                 <div class="col-md-7 col-md-offset-1">
