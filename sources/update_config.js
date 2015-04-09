@@ -65,9 +65,6 @@ PgDatabase.prototype.connect=function(client) {
 	return(defer.promise);
 }
 
-/* PgDatabase.prototype.close=function(conf) {
-	return(Promise.resolve(this.client.end()));
-}  */
 
 /** Execute query without reading any results. */
 PgDatabase.prototype.exec=function() {
@@ -167,40 +164,6 @@ SldInserter.prototype.abort=function() {
 SldInserter.prototype.finish=function() {
 	return(this.db.commit()); //.then(bindToScope(this.db,this.db.close)));
 };
-
-/** Read a file and retuŕn its contents in a promise.
-  * @param {string} path File to read.
-  * @param {string} name Description of the file for error messages.
-  * @return {Promise} */
-/**
-SldInserter.prototype.readFile=function(path, name) {
-	var defer=new Deferred();
-
-	fs.readFile(path,{encoding:'utf-8'},function(err, data) {
-		if(err) defer.reject('Unable to read '+name+' from '+path+': '+err);
-		defer.resolve(data);
-	})
-
-	return(defer.promise);
-}; */
-
-/** Read entire text contents of an SLD template and insert them into a single
-  * database row.
-  * @param {string} name name of original sld file
-  * @param {string} templatePath Path of file to read.
-  * @return {Promise} */
-  /**
-SldInserter.prototype.insertSldConfig=function(outputPath, fields) {
-    
-	console.log("name: " , fields.name);
-	console.log("templateId: " , fields.template_id);
-
-	return(this.db.querySingle(
-		'INSERT INTO sld_config (template_id,name,output_path)'+
- 			'VALUES ($1,$2,$3)'+
- 			'RETURNING id', [fields.template_id,fields.name,outputPath]
-	));
-}; */
 
 
 /** @param {number} templateId Refers to a template in the database.
@@ -350,95 +313,37 @@ exports.check_config_ownership = function(config_id, client, cb) {
  * */
 exports.update_config = function(fields, uuid, client, cb) {
 
-
-
   console.log("Upadataing config");
-  console.log("jeps_upadte_name: ", fields.name);
-  console.log("jeps_update_id: ", fields.id);
-
-
- console.log("1YYYYYYYYYYY");
+  console.log("upadte_name: ", fields.name);
+  console.log("update_id: ", fields.id);
 
   	var outputPath = 'Hubba/pubba/';
-
 	var inserter=new SldInserter();
-
 	var connected=inserter.connect(client);
-
- console.log("2YYYYYYYYYYY");
-
-	/*
-
-	var templateInserted=connected.then(function() {
-		return(inserter.insertSldConfig(outputPath, fields));
-	}); */
-
-///////
- console.log("3YYYYYYYYYYY");
     var deleted=connected.then(function() {
         return(inserter.deleteConfig(fields.id));
     });
-    //console.log("READY: " , ready);
-/////////
 
- console.log("4YYYYYYYYYYY");
 	var configInserted=deleted.then(function() {
-		console.log("käytetään id:tä: ",fields.id);
+		console.log("using id: ",fields.id);
         config_id = fields.id;
 		return(inserter.insertValuesToConfig(fields,config_id));
 	});
 
 	var ready=configInserted;
 
- console.log("5YYYYYYYYYYY");
 	ready.catch(function(err) {
 		inserter.abort();
         cb(err, 0);
 		return;
 	});
 
- console.log("6YYYYYYYYYYY");
 	ready.then(function() {
 		return(inserter.finish());
 	}).then(function() {
-		console.log('update config success!!!!!');
+		console.log('update config success');
         cb(false, config_id);
 	}); 
 }
 
 
-
-/** Main function, read template and store data to sld_styles db
- * @param id  templates id to be deleted
- * @param cb {function} status cb
- * */
- /**
-exports.delete_config = function(id, cb) {
-
-	console.log("IN DELETE CONFIG....");
-	var deletes=new SldDeleter(),
-        cb = cb;
-
-	var connected=deletes.connect('db.json');
-
-    var ready=connected.then(function() {
-        return(deletes.deleteConfig(id));
-    });
-    console.log("READY: " , ready);
-
-	ready.catch(function(err) {
-		deletes.abort();
-		console.error(err);
-		console.log(err);
-		return;
-	});
-
-	ready.then(function() {
-		return(deletes.finish());
-	}).then(function() {
-		console.log('Success!');
-        cb(false);
-	});
-
-	console.log("DONE delete_config main function");
-} */

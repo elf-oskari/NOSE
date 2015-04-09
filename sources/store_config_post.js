@@ -146,21 +146,6 @@ SldInserter.prototype.finish=function() {
 	return(this.db.commit()); //.then(bindToScope(this.db,this.db.close)));
 };
 
-/** Read a file and retuŕn its contents in a promise.
-  * @param {string} path File to read.
-  * @param {string} name Description of the file for error messages.
-  * @return {Promise} */
-/**
-SldInserter.prototype.readFile=function(path, name) {
-	var defer=new Deferred();
-
-	fs.readFile(path,{encoding:'utf-8'},function(err, data) {
-		if(err) defer.reject('Unable to read '+name+' from '+path+': '+err);
-		defer.resolve(data);
-	})
-
-	return(defer.promise);
-}; */
 
 /** Read entire text contents of an SLD template and insert them into a single
   * database row.

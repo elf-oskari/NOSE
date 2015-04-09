@@ -51,10 +51,6 @@ PgDatabase.prototype.connect=function(client) {
     return(defer.promise);
 }
 
-/* PgDatabase.prototype.close=function(conf) {
-	return(Promise.resolve(this.client.end()));
-} */
-
 /** Execute query without reading any results. */
 PgDatabase.prototype.exec=function() {
 	var query=this.client.query.apply(this.client,arguments);
@@ -181,17 +177,12 @@ SldSelecter.prototype.finish=function() {
  * */
 exports.select = function(id, client, cb) {
 
+    console.log("in select");
 	var selecter=new SldSelecter(),
         cb = cb,
         result = [];
 
 	var connected=selecter.connect(client);
-
-
-/*	connected.then(function() {
-		selecter.executeSql(statement,cb2);
-
-	});   */
 
     var templateSelected=connected.then(function() {
         return(selecter.selectTemplate(id));

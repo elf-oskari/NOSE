@@ -257,21 +257,6 @@ SldInserter.prototype.insertParam=function(symbolizerInserted,fieldList) {
 			});
 		});
 
-	/*	typeFound.catch(function() {
-			return(self.db.querySingle(
-				'INSERT INTO sld_type (name,symbolizer_parameter)'+
-				' VALUES ($1,$2)'+
-				' RETURNING id',['',fieldList[4]]
-			));
-		}).then(function(typeRow) {
-			self.db.querySingle(
-				'INSERT INTO sld_param (symbolizer_id,template_offset,type_id,default_value)'+
-				' VALUES ($1,$2,$3,$4)'+
-				' RETURNING id',[symbolizerId.id,fieldList[3],typeRow.id,fieldList[5]]
-			).then(function() {
-				defer.resolve();
-			});
-		}).catch(function(err) {defer.reject(err);}); */
 	});
 
 	return(defer.promise);
@@ -347,11 +332,7 @@ SldInserter.prototype.parseConfig=function(sldConfig,templateId) {
 SldInserter.prototype.insertConfig=function(params,templateId) {
 	var self=this;
 
-   // var inputReady=this.setParams(params);
-
- //   return(inputReady.then(function(sldConfig) {
-        return(self.parseConfig(params,templateId));
-  //  }));
+    return(self.parseConfig(params,templateId));
 
 };
 
@@ -362,6 +343,8 @@ SldInserter.prototype.insertConfig=function(params,templateId) {
  * @param cb {function} status cb
  * */
 exports.store = function(params, client, name, tname, tfile, cb) {
+
+	console.log("Store");
 	var inserter=new SldInserter();
 
 	var connected=inserter.connect(client);
