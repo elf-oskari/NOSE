@@ -49,21 +49,26 @@ define([
             var element = $(event.currentTarget);
             var target = element.data('target');
             var template_id = element.data('id');
+            $(target).attr('data-id', template_id).modal();
+        },
+        createNewSLDConfigModel: function(name, succesCallback, errorCallback) {
+            var element = $('button.btn.new')[0];
+            var template_id = $(element).attr('data-id');
             var SLDtemplatemodel = this.templates.getById(template_id);
             var new_config_sld_values = SLDtemplatemodel.getDefaultConfigSLDValues();
             var new_config = {
                 "template_id": template_id,
-                "sld_values": new_config_sld_values
+                "sld_values": new_config_sld_values,
+                "name": name
             };
-            this.SLDconfigmodel = this.configs.create(new_config);
-            this.SLDconfigmodel;
+            this.SLDconfigmodel = this.configs.create(new_config, {"wait": true, success: succesCallback, error: errorCallback});
             Backbone.Validation.bind(this, {
               model: this.SLDconfigmodel,
               attributes: ['name']
             });
             this.stopListening(this.SLDconfigmodel, "validated:invalid");
             this.listenTo(this.SLDconfigmodel, "validated:invalid", this.invalidValue);
-            $(target).attr('data-id', template_id).modal();
+
         },
         createNewConfig: function (event) {
             event.preventDefault();
@@ -77,20 +82,18 @@ define([
             modalBody = undefined;
             hasSpinner = true;
             self.showInfoModal(modalTitle, modalBody, hasSpinner);
-            this.SLDconfigmodel.set('name', name);
-            var isValid = this.SLDconfigmodel.isValid('name');
+            
+            var isValid = name && name.length;//this.SLDconfigmodel.isValid('name');
             if (isValid = true) {
-                this.SLDconfigmodel.save({},{
-                    wait: true
-                }).done(
+                this.createNewSLDConfigModel(name, 
                     function (model, response, options) {
-                        console.log("New config created. Model: ", model, "response: ", response, "options: ", options);
-                        modalTitle = locale.createConfig['creatingConfigSuccessTitle'],
-                        modalBody = locale.createConfig['creatingConfigSuccessBody'] + model.name,
-                        hasSpinner = false,
-                        goToEditor = false,
-                        self.showInfoModal(modalTitle, modalBody, hasSpinner, goToEditor, model);
-                }).fail(
+                            console.log("New config created. Model: ", model, "response: ", response, "options: ", options);
+                            modalTitle = locale.createConfig['creatingConfigSuccessTitle'],
+                            modalBody = locale.createConfig['creatingConfigSuccessBody'] + response.name,
+                            hasSpinner = false,
+                            goToEditor = false,
+                            self.showInfoModal(modalTitle, modalBody, hasSpinner, goToEditor, model);
+                    },
                     function (model, response, options) {
                         console.log('Error', model, response, options);
                         modalTitle = locale.createConfig['creatingConfigFailureTitle'],
@@ -98,7 +101,7 @@ define([
                         hasSpinner = false,
                         goToEditor = false,
                         self.showInfoModal(modalTitle, modalBody, hasSpinner, goToEditor, model);
-                });
+                    });
             }
         },
         //TODO
@@ -244,6 +247,7 @@ define([
             modalBody = undefined;
             hasSpinner = true;
             self.showInfoModal(modalTitle, modalBody, hasSpinner);
+
             $.ajax({
                 url: "./api/v1/templates/",
                 type: "POST",
@@ -257,7 +261,9 @@ define([
                     modalBody = locale.upload['uploadSuccessBody'] + newTemplate.name;
                     hasSpinner = false;
                     goToEditor = false;
-                    self.templates.create(newTemplate);
+                    //don't call create, we've already saved 
+//                    self.templates.create(newTemplate);
+                    self.templates.add(newTemplate);
                     self.showInfoModal(modalTitle, modalBody, hasSpinner, goToEditor, newTemplate);
                 },
                 error: function(newTemplate, response, options) {

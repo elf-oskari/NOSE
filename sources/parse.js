@@ -641,6 +641,9 @@ SldParser.prototype.onTag = function(node) {};
 
 /** Parse function,  input sld file stream and writes output as sld_template */
 exports.parse = function (inFileName, fname, tname, rfields, cb) {
+
+	console.log("in parse");
+
 	var featureTypeId=0;
 	var ruleId=0;
 	var fieldId=0;

@@ -43,17 +43,10 @@ PgDatabase.prototype.connect=function(client) {
     var defer=new Deferred();
 
     this.client=client;
-    /*	this.client.connect(function(err) {
-     if(err) return(defer.reject('Unable to connect to database: '+err));
-     defer.resolve();
-     }); */
     defer.resolve();
     return(defer.promise);
 }
 
-/* PgDatabase.prototype.close=function(conf) {
-	return(Promise.resolve(this.client.end()));
-} */
 
 /** Execute query without reading any results. */
 PgDatabase.prototype.exec=function() {
@@ -159,12 +152,12 @@ SldSelecter.prototype.selectValues=function(id) {
 
 /** Roll back current transaction and close connection. */
 SldSelecter.prototype.abort=function() {
-    return(this.db.rollback()); //.then(bindToScope(this.db,this.db.close)));
+    return(this.db.rollback()); 
 };
 
 /** Commit current transaction and close connection. */
 SldSelecter.prototype.finish=function() {
-    return(this.db.commit()); //.then(bindToScope(this.db,this.db.close)));
+    return(this.db.commit()); 
 };
 
 
@@ -175,7 +168,7 @@ SldSelecter.prototype.finish=function() {
 exports.select_config = function(id, uuid, client, cb) {
 
 
-    console.log("in select_config "+uuid);
+  console.log("in select_config "+uuid);
 
 	var selecter=new SldSelecter(),
         cb = cb,
@@ -207,7 +200,6 @@ exports.select_config = function(id, uuid, client, cb) {
     function subSelectValues(ind, id) {
         var featuretypeSelected = selecter.selectValues(id);
         var allSelected = featuretypeSelected.then(function (valueResult) {
-            //console.log("valueResult: ", valueResult);
             result[ind].sld_values = valueResult;
 
         });

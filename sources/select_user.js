@@ -51,9 +51,6 @@ PgDatabase.prototype.connect=function(client) {
     return(defer.promise);
 }
 
-/* PgDatabase.prototype.close=function(conf) {
-	return(Promise.resolve(this.client.end()));
-} */
 
 /** Execute query without reading any results. */
 PgDatabase.prototype.exec=function() {

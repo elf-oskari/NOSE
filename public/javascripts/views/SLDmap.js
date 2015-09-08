@@ -344,10 +344,13 @@ define([
                 });
             }
 
+            styleProot = new ol.style.Text();
+
             style = new ol.style.Text({
                 textAlign: def_params['align'],
                 textBaseline: def_params['baseline'],
-                font: def_params['font-weight'] + ' ' + def_params['font-size'] + ' ' + def_params['font-family'],
+                //font-style font-variant font-weight font-size font-family
+                font: def_params['font-style'] + ' Normal ' + def_params['font-weight'] + ' ' + def_params['font-size'] + ' ' + def_params['font-family'],
                 text: def_params['text'],
                 fill: new ol.style.Fill({color: def_params['fill']}),
                 //stroke: new ol.style.Stroke({color: def_params['outlineColor'], width: def_params['outlineWidth']}),
@@ -361,13 +364,16 @@ define([
            * Replace ol3 style params defined in this.params array
             * and returns edited style for ol3 points with labels
             * @param {Object} stylein;  current ol3 style
+            * @param {Object} params
             * @return {Object} edited ol3 style
          */
-        getPointTextStyle: function (stylein) {
+//        getPointTextStyle: function (stylein) {
+        getPointTextStyle: function (stylein, params) {
             // add TextStyle - no set function in ol3 ???
             var style = new ol.style.Style({
                 image: this.getPointStyle(stylein).getImage(),
-                text: this.getTextStyle(stylein)
+//                text: this.getTextStyle(stylein)
+                text: this.getTextStyle(stylein, params)
             });
             return style;
         },
