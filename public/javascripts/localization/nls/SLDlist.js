@@ -19,11 +19,11 @@ define({
 		},
 		"tooltips" : {
 			"deleteTemplate" : "Delete the highlighted template",
-			"newConfig" : "Create new config of the highlighted template",
-			"deleteConfig" : "Delete the highlighted config",
-			"editConfig" : "Edit the highlighted config",
+			"newConfig" : "Create new visualization of the highlighted template",
+			"deleteConfig" : "Delete the highlighted visualization",
+			"editConfig" : "Edit the highlighted visualization",
 			"uploadSLD" : "Upload new SLD",
-			"downloadSLD" : "Download the highlighted SLD config"
+			"downloadSLD" : "Download the highlighted SLD visualization"
 		},
 		"upload" : {
 			"title": "Upload new SLD template",
@@ -36,18 +36,18 @@ define({
 			"uploadFailureBody": "Something went wrong! Could not upload SLD."
 		},
 		"deleteConfig" : {
-			"title": "Are you sure you want to delete this config?",
-			"body": "Deleting this config will also delete all the configs of this config.",
-			"delete": "Delete config",
-			"deletingConfig": "Deleting config...",
-			"deletingConfigSuccessTitle" : "Config deleted!",
-			"deletingConfigSuccessBody" : "Deleted config ",
+			"title": "Are you sure you want to delete this visualization?",
+			"body": "Deleting this visualization will also delete all the visualizations of this visualization.",
+			"delete": "Delete visualization",
+			"deletingConfig": "Deleting visualization...",
+			"deletingConfigSuccessTitle" : "Visualization deleted!",
+			"deletingConfigSuccessBody" : "Deleted visualization ",
 			"deletingConfigFailureTitle" : "Error!",
-			"deletingConfigFailureBody" : "Something went wrong! Could not delete config ",
+			"deletingConfigFailureBody" : "Something went wrong! Could not delete visualization ",
 		},
 		"deleteTemplate" : {
 			"title": "Are you sure you want to delete this template?",
-			"body": "Deleting this template will also delete all the configs of this template.",
+			"body": "Deleting this template will also delete all the visualizations of this template.",
 			"delete": "Delete template",
 			"deletingTemplate": "Deleting template...",
 			"deletingTemplateSuccessTitle" : "Template deleted!",
@@ -56,15 +56,15 @@ define({
 			"deletingTemplateFailureBody" : "Something went wrong! Could not delete template ",
 		},
 		"createConfig" : {
-			"title": "Create new config",
-			"body": "The new config will have the same values as the template",
+			"title": "Create new visualization",
+			"body": "The new visualization will have the same values as the template",
 			"label": "Name:",
-			"creatingConfig": "Creating config...",
-			"creatingConfigSuccessTitle" : "New Config created!",
-			"creatingConfigSuccessBody" : "Created config ",
+			"creatingConfig": "Creating visualization...",
+			"creatingConfigSuccessTitle" : "New visualization created!",
+			"creatingConfigSuccessBody" : "Created visualization ",
 			"creatingConfigFailureTitle" : "Error!",
-			"creatingConfigFailureBody" : "Something went wrong! Could not create config ",
-			"invalidConfig": "Config is not valid!"
+			"creatingConfigFailureBody" : "Something went wrong! Could not create visualization ",
+			"invalidConfig": "Visualization is not valid!"
 		},
 		"internalError": "Hups, tallennus ei väliaikaisesti toimi, kokeile myöhemmin uudelleen."
 	}
