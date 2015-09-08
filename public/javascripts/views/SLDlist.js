@@ -46,7 +46,6 @@ define([
             $("#sld_buttons_navbar").html(_.template(SLDListButtons, options));
         },
         newConfig: function (event) {
-            debugger;
             var element = $(event.currentTarget);
             var target = element.data('target');
             var template_id = element.data('id');
