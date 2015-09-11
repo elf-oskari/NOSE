@@ -363,16 +363,16 @@ body
 /* SLDList */
 .list-group-item {
     cursor: pointer;
-    border-left: none;
-    border-right: none;
 }
 
-.list-group-item:hover, .list-group-item:focus {
+.list-group-item-config:hover, .list-group-item:focus {
     font-weight:bold;
+    background-color: #FAFAFA!important;
 }
 
 .list-group-item-config {
     padding-left: 3em;
+
 }
 
 .list-group-item:first-child {
@@ -389,7 +389,6 @@ body
 
 .list-group-item-selected {
     font-weight: bold;
-    background-color: #f5f5f5;
 }
 
 .list-group {

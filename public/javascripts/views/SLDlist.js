@@ -14,16 +14,17 @@ define([
         template: _.template(SLDListTemplate),
         userRole: null,
         events: {
-            'click .btn.delete': 'deleteConfirmation',
+            'click .delete': 'deleteConfirmation',
             'click .btn.upload': 'upload',
             'click .btn.delete-template': 'deleteTemplate',
-            'click .btn.new': 'newConfig',
+            'click .fa-plus-circle': 'newConfig',
             'click .btn.create-config': 'createNewConfig',
-            'click .btn.edit': 'editConfig',
+            'click .edit': 'editConfig',
             'click .btn.delete-config': 'deleteConfig',
-            'click .btn.download': 'downloadConfig',
-            'click .list-group-item':'getListItemElement',
-            'click .signout-list-page': 'logoutFromListView'
+            'click .download': 'downloadConfig',
+            'click .signout-list-page': 'logoutFromListView',
+            'click .collapse-panel': 'panelClicked',
+            'change .chosen-select': 'updateSLDList'
 
         },
         initialize: function(params) {
@@ -46,14 +47,12 @@ define([
             $("#sld_buttons_navbar").html(_.template(SLDListButtons, options));
         },
         newConfig: function (event) {
-            var element = $(event.currentTarget);
-            var target = element.data('target');
-            var template_id = element.data('id');
+            var element = event.currentTarget;
+            var target = element.dataset.target;
+            var template_id = element.dataset.id;
             $(target).attr('data-id', template_id).modal();
         },
-        createNewSLDConfigModel: function(name, succesCallback, errorCallback) {
-            var element = $('button.btn.new')[0];
-            var template_id = $(element).attr('data-id');
+        createNewSLDConfigModel: function(name, template_id, succesCallback, errorCallback) {
             var SLDtemplatemodel = this.templates.getById(template_id);
             var new_config_sld_values = SLDtemplatemodel.getDefaultConfigSLDValues();
             var new_config = {
@@ -77,6 +76,8 @@ define([
                 modalBody,
                 localization = locale
                 name = $(event.currentTarget.offsetParent.children).find("#nameInput")[0].value;
+
+            var template_id = $('#createConfigModal')[0].dataset.id;
             $('#createConfigModal').modal('hide');
             modalTitle = localization.createConfig['creatingConfig'];
             modalBody = undefined;
@@ -85,7 +86,7 @@ define([
             
             var isValid = name && name.length;//this.SLDconfigmodel.isValid('name');
             if (isValid = true) {
-                this.createNewSLDConfigModel(name, 
+                this.createNewSLDConfigModel(name, template_id,
                     function (model, response, options) {
                             console.log("New config created. Model: ", model, "response: ", response, "options: ", options);
                             modalTitle = locale.createConfig['creatingConfigSuccessTitle'],
@@ -104,6 +105,7 @@ define([
                     });
             }
         },
+
         //TODO
         //Check this function that it works correctly
         invalidValue: function(view, attr, error, selector) {
@@ -183,14 +185,7 @@ define([
                     //TODO! remove self.render to render the list only when it's changes f.e. config or template is deleted
                     if (_.has(model, 'id')) {
                         var element = $('.list-group').find("[data-id='" + model.id +"']");
-                        var offsetTop = element[0].offsetTop;
-                        $(".list-group").scrollTop(offsetTop);
-                        self.listGroupItemClick(element);
-                        /* Use function below if you want to go to the editor page after config has been created
-                        if (goToEditor === true) {
-                            Backbone.history.navigate('/edit/' + model.id, true);
-                        }
-                        */
+                        element.parent().parent().collapse('show');
                     }
                 });
             })
@@ -277,37 +272,6 @@ define([
             });
         },
 
-        getListItemElement: function (event) {
-            var element = $(event.currentTarget);
-            this.listGroupItemClick(element);
-        },
-
-        listGroupItemClick: function(element) {
-            var wasSelected = $(element).hasClass('list-group-item-selected');
-            //Remove selection from the previously selected list item, if any
-            $('.list-group-item-selected').removeClass('list-group-item-selected');
-            
-
-            var sldModel = null;
-            var configModel = null;
-            //Element wasn't selected before -> highlight it
-            if (!wasSelected) {
-                $(element).addClass('list-group-item-selected');
-
-                //get the active sld or config
-                if ($(element).hasClass('list-group-item-config')) {
-                    configModel = this.configs.getById(element.data('id')); 
-                } else {
-                    //sld
-                    sldModel = this.templates.getById(element.data('id'));
-                }
-
-            }
-
-            var buttonOptions = {SLDModel: sldModel, SLDConfigModel: configModel, SLDlist_i18n: locale, userrole: this.userRole};
-            this.renderButtons(buttonOptions);
-        },
-
         logoutFromListView: function() {
             var url = window.location.href;
             //this removes the anchor at the end, if there is one
@@ -316,6 +280,39 @@ define([
             url = url.substring(0, (url.indexOf("?") == -1) ? url.length : url.indexOf("?"));
             url = url.substr(0, url.lastIndexOf('/')) + "/logout";
             window.location.href = url;
+        },
+
+        panelClicked: function(event) {
+          var arrowelement = $(event.currentTarget).find('.pull-left')[0];
+          if (arrowelement) {
+              this.panelClickedHandler(arrowelement);
+          }
+        },
+
+        panelClickedHandler: function(arrowelement) {
+          if ($(arrowelement).hasClass("fa-caret-right")) {
+            arrowelement.setAttribute("class", "fa fa-caret-down pull-left");
+          } else {
+            arrowelement.setAttribute("class", "fa fa-caret-right pull-left");
+          }
+        },
+
+        updateSLDList: function(event) {
+          var me = this;
+          
+          var template_id = event.target.value;
+          me.collapsePanel(template_id);
+          
+        },
+
+        collapsePanel: function (template_id) {
+          var   me = this,
+                panel = $('#SLDtemplate-id-' + template_id);
+          panel.collapse('show');
+          var arrowelement = $(panel.parent()).find('.pull-left')[0];
+          me.panelClickedHandler(arrowelement);
+          var offsetTop = $(panel)[0].offsetTop;
+          $(".panel-body.container-panel").scrollTop(offsetTop);
         }
     });
     return SLDListView;
