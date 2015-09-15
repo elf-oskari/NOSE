@@ -199,6 +199,7 @@ define([
                     'stroke-dashoffset': 10   //* Miter limit. Default is `10`. ??
                 },
                 style,
+                color,
                 fill,
                 stroke,
                 self = this;
@@ -216,10 +217,15 @@ define([
                 });
             }
 
-
-
             // Create style
             fill = new ol.style.Fill({color: def_params['fill'], opacity: def_params['fill-opacity'] });
+            // no opacity in OL3, use color alpha
+             color = ol.color.asArray(fill.getColor());
+             color = color.slice();
+             color[3] = def_params['fill-opacity'];
+             //fill.setColor('rgba('+color.join() + ')'); not implemented
+             fill = new ol.style.Fill({color: 'rgba(' + color.join() + ')' });
+
             stroke = new ol.style.Stroke({color: def_params['stroke'],
                 width: Number(def_params['stroke-width']),
                 lineJoin: def_params[ 'stroke-linejoin'],
@@ -251,7 +257,6 @@ define([
                     'onlineresource': null,
                     'wellknownname': 'circle',
                     'fill': 'rgba(255,255,255,0.0)',
-                    'fill': 'rgba(255,255,255,0.0)',
                     'fill-opacity': 0.0,
                     'external-graphic': null,
                     'stroke': 'rgba(255,255,255,0.0)',
@@ -263,6 +268,7 @@ define([
                     'stroke-dashoffset': 10   //* Miter limit. Default is `10`. ??
                 },
                 style,
+                color,
                 fill,
                 stroke,
                 self = this;
@@ -285,6 +291,11 @@ define([
 
             // Create style
             fill = new ol.style.Fill({color: def_params['fill'], opacity: def_params['fill-opacity'] });
+            // no opacity in OL3, use color alpha
+            color = ol.color.asArray(fill.getColor());
+            color = color.slice();
+            color[3] = def_params['fill-opacity'];
+            fill = new ol.style.Fill({color: 'rgba(' + color.join() + ')' });
             stroke = new ol.style.Stroke({color: def_params['stroke'],
                 width: Number(def_params['stroke-width']),
                 lineJoin: def_params[ 'stroke-linejoin'],
