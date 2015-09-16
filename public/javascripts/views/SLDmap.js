@@ -256,11 +256,11 @@ define([
                     'rotation': 0.0,
                     'onlineresource': null,
                     'wellknownname': 'circle',
-                    'fill': 'rgba(255,255,255,0.0)',
-                    'fill-opacity': 0.0,
+                    'fill': 'rgba(255,255,255,0.9)',
+                    'fill-opacity': 0.9,
                     'external-graphic': null,
-                    'stroke': 'rgba(255,255,255,0.0)',
-                    'stroke-opacity': 0.0,
+                    'stroke': 'rgba(255,255,255,0.9)',
+                    'stroke-opacity': 0.9,
                     'stroke-width': 1,
                     'stroke-linejoin': 'round',   // Line join style: `bevel`, `round`, or `miter`. Default is `round`.
                     'stroke-linecap': 'round',  //Line cap style: `butt`, `round`, or `square`. Default is `round`.
