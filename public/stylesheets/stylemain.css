@@ -326,10 +326,11 @@ body
 
 #preview
 {
-    min-width: 150px;
-    margin-left: 15px;
+    min-width: 70px;
+    margin-top: 50px;
+    margin-left: 60px;
     margin-bottom: 10px;
-    max-height: 150px;
+    max-height: 70px;
 }
 
 .upper-panel {

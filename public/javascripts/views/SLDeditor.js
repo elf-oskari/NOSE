@@ -555,11 +555,10 @@ define([
       } else {
         var path = this.graphicPaths[wellknownname];
         this.previewElement = this.preview.path(path);
-        this.previewElement.size(50);
+        this.previewElement.size(50, 50);
       }
       this.previewElement.attr(this.attributes);
       this.previewElement.transform({rotation: this.elementRotation});
-      this.previewElement.center(80,75);
     },
 
     renderExternalGraphics: function () {
@@ -578,7 +577,7 @@ define([
           this.attributes[attribute] = attributeValue;
         }
       }
-      this.previewElement = this.preview.line(20, 20, 130, 130).stroke({width: 8});
+      this.previewElement = this.preview.line(10, 10, 60, 60).stroke({width: 8});
       this.previewElement.attr(this.attributes);
     },
 
@@ -594,7 +593,7 @@ define([
           this.attributes[attribute] = attributeValue;
         }
       }
-      this.previewElement = this.preview.polygon('20,50 100,40 80,130 20,100').fill('none');
+      this.previewElement = this.preview.rect(60,60).fill('none');
       this.previewElement.attr(this.attributes);
       if (strokeWidth === true) {
         this.previewElement.attr({"stroke-width": 4});
@@ -612,7 +611,7 @@ define([
       }
       this.previewElement = this.preview.text("Text!").font({size: 30});
       this.previewElement.attr(this.attributes);
-      this.previewElement.center(40,40);
+      //this.previewElement.center(40,40);
     },
 
     updatePreview: function () {
