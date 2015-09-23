@@ -26,7 +26,7 @@ define({
 			"Config-name": "SLD visualization name:",
 			"SLDmap-heading": "Rule preview",
 			"SLDtree-name": "name",
-			"featuretype_id": "Featuretype id",
+			"featuretype_style": "Feature type style",
 			"SLD-features-heading": "Features",
 			"unit": "Unit",
 			"foot": "Foot",
