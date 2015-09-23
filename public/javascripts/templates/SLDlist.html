@@ -38,7 +38,7 @@
               <% _.forEach(SLDtemplates, function(SLDtemplateModel) { %>
               <div class="panel panel-default sld-tree-panel">
                 <div class="panel-heading cursor-pointer list-group-item" data-id="<%=SLDtemplateModel.id%>">
-                  <h4 data-toggle="collapse" data-target="#SLDtemplate-id-<%=SLDtemplateModel.id%>" class="panel-title collapse-panel">
+                  <h4 data-toggle="collapse" data-target="#SLDtemplate-id-<%=SLDtemplateModel.id%>" class="panel-title collapse-panel collapse-panel-list">
                   <% if (SLDtemplateModel.configs.length !== 0) { %>
                     <i class="fa fa-caret-right pull-left"></i>
                   <% } %>

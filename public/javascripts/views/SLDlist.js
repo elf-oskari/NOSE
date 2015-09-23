@@ -23,7 +23,7 @@ define([
             'click .btn.delete-config': 'deleteConfig',
             'click .download': 'downloadConfig',
             'click .signout-list-page': 'logoutFromListView',
-            'click .collapse-panel': 'panelClicked',
+            'click .collapse-panel-list': 'panelClicked',
             'change .chosen-select': 'updateSLDList'
 
         },

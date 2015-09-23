@@ -14,7 +14,7 @@ define([
     template: _.template(SLDTreeTemplate),
     events: {
       'click .btn.sld_symbolizer': 'updateSLDeditor',
-      'click .collapse-panel': 'panelClicked',
+      'click .collapse-panel-tree': 'panelClicked',
       'change .chosen-select': 'updateSLDtree'
     },
     initialize: function(params) {
@@ -54,6 +54,7 @@ define([
     },
 
     panelClicked: function(event) {
+      debugger;
       var element = $(event.currentTarget)[0].children[0];
       var panelHeadingElement = event.currentTarget.parentElement;
       this.panelClickedHandler(element, panelHeadingElement);
