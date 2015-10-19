@@ -143,6 +143,13 @@ body
 {
     margin-left: 0;
 }
+.userguide {
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 16px;
+    text-decoration: none!important;
+    padding-right: 30px;
+}
 
 /* CUSTOM STYLE for EDITOR PAGE */
 
