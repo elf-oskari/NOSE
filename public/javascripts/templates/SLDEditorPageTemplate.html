@@ -3,10 +3,12 @@
 		<div class="panel editor-page-header-panel">
 			<div class="panel-heading editor-page-header">
 				<span class="config-name"><%= locale.common['SLD-editor'] + "    -    " + SLDconfigmodel.name %></span><span id="is-config-saved" class="hidden"> *</span>
-		       	<h4 class="sld-list-signout-link">
+		       	<h4 class="sld-editor-page-h4">
 		       		<a class="userguide" href="sld_editor_user_guide_20151016.pdf" target="_blank">User guide</a>
-		         	<%=userName%>&nbsp;-&nbsp;<%= locale.common.logout%>
-		         	<i class="fa fa-sign-out pull-right"></i>
+		       		<span class="signout-list-page">
+			         	<%=userName%>&nbsp;-&nbsp;<%= locale.common.logout%>
+			         	<i class="fa fa-sign-out pull-right"></i>
+			        </span>
 		       	</h4>
 			</div>
 			<div class="panel-body editor-page-header-body">
