@@ -513,7 +513,8 @@ define([
 
                 console.log('render --Map');
                 var vectorPolygons = new ol.layer.Vector({
-                    source: new ol.source.GeoJSON({
+                    source: new ol.source.Vector({
+                        format: new ol.format.GeoJSON(),
                         projection: 'EPSG:3857',
                         url: 'data/geojson/polygon-samples.geojson'
                     }),
@@ -522,7 +523,8 @@ define([
                 });
 
                 var vectorLines = new ol.layer.Vector({
-                    source: new ol.source.GeoJSON({
+                    source: new ol.source.Vector({
+                        format: new ol.format.GeoJSON(),
                         projection: 'EPSG:3857',
                         url: 'data/geojson/line-samples.geojson'
                     }),
@@ -531,7 +533,8 @@ define([
                 });
 
                 var vectorPoints = new ol.layer.Vector({
-                    source: new ol.source.GeoJSON({
+                    source: new ol.source.Vector({
+                        format: new ol.format.GeoJSON(),
                         projection: 'EPSG:3857',
                         url: 'data/geojson/point-samples.geojson'
                     }),

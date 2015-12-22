@@ -4,7 +4,7 @@ requirejs.config({
 		backbone: 'lib/backbone',
 		jquery: 'lib/jquery-1.10.2.min',
 		lodash: 'lib/lodash',
-		ol3: 'lib/ol3-v3.0.0-debug-modified'
+		ol3: 'lib/ol-v3.12.1-custom'
 	},
 	shim: {
 		'ol3': {
