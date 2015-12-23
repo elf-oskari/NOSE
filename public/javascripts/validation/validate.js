@@ -164,12 +164,16 @@ define([
 	    validateFontFamily: function (value) {
 	      var errormsg,
 	          locale = localeValidation;
-	      if (value === "Arial" || value === "Geneva" || value === "sans-serif" || value === "Verdana") {
+	          //font-family is a select, probably never invalid...
+	          return ["valid"];
+	          /*
+	      if (value === "Arial" || value === "Geneva" || value === "sans-serif" || value === "Verdana" || value === "Gothica") {
 	        return ["valid"];
 	      } else {
 	        errormsg = locale.select['invalidFontfamily'];
 	        return ["invalid", errormsg];
 	      }
+	      */
 	    },
 
 	    validateFontWeight: function (value) {
