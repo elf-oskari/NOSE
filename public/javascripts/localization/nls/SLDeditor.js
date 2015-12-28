@@ -38,7 +38,8 @@ define({
 		},
 		"sldtree": {
 			"noRules": "No rules defined",
-			"noSymbolizers": "No symbolizers defined"
+			"noSymbolizers": "No symbolizers defined",
+			"featuretypeWithoutName": "[No name defined]"
 		},
 		"point": {
 			"label": "Point",

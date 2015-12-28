@@ -1,4 +1,4 @@
-define(['lodash','backbone'], function(_, Backbone) {
+define(['lodash','backbone','i18n!localization/nls/SLDeditor'], function(_, Backbone, locale) {
 	var SLDtemplateModel = Backbone.Model.extend({
 		defaults: {
 			id: null,
@@ -41,6 +41,9 @@ define(['lodash','backbone'], function(_, Backbone) {
 
 			return _.map(SLDfeaturetypes, function (SLDfeatureType) {
 				var featuretype = _.pick(SLDfeatureType, 'id', 'name');
+				if (featuretype.name === "") {
+					featuretype.name = locale.sldtree.featuretypeWithoutName;
+				}
 				var rules = _.where(SLDrules, {featuretype_id: featuretype.id});
 				featuretype.rules = _.map(rules, function (SLDrule) {
 					var rule = _.pick(SLDrule, 'id', 'title');
