@@ -54,7 +54,6 @@ define([
     },
 
     panelClicked: function(event) {
-      debugger;
       var element = $(event.currentTarget)[0].children[0];
       var panelHeadingElement = event.currentTarget.parentElement;
       this.panelClickedHandler(element, panelHeadingElement);
