@@ -1,4 +1,6 @@
-
+<%
+  var panelNumber = 0;
+%>
 <!-- List template -->
 <div class="view" id="sld-tree-view">
     <div class="panel editor-panel sld-editor-tree-panel">
@@ -14,10 +16,11 @@
           </select>
           <div class="panel-body sld-tree">
             <% _.forEach(SLDfeaturetypeTree, function(SLDfeatureType) {
+              panelNumber = panelNumber + 1;
             %>
             <div class="panel panel-default sld-tree-panel">
               <div class="panel-heading cursor-pointer">
-                <h4 class="panel-title collapse-panel collapse-panel-tree" data-toggle="collapse" data-target="#featuretype-id-<%=SLDfeatureType.id%>"><i class="fa fa-caret-right pull-left"></i><%= SLDfeatureType.name %></h4>
+                <h4 class="panel-title collapse-panel collapse-panel-tree" data-toggle="collapse" data-target="#featuretype-id-<%=SLDfeatureType.id%>"><i class="fa fa-caret-right pull-left"></i><%= panelNumber + ". " + SLDfeatureType.name %></h4>
               </div>
               <div id="featuretype-id-<%=SLDfeatureType.id%>" class="panel-collapse collapse">
                 <div class="panel-body">
