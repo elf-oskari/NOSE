@@ -13,7 +13,6 @@ define([
             this.listenTo(this.dispatcher, "resetVectorLayers", this.resetVectorLayers);
             this.listenTo(this.dispatcher, "updateMapStyleByParam", this.updateMapStyleByParam);
             this.listenTo(this.dispatcher, "updateMapStyle", this.updateMapStyle);
-            this.listenTo(this.dispatcher, "updateMapScales", this.updateMapScales);
             this.listenTo(this.dispatcher, "all", this.logger);
             _.bindAll(this, 'render');
         },
@@ -104,13 +103,28 @@ define([
         /**
          * transform scale into resolution
          */
+        calculateScaleForResolution: function(resolution, units) {
+            var dpi = 25.4 / 0.28;
+            var mpu = ol.proj.METERS_PER_UNIT[units];
+            var inchesPerMeter = 39.37;
+            var scale = (mpu * inchesPerMeter * dpi * resolution);
+
+            scale = scale * 10000;
+            scale = Math.round(scale);
+            scale = scale / 10000; 
+            return scale.toFixed();
+        },
+        /**
+         * transform resolution into scale
+         */
         calculateResolutionForScale: function(scale, units) {
             var dpi = 25.4 / 0.28;
             var mpu = ol.proj.METERS_PER_UNIT[units];
             var inchesPerMeter = 39.37;
             var resolution = parseFloat(scale) / (mpu * inchesPerMeter * dpi);
             return resolution;
-        },        
+        },
+
         /**
          * @method setMapLayerStyle
          * Set or update map layer style for ol3 layers
@@ -611,6 +625,7 @@ define([
                 this.map.getView().on('change:resolution', function(event) {
                     self.mapResolutionChanged(event);
                 });
+                this.mapResolutionChanged();
             } else {
                 // map node has been detached.
                 // Note! event handling might not function properly, but since we currently do not have any map specific
@@ -624,14 +639,18 @@ define([
                 this.map.getView().setCenter([2776000, 8444000]);
                 this.map.getView().setZoom(13);
                 this.map.render();
+                this.mapResolutionChanged();
             }
         },
         mapResolutionChanged: function(event) {
-
             var self = this;
             _.each(this.params, function(symbolizer, key) {
                 self.setMapLayerStyle(key, true);
             });
+
+            var headerElement = $(this.el).parent().parent().find('div.panel-heading.main-heading');
+            var scaleLabel = headerElement.html().split('-')[0] +' - 1:'+self.calculateScaleForResolution(self.map.getView().getResolution(), 'm');
+            headerElement.html(scaleLabel);
         }
     });
     return SLDMapView;
