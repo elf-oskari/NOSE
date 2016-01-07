@@ -11,8 +11,8 @@ define([
   var SLDEditorView = Backbone.View.extend({
     className: 'page',
     template: _.template(editSLDTemplate),
-        // Configuration:
-        attrData: {},
+    // Configuration:
+    attrData: {},
     events: {
         'click .delete': 'deleteConfig',
         'click .upload': 'showUpload',
@@ -20,6 +20,7 @@ define([
         'keyup .param': 'setParam',
         'change .param': 'setParam',
         'click .cancel-changes':'resetModel',
+        'keyup .rule-input':'updateRule'
     },
 
     initialize: function(params) {
@@ -52,7 +53,7 @@ define([
       // we use promises with saving so we don't propably need this
       //self.listenTo(self.SLDconfigmodel, "sync", self.showInfoModal);
     },
-    render: function(paramlist,symbol,ruletitle) {
+    render: function(paramlist,symbol,ruletitle,rule) {
         if (this.originalValuesStored === false) {
           this.originalAttributes = _.cloneDeep(this.SLDconfigmodel.attributes);
           this.originalValuesStored = true;
@@ -102,7 +103,7 @@ define([
             data.graphic.values["external-graphic"].class = ""; // Not hidden
             data.graphic.values["wellknownname"] = "external";  // Drop-down value
         }
-        this.$el.html(this.template({SLDmodel: model, editSLD: localization, attrData: data, symbolType: type, symbolUnit: uom, ruletitle: ruletitle}));
+        this.$el.html(this.template({SLDmodel: model, editSLD: localization, attrData: data, symbolType: type, symbolUnit: uom, ruletitle: ruletitle, rule: rule}));
         Backbone.Validation.bind(this, {
           model: SLDconfigmodel
         });
@@ -141,8 +142,9 @@ define([
 
       //get the rule id based on given params
       var ruleid = SLDTemplateModel.getRuleIdByParams(params);
-      
+
       //get all symbolizers for the given rule
+      //symbolizers _really_ should be per config as well
       var symbolizers_by_rule = SLDTemplateModel.getSymbolizersByRuleId(ruleid);
 
 
@@ -170,10 +172,11 @@ define([
       //preserve the currently active symbolizer -> will be needed when updating params to map...
       this.activeSymbolizer = symbolizer;
 
+      this.SLDTemplateModel = SLDTemplateModel;
       //symbolizerchange -> toggle point, line and polygon layers off by default (they get toggled on as needed when symbolizers of the rule are added)
       self.dispatcher.trigger("resetVectorLayers");
-      self.updateMapSymbolizers(params, SLDTemplateModel);
       self.updateEditParams(params, symbolizer, ruletitle);
+      self.updateMapSymbolizers(params, SLDTemplateModel);
     },
 
     /**
@@ -188,7 +191,12 @@ define([
             type: symbolizer.type,
             uom: symbolizer.uom
           };
-      self.render(paramlist,symbol,ruletitle);
+
+      //Get the rule of the template (symbolizers bound to that one)
+      var sldTemplateRule = params && this.SLDTemplateModel ? this.SLDTemplateModel.getRuleById(this.SLDTemplateModel.getRuleIdByParams(params)) : null;
+      //get the rule of this instance corresponding to that of the template (things common to all symbolizers within rule - minscaledenominator, maxscaledenominator, in the future possibly also title, abstract etc.)
+      var rule =  sldTemplateRule && this.SLDconfigmodel ? this.SLDconfigmodel.getRuleCorrespondingToTemplateRule(sldTemplateRule) : null;
+      self.render(paramlist,symbol,ruletitle, rule);
     },
 
     back: function () {
@@ -222,6 +230,24 @@ define([
       this.SLDconfigmodel.set(attribute, newvalue);
     },
 
+    /**
+     * Updates the rules
+     */
+    updateRule: function() {
+
+      var ruleId = $('input[id=ruleId').val();
+      var rule = ruleId && this.SLDconfigmodel ? this.SLDconfigmodel.getRuleById(ruleId) : null;
+      var minScaleDenominator = $('input[id=minScaleDenominator]').val() ? $('input[id=minScaleDenominator]').val() : null;
+      var maxScaleDenominator = $('input[id=maxScaleDenominator]').val() ? $('input[id=maxScaleDenominator]').val() : null;
+      var validation = validateFunctions.validateMinMax(minScaleDenominator, maxScaleDenominator);
+      if (validation[0] === "invalid") {
+        validateFunctions.handleInvalidParam(validation, $('#minScaleDenominator')[0]);
+      } else if (rule) {
+        rule.minscaledenominator = minScaleDenominator;
+        rule.maxscaledenominator = maxScaleDenominator;
+        validateFunctions.handleValidParam($('#minScaleDenominator')[0]);
+      }
+    },
     //resets the changes made to the _current_ config model. Still have to implement a "reset all"-button + functionality
     resetModel: function(event) {
       var self = this;

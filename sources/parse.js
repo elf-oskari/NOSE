@@ -273,6 +273,7 @@ Rule.prototype.setComment=function(txt) {
 /** Format all names given to the rule for outputting parameter description.
   * @return {string} */
 Rule.prototype.formatNamesForJson=function() {
+	console.log("My name list : "+JSON.stringify(this.nameList));
 	return(this.nameList.join(';'));
 };
 
@@ -675,7 +676,7 @@ exports.parse = function (inFileName, fname, tname, rfields, cb) {
 			i;
 
 		var namePathList=[
-			['Name'],['Title'],['Abstract']
+			['Name'],['Title'],['Abstract'],['MinScaleDenominator'],['MaxScaleDenominator']
 		];
 
 		/** Convert the list of a field's parent tags and their attributes into
@@ -710,19 +711,21 @@ exports.parse = function (inFileName, fname, tname, rfields, cb) {
 
 		// Store any comment immediately before a rule.
 		// It might be a human-readable description of the rule.
-		if(node.comment) rule.setComment(node.comment);
-        else rule.setComment('Rule_'+rule.id);
-
-		for(i=0;i<namePathList.length;i++) {
-			nameNode=node.queryText(namePathList[i]);
-			if(nameNode) {
-				rule.addName(nameNode.getText());
-			} else rule.addName('');
+		if (node.comment) {
+			rule.setComment(node.comment);
+		} else {
+			rule.setComment('Rule_'+rule.id);
 		}
 
-		// Maybe in the future we need to process scale denominators:
-		// console.log(node.queryText(['MinScaleDenominator']).txt);
-
+		for(i = 0; i < namePathList.length; i++) {
+			nameNode = node.queryText(namePathList[i]);
+			if(nameNode) {
+				rule.addName(nameNode.getText());
+				nameNode.setText(placeHolder);
+			} else {
+				rule.addName('');
+			}
+		}
         params.push('Rule'+'\t'+rule.encode(this.xmlEncoder,this.outputCharPos));
         // Symbolizer switch
         symbolizer = '';

@@ -13,6 +13,7 @@ define([
             this.listenTo(this.dispatcher, "resetVectorLayers", this.resetVectorLayers);
             this.listenTo(this.dispatcher, "updateMapStyleByParam", this.updateMapStyleByParam);
             this.listenTo(this.dispatcher, "updateMapStyle", this.updateMapStyle);
+            this.listenTo(this.dispatcher, "updateMapScales", this.updateMapScales);
             this.listenTo(this.dispatcher, "all", this.logger);
             _.bindAll(this, 'render');
         },
@@ -101,12 +102,24 @@ define([
             this.setMapLayerStyle(type, true);
         },
         /**
+         * transform scale into resolution
+         */
+        calculateResolutionForScale: function(scale, units) {
+            var dpi = 25.4 / 0.28;
+            var mpu = ol.proj.METERS_PER_UNIT[units];
+            var inchesPerMeter = 39.37;
+            var resolution = parseFloat(scale) / (mpu * inchesPerMeter * dpi);
+            return resolution;
+        },        
+        /**
          * @method setMapLayerStyle
          * Set or update map layer style for ol3 layers
          * @param {String} type; type of symbolizer.
          * @param {Boolean} update; true:update case, false: init case (sld template symbolizer default values).
          */
         setMapLayerStyle: function (type, update) {
+            var minScale = $('input[id=minScaleDenominator]').val();
+            var maxScale = $('input[id=maxScaleDenominator]').val();
             var self = this;
             if (this.map) {
                 var polygons, points, lines, labels, cur_style;
@@ -115,6 +128,22 @@ define([
                     if (l.get('title') == 'Lines') lines = l;
                     if (l.get('title') == 'Points') points = l;
                     if (l.get('title') == 'Labels') labels = l;
+
+                    if (l.get('title') === 'Polygons' || l.get('title') == 'Lines' || l.get('title') == 'Points' || l.get('title') == 'Labels') {
+                        if (minScale) {
+                            var minResolution = self.calculateResolutionForScale(minScale, 'm');
+                            l.setMinResolution(minResolution);
+                        } else {
+                            l.setMinResolution(0);
+                        }
+
+                        if (maxScale) {
+                            var maxResolution = self.calculateResolutionForScale(maxScale, 'm');
+                            l.setMaxResolution(maxResolution);
+                        } else {
+                            l.setMaxResolution(Infinity);
+                        }
+                    }
                 });
                 if (polygons && type == 'polygonsymbolizer') {
                     var stylesArray = [];
@@ -130,6 +159,7 @@ define([
                     }
 
                     polygons.setStyle(stylesArray);
+
                     polygons.setVisible(true);
                 }
                 else if (lines && type == 'linesymbolizer') {
@@ -163,7 +193,6 @@ define([
                     points.setVisible(true);
                 }
                 else if (labels && type == 'textsymbolizer') {
-                    console.log("i is textsymbolizr doing");
                     var stylesArray = [];
                     if (update) {
                         for (var key in this.params[type]) {
@@ -603,7 +632,6 @@ define([
             _.each(this.params, function(symbolizer, key) {
                 self.setMapLayerStyle(key, true);
             });
-
         }
     });
     return SLDMapView;

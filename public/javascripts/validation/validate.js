@@ -197,5 +197,13 @@ define([
 	        return ["invalid", errormsg];
 	      }
 	    },
+
+	    validateMinMax: function(minValue, maxValue) {
+	    	if (minValue && maxValue && parseFloat(minValue) > parseFloat(maxValue)) {
+	    		return ["invalid", localeValidation.scales.minscalegreaterthanmaxscale]
+	    	} else {
+	    		return ["valid"];
+	    	}
+	    }
 	};
 });

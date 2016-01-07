@@ -177,6 +177,22 @@ SldInserter.prototype.insertSldValue=function(configId,paramId,value) {
 	));
 };
 
+/** @param {number} templateId Refers to a template in the database.
+  * @return {Promise} */
+SldInserter.prototype.updateRule = function(rule) {
+    var sql = 
+    	"UPDATE sld_rule SET "+
+    	"name = '"+rule.name+"',"+
+    	"title = '"+rule.title+"',"+
+    	"abstract = '"+rule.abstract+"',"+
+    	"minscaledenominator = "+rule.minscaledenominator+","+
+    	"maxscaledenominator = "+rule.maxscaledenominator+" "+
+    	"WHERE id = "+rule.id+" "+
+    	"RETURNING id";
+//    console.log("updating rule: ", sql);
+	return(this.db.querySingle(sql));
+};
+
 
 
 /** Insert rule and parameter descriptions from parse.js into the database.
@@ -184,13 +200,13 @@ SldInserter.prototype.insertSldValue=function(configId,paramId,value) {
   * @param {number} templateId Refers to a template in the database.
   * @return {Promise} Resolved when everything has been successfully inserted. */
 SldInserter.prototype.parseConfig=function(sldConfig, config_id) {
-	console.log("looping param valules and saving data");
+//	console.log("looping param vallllules and saving data");
 
 	var defer=new Deferred();
 	/** A separate promise for each database INSERT command to track them. */
 	var promiseList=[];
-	console.log("configin name: ", sldConfig.name);
-
+//	console.log("configin name: ", sldConfig.name);
+//	console.log(JSON.stringify(sldConfig, null, '\t'));
 	var lineList;
 	var lineNum,lineCount;
 	var fieldList;
@@ -215,8 +231,22 @@ SldInserter.prototype.parseConfig=function(sldConfig, config_id) {
 			defer.reject('Error inserting feature type: '+err);
 		});
 		promiseList.push(featureTypeInserted); 
-		
 	}
+
+	var rules = sldConfig.sld_rules;
+	var ruleCount = rules.length;
+	var rule;
+//	console.log("RuleCount - "+ruleCount);
+	for(var i = 0; i < ruleCount; i++) {
+		rule = rules[i];
+
+		ruleInserted = this.updateRule(rule);
+		ruleInserted.catch(function(err) {
+			defer.reject('Error updating rule: '+err);
+		});
+		promiseList.push(ruleInserted); 
+	}
+
 
 	// Ready when all inserts finish.
 	Promise.all(promiseList).then(function() {
@@ -264,7 +294,7 @@ exports.check_config_ownership = function(config_id, client, cb) {
 	/*
 		Check, if uuid matches the current uuid of the config in the db
 		if not -> error
-		else if admin, editing must be possible but uuid must still remain as it was? wtf...
+		else if admin, editing must be possible but uuid must still remain as it was?
 	*/
 
 

@@ -36,6 +36,11 @@ define({
 			"saving" : "Saving...",
 			"logout": "Sign out"
 		},
+		"rulepreview": {
+			"rule":"Rule",
+			"minScaleDenominator":"Min scale",
+			"maxScaleDenominator":"Max scale"
+		},
 		"sldtree": {
 			"noRules": "No rules defined",
 			"noSymbolizers": "No symbolizers defined",

@@ -249,6 +249,11 @@ CREATE TABLE sld_rule
   name character varying(256) NOT NULL,
   title character varying(256) NOT NULL,
   abstract character varying(512) NOT NULL,
+  minscaledenominator bigint,
+  maxscaledenominator bigint,
+  config_id bigint,
+  template_rule_id bigint,  
+  template_offset bigint,
   CONSTRAINT sld_rule_pkey PRIMARY KEY (id),
   CONSTRAINT featuretype_id_fkey FOREIGN KEY (featuretype_id)
       REFERENCES sld_featuretype (id) MATCH SIMPLE
@@ -379,7 +384,12 @@ CREATE VIEW sld_params_view AS
     c.featuretype_id,
     c.name,
     c.title,
-    c.abstract
+    c.abstract,
+    c.minscaledenominator,
+    c.maxscaledenominator
+    c.config_id,
+    c.template_rule_id,
+    c.template_offset
    FROM sld_template a,
     sld_featuretype b,
     sld_rule c
