@@ -209,10 +209,19 @@ SldInserter.prototype.insertRule=function(featureTypeInserted,fieldList) {
 		var nameList=fieldList[3].split(';');
 		if(!nameList[1] && nameList[0]) nameList[1]=nameList[0];
         if(!nameList[1]) nameList[1]=fieldList[4];
+	
+		//no minscaledenominator
+        if (!nameList[3] || nameList[3].length === 0) {
+        	nameList[3] = null;
+        }
+		//no maxscaledenominator
+        if (!nameList[4] || nameList[4].length === 0) {
+        	nameList[4] = null;
+        }
 		return(self.db.querySingle(
-			'INSERT INTO sld_rule (featuretype_id,name,title,abstract)'+
-			' VALUES ($1,$2,$3,$4)'+
-			' RETURNING id',[featureTypeId.id,nameList[0],nameList[1],nameList[2]]
+			'INSERT INTO sld_rule (featuretype_id,name,title,abstract, minscaledenominator, maxscaledenominator, template_offset)'+
+			' VALUES ($1,$2,$3,$4,$5,$6, $7)'+
+			' RETURNING id',[featureTypeId.id,nameList[0],nameList[1],nameList[2], nameList[3], nameList[4], fieldList[2]]
 		));
 	}));
 };

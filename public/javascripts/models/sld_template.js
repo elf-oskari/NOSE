@@ -91,6 +91,16 @@ define(['lodash','backbone','i18n!localization/nls/SLDeditor'], function(_, Back
 	      return _.uniq(_.pluck(_.flatten(symbolizers), 'rule_id'))[0];
         },
         /**
+         * @method getRuleById
+         * @return {Object} the rule matching the id or null if not found
+         */
+        getRuleById: function(ruleId) {
+        	var me = this;
+        	var rules = _.where(me.get('sld_rules'), { id: ruleId });      	
+			return (rules && rules.length === 1) ? rules[0] : null;
+        },
+        
+        /**
          * @method getRuleIdByParams
          * @return {Array} all symbolizers of the currently selected rule
          */

@@ -44,9 +44,33 @@ var toggleAdvanced = function(divClass) {
                     <div class="form-group">
                         <label for="SLDConfigName" class="col-md-12 editor-label-heading"><%= ruletitle + ":  " + symbolType%></label>
                     </div>
+
+                    <!-- rule specific stuff, scale denominators etc. -->
+                    <% if (rule) { %>
+                        <div class="form-group">
+                            <label class="col-md-3 editor-label"><%= editSLD.rulepreview['rule'] %></label>
+                        </div>
+                        <div class="form-group">
+                            <input type="hidden" id="ruleId" value="<%=rule.id%>"/>
+
+                            <% if (rule.minscaledenominator) { %>
+                                <label for="minScaleDenominator" class="col-md-3 control-label edit-sld-label"><%= editSLD.rulepreview['minScaleDenominator'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <input type="number" class="form-control rule-input" id="minScaleDenominator" value="<%= rule.minscaledenominator %>"/>
+                                </div>
+                            <% } %>
+
+                            <% if (rule.maxscaledenominator) { %>
+                                <label for="maxScaleDenominator" class="col-md-3 control-label edit-sld-label"><%= editSLD.rulepreview['maxScaleDenominator'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <input type="number" class="form-control rule-input" id="maxScaleDenominator" value="<%= rule.maxscaledenominator %>"/>
+                                </div>
+                            <% } %>
+                        </div>
+                    <% } %>
                     <div class="form-group">
                         <label for="unit" class="col-md-3 control-label edit-sld-label"><%= editSLD.common['unit'] %></label>
-                        <div class="col-md-9">
+                        <div class="col-md-7 col-md-offset-1">
                             
                             <input type="hidden" id="unit" class="form-control" <%=generateOptionValue("metre",symbolUnit) %>/>
                             <input type="text" class="form-control" disabled="true" value="<%= editSLD.common['metre'] %>"/>
@@ -58,6 +82,9 @@ var toggleAdvanced = function(divClass) {
                             <div class="form-group <%= attrData.graphic.class %>">
                                 <label class="col-md-3 editor-label"><%= editSLD.point['label'] %></label>
                             </div>
+                            <div class="form-group param <%= attrData.graphic.values['wellknownname'].class %>">
+                            </div>
+
                             <div class="form-group param <%= attrData.graphic.values['wellknownname'].class %>">
                                 <label class="col-md-3 control-label edit-sld-label" for="graphic-symbol"><%= editSLD.point['symbol'] %></label>
                                 <div class="col-md-7 col-md-offset-1">

@@ -101,12 +101,39 @@ define([
             this.setMapLayerStyle(type, true);
         },
         /**
+         * transform scale into resolution
+         */
+        calculateScaleForResolution: function(resolution, units) {
+            var dpi = 25.4 / 0.28;
+            var mpu = ol.proj.METERS_PER_UNIT[units];
+            var inchesPerMeter = 39.37;
+            var scale = (mpu * inchesPerMeter * dpi * resolution);
+
+            scale = scale * 10000;
+            scale = Math.round(scale);
+            scale = scale / 10000; 
+            return scale.toFixed();
+        },
+        /**
+         * transform resolution into scale
+         */
+        calculateResolutionForScale: function(scale, units) {
+            var dpi = 25.4 / 0.28;
+            var mpu = ol.proj.METERS_PER_UNIT[units];
+            var inchesPerMeter = 39.37;
+            var resolution = parseFloat(scale) / (mpu * inchesPerMeter * dpi);
+            return resolution;
+        },
+
+        /**
          * @method setMapLayerStyle
          * Set or update map layer style for ol3 layers
          * @param {String} type; type of symbolizer.
          * @param {Boolean} update; true:update case, false: init case (sld template symbolizer default values).
          */
         setMapLayerStyle: function (type, update) {
+            var minScale = $('input[id=minScaleDenominator]').val();
+            var maxScale = $('input[id=maxScaleDenominator]').val();
             var self = this;
             if (this.map) {
                 var polygons, points, lines, labels, cur_style;
@@ -115,6 +142,22 @@ define([
                     if (l.get('title') == 'Lines') lines = l;
                     if (l.get('title') == 'Points') points = l;
                     if (l.get('title') == 'Labels') labels = l;
+
+                    if (l.get('title') === 'Polygons' || l.get('title') == 'Lines' || l.get('title') == 'Points' || l.get('title') == 'Labels') {
+                        if (minScale) {
+                            var minResolution = self.calculateResolutionForScale(minScale, 'm');
+                            l.setMinResolution(minResolution);
+                        } else {
+                            l.setMinResolution(0);
+                        }
+
+                        if (maxScale) {
+                            var maxResolution = self.calculateResolutionForScale(maxScale, 'm');
+                            l.setMaxResolution(maxResolution);
+                        } else {
+                            l.setMaxResolution(Infinity);
+                        }
+                    }
                 });
                 if (polygons && type == 'polygonsymbolizer') {
                     var stylesArray = [];
@@ -130,6 +173,7 @@ define([
                     }
 
                     polygons.setStyle(stylesArray);
+
                     polygons.setVisible(true);
                 }
                 else if (lines && type == 'linesymbolizer') {
@@ -163,7 +207,6 @@ define([
                     points.setVisible(true);
                 }
                 else if (labels && type == 'textsymbolizer') {
-                    console.log("i is textsymbolizr doing");
                     var stylesArray = [];
                     if (update) {
                         for (var key in this.params[type]) {
@@ -191,10 +234,10 @@ define([
             // Default fill stroke params
             var def_params = {
                     'fill': 'rgba(255,255,255,0.0)',
-                    'fill-opacity': 0.0,
+                    'fill-opacity': 0.9,
                     'external-graphic': null,
                     'stroke': 'rgba(255,255,255,0.0)',
-                    'stroke-opacity': 0.0,
+                    'stroke-opacity': 0.9,
                     'stroke-width': 1,
                     'stroke-linejoin': 'round',   // Line join style: `bevel`, `round`, or `miter`. Default is `round`.
                     'stroke-linecap': 'round',  //Line cap style: `butt`, `round`, or `square`. Default is `round`.
@@ -582,6 +625,7 @@ define([
                 this.map.getView().on('change:resolution', function(event) {
                     self.mapResolutionChanged(event);
                 });
+                this.mapResolutionChanged();
             } else {
                 // map node has been detached.
                 // Note! event handling might not function properly, but since we currently do not have any map specific
@@ -595,15 +639,18 @@ define([
                 this.map.getView().setCenter([2776000, 8444000]);
                 this.map.getView().setZoom(13);
                 this.map.render();
+                this.mapResolutionChanged();
             }
         },
         mapResolutionChanged: function(event) {
-
             var self = this;
             _.each(this.params, function(symbolizer, key) {
                 self.setMapLayerStyle(key, true);
             });
 
+            var headerElement = $(this.el).parent().parent().find('div.panel-heading.main-heading');
+            var scaleLabel = headerElement.html().split('-')[0] +' - 1:'+self.calculateScaleForResolution(self.map.getView().getResolution(), 'm');
+            headerElement.html(scaleLabel);
         }
     });
     return SLDMapView;

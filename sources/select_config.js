@@ -149,6 +149,13 @@ SldSelecter.prototype.selectValues=function(id) {
     return(self.db.queryResult(value_sql));
 };
 
+SldSelecter.prototype.selectRules=function(config_id) {
+    var self = this;
+    var sql = 'SELECT ID, FEATURETYPE_ID, NAME, TITLE, ABSTRACT, MINSCALEDENOMINATOR, MAXSCALEDENOMINATOR, CONFIG_ID, TEMPLATE_RULE_ID FROM ' +
+        'SLD_RULE WHERE CONFIG_ID='+config_id;
+    return(self.db.queryResult(sql));
+};
+
 
 /** Roll back current transaction and close connection. */
 SldSelecter.prototype.abort=function() {
@@ -185,25 +192,32 @@ exports.select_config = function(id, uuid, client, cb) {
 
 
     var ready = configSelected.then(function (configResult) {
-       //Loop templates
-            var ind = 0;
-            var maxind = configResult.lenght;
-            var feaSelected = null;
+        //Loop templates
+        var ind = 0;
+        var feaSelected = null;
         configResult.forEach(function(row){
             result.push(row);
             valuesSelected = subSelectValues(ind, row.id);
+            rulesSelected = subSelectRules(ind, row.id);
             ind++;
         });
-        return valuesSelected;
-    }); 
+        return rulesSelected;
+    });
 
     function subSelectValues(ind, id) {
         var featuretypeSelected = selecter.selectValues(id);
         var allSelected = featuretypeSelected.then(function (valueResult) {
             result[ind].sld_values = valueResult;
-
         });
         console.log("allSelected: ", allSelected);
+        return allSelected;
+    };
+
+    function subSelectRules(ind, id) {
+        var rulesSelected = selecter.selectRules(id);
+        var allSelected = rulesSelected.then(function (featureResult) {
+            result[ind].sld_rules = featureResult;
+        });
         return allSelected;
     };
 

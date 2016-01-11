@@ -18,6 +18,9 @@ define({
 			"invalidFontweight": "Font weight must be normal or bold!",
 			"invalidFontstyle": "Font style must be normal, italic or oblique!",
 			"invalidFontfamily": "So far we are only supporting following fonts: Arial, Geneva, sans-serif and Verdana."
+		},
+		"scales": {
+			"minscalegreaterthanmaxscale": "Min scale must be smaller than max scale!"
 		}
 	}
 });

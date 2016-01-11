@@ -26,10 +26,16 @@ define([
     },
 
     setModels: function(models) {
-        this.SLDtemplatemodel = models.SLDtemplatemodel;
-        this.SLDconfigmodel = models.SLDconfigmodel;
-        this.SLDfeaturetypeTree = this.SLDtemplatemodel.getFeaturetypeTree();
-        return this;
+      var me = this;
+      this.SLDtemplatemodel = models.SLDtemplatemodel;
+      this.SLDconfigmodel = models.SLDconfigmodel;
+      this.SLDfeaturetypeTree = this.SLDtemplatemodel.getFeaturetypeTree();
+
+      _.each(this.SLDfeaturetypeTree, function(featureType) {
+        featureType.rules = me.SLDconfigmodel.getFeaturetypeTreeRules(me.SLDtemplatemodel);
+      })
+
+      return this;
     },
 
     render: function() {

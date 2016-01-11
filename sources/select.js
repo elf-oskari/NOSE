@@ -140,8 +140,8 @@ SldSelecter.prototype.selectFeaturetypes=function(id) {
  * @return {Promise} */
 SldSelecter.prototype.selectRules=function(id) {
     var self=this;
-    return(self.db.queryResult('SELECT ID, FEATURETYPE_ID, NAME, TITLE, ABSTRACT FROM ' +
-        'SLD_RULE_VIEW WHERE TEMPLATE_ID='+id));
+    return(self.db.queryResult('SELECT ID, FEATURETYPE_ID, NAME, TITLE, ABSTRACT, MINSCALEDENOMINATOR, MAXSCALEDENOMINATOR, CONFIG_ID FROM ' +
+        'SLD_RULE_VIEW WHERE TEMPLATE_ID='+id+' AND CONFIG_ID IS NULL'));
 };
 
 /** Select symbolizers of one template

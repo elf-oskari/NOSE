@@ -123,6 +123,17 @@ SldDownloader.prototype.readValues = function (id) {
 };
 
 /**
+ * Read rule values from database
+ * @param id config id
+ * @returns {Promise}
+ */
+SldDownloader.prototype.readRules = function (id) {
+    var self = this,
+        sql = 'SELECT name, title, abstract, minscaledenominator, maxscaledenominator, template_offset FROM sld_rule WHERE config_id=' + id;
+    return (self.db.queryResult(sql));
+};
+
+/**
  * Read parameter offset from database
  * @param id parameter id
  * @returns {Promise}
@@ -236,9 +247,62 @@ exports.download_config = function (id, client, cb) {
         return (downloader.readTemplate(templateId[0].template_id));
     });
 
+    var ruleTags = {
+        'name':'Name',
+        'title':'Title',
+        'abstract':'Abstract',
+        'minscaledenominator':'MinScaleDenominator',
+        'maxscaledenominator':'MaxScaleDenominator'
+    };
+    var calculateOffsetsForRuleTags = function(rule, template) {
+        //only search for tags inside this particular rule
+        var ruleStartOffset = rule.template_offset;
+        var ruleEndOffset = template.substr(ruleStartOffset, template.length).toLowerCase().indexOf('</rule>');
+        var ruleSubstring = null;
+        
+        if (ruleEndOffset > -1) {
+            ruleEndOffset = parseInt(ruleStartOffset) + parseInt(ruleEndOffset);
+            ruleSubstring = template.substr(ruleStartOffset, ruleEndOffset);
+
+            if (ruleSubstring) {
+                for (var key in ruleTags) {
+                    if (rule.hasOwnProperty(key)) {
+                        var tagOffset = calculateOffsetForTag(ruleSubstring, ruleTags[key]);
+                        if (tagOffset > -1) {
+//                            console.log("Pushing rule offset - "+key+" "+ruleTags[key]+" "+tagOffset+" "+rule[key]+" "+JSON.stringify(rule));
+                            downloader.data.push([parseInt(ruleStartOffset)+parseInt(tagOffset) - 1, rule[key]]);
+                        } 
+                    }
+                }
+            }
+        }
+        return;
+    };
+    calculateOffsetForTag = function(ruleTemplate, tagName) {
+        tagName = '<'+tagName.toLowerCase()+'>';
+        var tagOffset = ruleTemplate.toLowerCase().indexOf(tagName);
+        if (tagOffset > -1) {
+            return tagOffset + tagName.length + 1;
+        }
+        return tagOffset;
+
+    };
+
+    var templateGlobal = null;
+    var rulesRead = templateRead.then(function (template) {
+        templateGlobal = template;
+        return (downloader.readRules(id));
+    });
+
+    var rulesReadThen = rulesRead.then(function(rules) {
+        return (rules.forEach(function(rule) {
+            return calculateOffsetsForRuleTags(rule, templateGlobal[0].content);
+        }));
+    });
+
     // Generate an SLD file
-    var ready = templateRead.then(function (template) {
-        return (downloader.generateSld(template[0].content));
+    var ready = rulesReadThen.then(function () {
+        return (downloader.generateSld(templateGlobal[0].content));
     });
 
     ready.catch(function (err) {

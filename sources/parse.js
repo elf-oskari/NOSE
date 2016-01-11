@@ -274,6 +274,7 @@ Rule.prototype.setComment=function(txt) {
 /** Format all names given to the rule for outputting parameter description.
   * @return {string} */
 Rule.prototype.formatNamesForJson=function() {
+	console.log("My name list : "+JSON.stringify(this.nameList));
 	return(this.nameList.join(';'));
 };
 
@@ -729,98 +730,100 @@ exports.parse = function (inFileName, fname, tname, rfields, cb) {
 
 	/** Handle all processing of SLD rules.
 	  * @param {TagNode} node */
-	parser.onCaptureDone = function(node, cb) {
-		var rule,
-			field,
-			marker,
-			nameNode,
-			i;
+ 	parser.onCaptureDone = function(node, cb) {
+        var rule,
+            field,
+            marker,
+            nameNode,
+            i;
 
-		/** Convert the list of a field's parent tags and their attributes into
-		  * a string. */
-		function serializeSpec(spec) {
-			return(spec.path.map(function(part) {
-				var argList;
+        var namePathList=[
+            ['Name'],['Title'],['Abstract'],['MinScaleDenominator'],['MaxScaleDenominator']
+        ];
 
-				if(typeof(part)=='object') {
-					argList=[];
+        /** Convert the list of a field's parent tags and their attributes into
+          * a string. */
+        function serializeSpec(spec) {
+            return(spec.path.map(function(part) {
+                var argList;
 
-					// Loop through required attributes and list key-value pairs.
-					for(var key in part) {
-						argList.push(key+'\t'+part[key]);
-					}
+                if(typeof(part)=='object') {
+                    argList=[];
 
-					// Sort the attributes alphabetically by key.
-					argList.sort();
-
-					// Remove keys and make a comma-separated list of required
-					// values.
-					if(argList.length) return('('+argList.map(function(arg) {
-						return(arg.split('\t')[1]);
-					}).join(',')+')');
-				} else {
-					return('/'+part);
-				}
-			}).join('').substr(1));
-		}
-
-		var namePathList=[
-			['Name'],['Title'],['Abstract']
-		];
-
-		var nodeInstance =new Rule(ruleId++);
-		// Store any comment immediately before a rule.
-		// It might be a human-readable description of the rule.
-		if(node.comment) nodeInstance.setComment(node.comment);
-        else nodeInstance.setComment('Rule_'+nodeInstance.id);
-
-		for(i=0;i<namePathList.length;i++) {
-			nameNode=node.queryText(namePathList[i]);
-			if(nameNode) {
-				nodeInstance.addName(nameNode.getText());
-			} else nodeInstance.addName('');
-		}
-
-		params.push(node.localName+'\t'+nodeInstance.encode(this.xmlEncoder,this.outputCharPos));
-
-		// Maybe in the future we need to process scale denominators:
-		// console.log(node.queryText(['MinScaleDenominator']).txt);
-        
-        // Symbolizer switch
-        symbolizer = '';
-
-        // Parse symbolizers
-        var child = node.childList;
-        var cnt=1;
-        for (i = 0; i < child.length; i++) {
-            symbolizerSpecList.forEach(function (symb) {
-                if (child[i].localName === symb) {
-                    var uom = 'pixel';
-                    if(child[i].node.attributes) {
-                        var suom;
-                        if(child[i].node.attributes['uom']) {
-                            suom = child[i].node.attributes['uom'].split('/');
-                            if( suom.length > 0) uom = suom[suom.length-1];
-                        }
+                    // Loop through required attributes and list key-value pairs.
+                    for(var key in part) {
+                        argList.push(key+'\t'+part[key]);
                     }
-                    var symbl = 'Symbolizer' + '\t' + symb + '\t' + cnt++ +'\t' + uom;
-                    var subnode = child[i];
 
-                    fieldSpecList.forEach(function (spec) {
-                        field = subnode.queryText(spec.path);
-                        if (field) {
-                            marker = new FieldMarkerNode(fieldId++, serializeSpec(spec), field.getText(), rule, symbl);
-                            field.parent.insertBefore(field, marker);
-                            field.setText(placeHolder);
-                        }
-                    })
+                    // Sort the attributes alphabetically by key.
+                    argList.sort();
 
+                    // Remove keys and make a comma-separated list of required
+                    // values.
+                    if(argList.length) return('('+argList.map(function(arg) {
+                        return(arg.split('\t')[1]);
+                    }).join(',')+')');
+                } else {
+                    return('/'+part);
                 }
-            });
-
+            }).join('').substr(1));
         }
 
-	};
+        rule=new Rule(ruleId++);
+
+        // Store any comment immediately before a rule.
+        // It might be a human-readable description of the rule.
+        if (node.comment) {
+            rule.setComment(node.comment);
+        } else {
+            rule.setComment('Rule_'+rule.id);
+        }
+
+        for(i = 0; i < namePathList.length; i++) {
+            nameNode = node.queryText(namePathList[i]);
+            if(nameNode) {
+                rule.addName(nameNode.getText());
+                nameNode.setText(placeHolder);
+            } else {
+                rule.addName('');
+            }
+        }
+       params.push('Rule'+'\t'+rule.encode(this.xmlEncoder,this.outputCharPos));
+       // Symbolizer switch
+       symbolizer = '';
+
+       // Parse symbolizers
+       var child = node.childList;
+       var cnt=1;
+       for (i = 0; i < child.length; i++) {
+           symbolizerSpecList.forEach(function (symb) {
+               if (child[i].localName === symb) {
+                   var uom = 'pixel';
+                   if(child[i].node.attributes) {
+                       var suom;
+                       if(child[i].node.attributes['uom']) {
+                           suom = child[i].node.attributes['uom'].split('/');
+                           if( suom.length > 0) uom = suom[suom.length-1];
+                       }
+                   }
+                   var symbl = 'Symbolizer' + '\t' + symb + '\t' + cnt++ +'\t' + uom;
+                   var subnode = child[i];
+
+                   fieldSpecList.forEach(function (spec) {
+                       field = subnode.queryText(spec.path);
+                       if (field) {
+                           marker = new FieldMarkerNode(fieldId++, serializeSpec(spec), field.getText(), rule, symbl);
+                           field.parent.insertBefore(field, marker);
+                           field.setText(placeHolder);
+                       }
+                   })
+
+               }
+           });
+
+       }
+
+    };
 
 	/** @param {Object} node Sax node object. */
 	parser.onTag=function(node, name, title) {

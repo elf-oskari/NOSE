@@ -185,6 +185,11 @@ SldDeleter.prototype.deleteConfig=function(id, uuid) {
 //    return(self.db.queryResult('delete from sld_config where id='+id ));
 };
 
+SldDeleter.prototype.deleteConfigRules = function(id) {
+    var self=this;
+    var sql = 'delete from sld_rule where config_id='+id;
+    return(self.db.queryResult(sql));
+};
 
 
 /** Main function, read template and store data to sld_styles db
@@ -200,7 +205,10 @@ exports.delete_config = function(client, id, uuid, cb) {
 	var connected=deletes.connect(client);
 
     var ready=connected.then(function() {
-        return(deletes.deleteConfig(id, uuid));
+    	var deleteRules = deletes.deleteConfig(id, uuid).then(function() {
+    		return deletes.deleteConfigRules(id);
+    	});
+		return deleteRules;
     });
     console.log("READY: " , ready);
 
