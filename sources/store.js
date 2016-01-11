@@ -188,11 +188,13 @@ SldInserter.prototype.insertTemplate=function(templatePath, name, tname) {
 /** @param {number} templateId Refers to a template in the database.
   * @return {Promise} */
 SldInserter.prototype.insertFeatureType=function(templateId,fieldList) {
-    var order = fieldList[1];
+    var name = fieldList[1],
+    	title = fieldList[2],
+    	order = fieldList[3];
 	return(this.db.querySingle(
 		'INSERT INTO sld_featuretype (template_id,name,title,featuretype_name, feature_order)'+
 		' VALUES ($1,$2,$3,$4, $5)'+
-		' RETURNING id',[templateId,'','','', order]
+		' RETURNING id',[templateId,name,title,'', order]
 	));
 };
 

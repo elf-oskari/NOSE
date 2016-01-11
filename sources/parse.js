@@ -205,6 +205,7 @@ TagNode.prototype.query = function(partList) {
 		else attrTbl=null;
 
 		childList=tag.childList;
+
 		childCount=childList.length;
 
 		// Loop through child nodes.
@@ -432,7 +433,9 @@ var SldParser = function(outStream) {
 	/** @type {boolean} Flag set if sax is currently inside an SLD rule so its
 	  * output needs to be read into an object. If flag is cleared, XML
 	  * from input is sent straight into output as unmodified as possible. */
-	this.capturing = false;
+	this.capturingRule = false;
+
+	this.captureNameTag = false;
 	/** @type {number} Number of characters written into XML output. */
 	this.outputCharPos = 0;
 
@@ -492,6 +495,9 @@ SldParser.prototype.captureOpeningTag = function(node) {
 
 	if(this.latestComment) tag.setComment(this.latestComment);
 
+	if (this.isRule(node)) {
+		this.captureStack = [];
+	}
 	this.captureStack.push(tag);
 
 	return tag;
@@ -502,14 +508,16 @@ SldParser.prototype.captureClosingTag = function() {
 	var txt;
 
 	obj = this.captureStack.pop();
-	if (this.captureStack.length == 0) this.capturing = false;
+
+	if (this.captureStack.length == 0) this.capturingRule = false;
 
 	if (obj.needsProcessing) {
 		this.onCaptureDone(obj);
 		txt = this.xmlEncoder.encodeCapturedNode(obj, this.outputCharPos);
-
-		if (this.capturing) captureText(txt);
-		else this.writeOut(txt);
+		if (this.capturingRule) this.captureText(txt);
+		else {
+			this.writeOut(txt);
+		}
 	}
 };
 
@@ -532,24 +540,31 @@ SldParser.prototype.handleXmlHeader = function(node) {
   * a Javascript object for processing before encoding it back to XML output.
   * @param {Object} node Sax node object.
   * @return {boolean} */
-SldParser.prototype.isCaptureNeeded = function(node) {
-	if ( node.localName == 'Rule') {
-		return true;
-	}
-
-	return false;
+SldParser.prototype.isRule = function(node) {
+	return node.localName === 'Rule';
+};
+/** Check if the node is an SLD rule, which needs to be read temporarily into
+  * a Javascript object for processing before encoding it back to XML output.
+  * @param {Object} node Sax node object.
+  * @return {boolean} */
+SldParser.prototype.isNamedLayer = function(node) {
+	return node.localName === 'NamedLayer';
 };
 
 /** Check if the tag requires handling to output useful SLD structure around
   * actual rules.
   * @param {Object} node Sax node object.
   * @return {boolean} */
-SldParser.prototype.isTagHandlerNeeded = function(node) {
-	if ( node.localName == 'FeatureTypeStyle') {
-		return true;
-	}
+SldParser.prototype.isFeatureTypeStyle = function(node) {
+	return node.localName === 'FeatureTypeStyle';
+};
 
-	return false;
+/** Check if the tag requires handling to output useful SLD structure around
+  * actual rules.
+  * @param {Object} node Sax node object.
+  * @return {boolean} */
+SldParser.prototype.getLocalName = function(tagName) {
+	return tagName.split(':')[tagName.split(':').length-1];
 };
 
 /** Called when sax has read an opening tag. Recognizes if it's an SLD rule
@@ -558,44 +573,87 @@ SldParser.prototype.isTagHandlerNeeded = function(node) {
 SldParser.prototype.handleOpeningTag = function(node) {
 	var obj;
 	var needsProcessing = false;
+	var me = this;
 
     // local name without prefix
-    node.localName = node.name.split(':')[node.name.split(':').length-1];
+    node.localName = me.getLocalName(node.name);
 
-	if(this.isTagHandlerNeeded(node)) {
-		this.onTag(node);
+    // the next is for knowing when we have chance to parse name from <NamedLayer> to <FeatureTypeStyle>
+    if (me.isNamedLayer(node)) {
+    	me.namedLayerName = null;
+    	me.namedLayerTitle = null;
+    	me.captureNameTag = true;
+    }
+
+    //the next is for handling <FeatureTypeStyle>
+    //we assume that the structure of SLD is following:
+    // <NamedLayer>
+    //	  <Name>
+    //	  <Title>
+    //	  <UserStyle>
+    //		<FeatureTypeStyle>
+	if(me.isFeatureTypeStyle(node)) {
+
+		//every time we get new <NamedLayer>, let's parse the Name tag for FeatureTypeStyle
+		if (!me.namedLayerName) {
+			var userStyleTag = me.getCurrentTag(),
+				namedLayerTag = userStyleTag.parent,
+				childlist = namedLayerTag.childList,
+				i;
+
+			for (i=0; i < childlist.length; i++) {
+				if (childlist[i].localName == 'Name') {
+					var namedLayerName = childlist[i].childList[0].txt;
+				} else if (childlist[i].localName == 'Title') {
+					var namedLayerTitle = childlist[i].childList[0].txt;
+				}
+			}
+
+			me.namedLayerName = namedLayerName || '';
+			me.namedLayerTitle = namedLayerTitle || '';
+		}
+
+		me.onTag(node, me.namedLayerName, me.namedLayerTitle);
+		me.captureNameTag = false;
+
 	}
 
-	if (this.isCaptureNeeded(node)) {
-		this.capturing = true;
+	if (me.isRule(node)) {
+		me.capturingRule = true;
 		needsProcessing = true;
 	}
 
-	if (this.capturing) {
-		obj = this.captureOpeningTag(node);
-		if (needsProcessing) obj.needsProcessing = true;
 
-		if (node.isSelfClosing) this.captureClosingTag();
-	} else {
+	if (me.capturingRule || me.captureNameTag) {
+		obj = me.captureOpeningTag(node);
+		if (needsProcessing) {obj.needsProcessing = true};
+
+		if (node.isSelfClosing) {me.captureClosingTag()};
+	} 
+
+	if (me.captureNameTag || !me.capturingRule) {
 		this.writeOut(this.xmlEncoder.encodeOpeningTag(node));
 	}
 
-	this.latestComment=null;
-	this.nestingDepth++;
+	me.latestComment=null;
+	me.nestingDepth++;
 };
 
 /** Called when sax has read a closing tag. Passed on as is or if the tag was
   * captured into an object, processes it and encodes back to XML.
   * @param {string} tagName */
 SldParser.prototype.handleClosingTag = function(tagName) {
-	if (this.capturing) {
+	var isRule = this.getLocalName(tagName) === 'Rule';
+
+	if (this.capturingRule || this.captureNameTag) {
 		this.captureClosingTag();
-	} else if ( tagName.split(':')[tagName.split(':').length-1] == "Rule"){
+	} else if (isRule){
 		// dirty fix - sync problem ?
 		// nop
 	}
-    else {
-	this.writeOut(this.xmlEncoder.encodeClosingTag(tagName));
+
+    if (this.captureNameTag || !this.capturingRule && !isRule) {
+		this.writeOut(this.xmlEncoder.encodeClosingTag(tagName));
     }
 
 	this.latestComment=null;
@@ -605,9 +663,11 @@ SldParser.prototype.handleClosingTag = function(tagName) {
 /** Called when sax has read text or whitespace.
   * @param {string} txt */
 SldParser.prototype.handleTextNode = function(txt) {
-	if (this.capturing) {
+	if (this.capturingRule || this.captureNameTag) {
 		this.captureText(txt);
-	} else {
+	} 
+
+	if (this.captureNameTag || !this.capturingRule) {
 		this.writeOut(this.xmlEncoder.encodeText(txt));
 	}
 };
@@ -615,9 +675,11 @@ SldParser.prototype.handleTextNode = function(txt) {
 /** Called when sax has read a comment.
   * @param {string} txt Text inside the comment. */
 SldParser.prototype.handleCommentNode = function(txt) {
-	if (this.capturing) {
+	if (this.capturingRule || this.captureNameTag) {
 		this.captureComment(txt);
-	} else {
+	} 
+
+	if (this.captureNameTag || !this.capturingRule) {
 		this.writeOut(this.xmlEncoder.encodeComment(txt));
 		this.latestComment=txt;
 	}
@@ -674,10 +736,6 @@ exports.parse = function (inFileName, fname, tname, rfields, cb) {
 			nameNode,
 			i;
 
-		var namePathList=[
-			['Name'],['Title'],['Abstract']
-		];
-
 		/** Convert the list of a field's parent tags and their attributes into
 		  * a string. */
 		function serializeSpec(spec) {
@@ -706,24 +764,28 @@ exports.parse = function (inFileName, fname, tname, rfields, cb) {
 			}).join('').substr(1));
 		}
 
-		rule=new Rule(ruleId++);
+		var namePathList=[
+			['Name'],['Title'],['Abstract']
+		];
 
+		var nodeInstance =new Rule(ruleId++);
 		// Store any comment immediately before a rule.
 		// It might be a human-readable description of the rule.
-		if(node.comment) rule.setComment(node.comment);
-        else rule.setComment('Rule_'+rule.id);
+		if(node.comment) nodeInstance.setComment(node.comment);
+        else nodeInstance.setComment('Rule_'+nodeInstance.id);
 
 		for(i=0;i<namePathList.length;i++) {
 			nameNode=node.queryText(namePathList[i]);
 			if(nameNode) {
-				rule.addName(nameNode.getText());
-			} else rule.addName('');
+				nodeInstance.addName(nameNode.getText());
+			} else nodeInstance.addName('');
 		}
+
+		params.push(node.localName+'\t'+nodeInstance.encode(this.xmlEncoder,this.outputCharPos));
 
 		// Maybe in the future we need to process scale denominators:
 		// console.log(node.queryText(['MinScaleDenominator']).txt);
-
-        params.push('Rule'+'\t'+rule.encode(this.xmlEncoder,this.outputCharPos));
+        
         // Symbolizer switch
         symbolizer = '';
 
@@ -761,8 +823,8 @@ exports.parse = function (inFileName, fname, tname, rfields, cb) {
 	};
 
 	/** @param {Object} node Sax node object. */
-	parser.onTag=function(node) {
-        params.push('FeatureType'+'\t'+featureTypeId++);
+	parser.onTag=function(node, name, title) {
+        params.push('FeatureType'+'\t'+ name + '\t' + title + '\t' + featureTypeId++);
 	};
 
 	parser.onEnd=function() {
