@@ -86,8 +86,9 @@ define(['lodash','backbone'], function(_, Backbone) {
 
         	return rules && rules.length === 1 ? rules[0] : null;
         },
-		getFeaturetypeTreeRules: function(SLDTemplateModel) {
-			var SLDrules = this.get('sld_rules');
+		getFeaturetypeTreeRules: function(SLDTemplateModel, SLDFeatureType) {
+			var me = this;
+			var SLDrules = _.where(this.get('sld_rules'), {featuretype_id: SLDFeatureType.id});
 			var SLDsymbolizers = SLDTemplateModel.get('sld_symbolizers');
 
 			var rules = _.map(SLDrules, function (SLDrule) {

@@ -32,7 +32,7 @@ define([
       this.SLDfeaturetypeTree = this.SLDtemplatemodel.getFeaturetypeTree();
 
       _.each(this.SLDfeaturetypeTree, function(featureType) {
-        featureType.rules = me.SLDconfigmodel.getFeaturetypeTreeRules(me.SLDtemplatemodel);
+        featureType.rules = me.SLDconfigmodel.getFeaturetypeTreeRules(me.SLDtemplatemodel, featureType);
       })
 
       return this;
