@@ -257,19 +257,19 @@ exports.download_config = function (id, client, cb) {
     var calculateOffsetsForRuleTags = function(rule, template) {
         //only search for tags inside this particular rule
         var ruleStartOffset = rule.template_offset;
-        var ruleEndOffset = template.substr(ruleStartOffset, template.length).toLowerCase().indexOf('</rule>');
+        //regex for rule ending tag (with or without namespace)
+        var ruleEndRegex = /(<\/)(.)*rule>/i;
+        var ruleEndOffset = template.substr(ruleStartOffset, template.length).toLowerCase().search(ruleEndRegex);
         var ruleSubstring = null;
         
         if (ruleEndOffset > -1) {
             ruleEndOffset = parseInt(ruleStartOffset) + parseInt(ruleEndOffset);
-            ruleSubstring = template.substr(ruleStartOffset, ruleEndOffset);
-
+            ruleSubstring = template.substr(ruleStartOffset, ruleEndOffset - ruleStartOffset);
             if (ruleSubstring) {
                 for (var key in ruleTags) {
                     if (rule.hasOwnProperty(key)) {
                         var tagOffset = calculateOffsetForTag(ruleSubstring, ruleTags[key]);
                         if (tagOffset > -1) {
-//                            console.log("Pushing rule offset - "+key+" "+ruleTags[key]+" "+tagOffset+" "+rule[key]+" "+JSON.stringify(rule));
                             downloader.data.push([parseInt(ruleStartOffset)+parseInt(tagOffset) - 1, rule[key]]);
                         } 
                     }
@@ -279,10 +279,13 @@ exports.download_config = function (id, client, cb) {
         return;
     };
     calculateOffsetForTag = function(ruleTemplate, tagName) {
-        tagName = '<'+tagName.toLowerCase()+'>';
-        var tagOffset = ruleTemplate.toLowerCase().indexOf(tagName);
+        //with or without namespace and ending to the placeholder
+        var tagStartRegexString = '(<)(.)*'+tagName.toLowerCase()+'>[$]';
+        var tagStartRegex = new RegExp(tagStartRegexString, 'i');
+        var tagOffset = ruleTemplate.toLowerCase().search(tagStartRegex);
+        var startTagFullName = ruleTemplate.match(tagStartRegex);
         if (tagOffset > -1) {
-            return tagOffset + tagName.length + 1;
+            return tagOffset + startTagFullName[0].length;
         }
         return tagOffset;
 
