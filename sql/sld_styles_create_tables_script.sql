@@ -1,11 +1,8 @@
 -- Create scripts for sld_styles Postgres db
 
 CREATE DATABASE sld_styles
-  WITH OWNER = "MBLOMBERG"
-       ENCODING = 'UTF8'
+  WITH ENCODING = 'UTF8'
        TABLESPACE = pg_default
-       LC_COLLATE = 'Finnish_Finland.1252'
-       LC_CTYPE = 'Finnish_Finland.1252'
        CONNECTION LIMIT = -1;
 
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ sld_users
@@ -53,8 +50,6 @@ CREATE TABLE sld_users
 WITH (
 OIDS=FALSE
 );
-ALTER TABLE sld_users
-OWNER TO liferay;
 
 -- Trigger: trigger_sld_users on sld_users
 
@@ -386,7 +381,7 @@ CREATE VIEW sld_params_view AS
     c.title,
     c.abstract,
     c.minscaledenominator,
-    c.maxscaledenominator
+    c.maxscaledenominator,
     c.config_id,
     c.template_rule_id,
     c.template_offset
