@@ -269,6 +269,11 @@ exports.download_config = function (id, client, cb) {
                 for (var key in ruleTags) {
                     if (rule.hasOwnProperty(key)) {
                         var tagOffset = calculateOffsetForTag(ruleSubstring, ruleTags[key]);
+
+                        if (rule[key] && rule[key].indexOf('tertiaryRoad') > -1) {
+                            console.log("whad ? "+tagOffset+" "+ruleSubstring+" "+key+" "+ruleTags[key]+" "+rule[key]);
+                        }
+
                         if (tagOffset > -1) {
                             downloader.data.push([parseInt(ruleStartOffset)+parseInt(tagOffset) - 1, rule[key]]);
                         } 
@@ -280,10 +285,16 @@ exports.download_config = function (id, client, cb) {
     };
     calculateOffsetForTag = function(ruleTemplate, tagName) {
         //with or without namespace and ending to the placeholder
-        var tagStartRegexString = '(<)(.)*'+tagName.toLowerCase()+'>[$]';
+        var tagStartRegexString = '(<)(.)*'+tagName.toLowerCase()+'(.)[$]';
         var tagStartRegex = new RegExp(tagStartRegexString, 'i');
         var tagOffset = ruleTemplate.toLowerCase().search(tagStartRegex);
         var startTagFullName = ruleTemplate.match(tagStartRegex);
+
+
+        if (tagName === 'Name') {
+//            console.log("WT? "+tagStartRegexString+" "+tagOffset+" "+JSON.stringify(startTagFullName));
+        }
+
         if (tagOffset > -1) {
             return tagOffset + startTagFullName[0].length;
         }
@@ -305,6 +316,7 @@ exports.download_config = function (id, client, cb) {
 
     // Generate an SLD file
     var ready = rulesReadThen.then(function () {
+//        console.log("PERKELE "+templateGlobal[0].content);
         return (downloader.generateSld(templateGlobal[0].content));
     });
 

@@ -206,7 +206,8 @@ SldInserter.prototype.insertRule=function(featureTypeInserted,fieldList) {
 	var self=this;
 
 	return(featureTypeInserted.then(function(featureTypeId) {
-		var nameList=fieldList[3].split(';');
+//		var nameList=fieldList[3].split(';');
+		var nameList=fieldList[3].split('^');
 		if(!nameList[1] && nameList[0]) nameList[1]=nameList[0];
         if(!nameList[1]) nameList[1]=fieldList[4];
 	

@@ -263,6 +263,7 @@ var Rule = function(id) {
   * @param {string} name */
 Rule.prototype.addName=function(name) {
 	this.nameList.push(name);
+
 };
 
 /** Set comment found associated to the rule.
@@ -274,8 +275,7 @@ Rule.prototype.setComment=function(txt) {
 /** Format all names given to the rule for outputting parameter description.
   * @return {string} */
 Rule.prototype.formatNamesForJson=function() {
-	console.log("My name list : "+JSON.stringify(this.nameList));
-	return(this.nameList.join(';'));
+	return(this.nameList.join('^'));
 };
 
 /** Format comment found near the rule for outputting parameter description.
@@ -782,7 +782,7 @@ exports.parse = function (inFileName, fname, tname, rfields, cb) {
         for(i = 0; i < namePathList.length; i++) {
             nameNode = node.queryText(namePathList[i]);
             if(nameNode) {
-                rule.addName(nameNode.getText());
+                rule.addName(this.xmlEncoder.encodeText(nameNode.getText()));
                 nameNode.setText(placeHolder);
             } else {
                 rule.addName('');
