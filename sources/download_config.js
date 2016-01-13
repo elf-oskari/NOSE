@@ -118,7 +118,6 @@ SldDownloader.prototype.connect = function (client) {
 SldDownloader.prototype.readValues = function (id) {
     var self = this,
         sql = 'SELECT param_id, value FROM sld_value WHERE config_id=' + id;
-    //console.log("readValues SQL: ", sql);
     return (self.db.queryResult(sql));
 };
 
@@ -141,7 +140,6 @@ SldDownloader.prototype.readRules = function (id) {
 SldDownloader.prototype.readOffset = function (id) {
     var self = this,
         sql = 'SELECT template_offset FROM sld_param WHERE id=' + id;
-    //console.log("readOffset SQL: ", sql);
     return (self.db.queryResult(sql));
 };
 
@@ -153,7 +151,6 @@ SldDownloader.prototype.readOffset = function (id) {
 SldDownloader.prototype.readTemplateId = function (id) {
     var self = this,
         sql = 'SELECT template_id FROM sld_config WHERE id=' + id;
-    //console.log("readTemplateId SQL: ", sql);
     return (self.db.queryResult(sql));
 };
 
@@ -165,7 +162,6 @@ SldDownloader.prototype.readTemplateId = function (id) {
 SldDownloader.prototype.readTemplate = function (id) {
     var self = this,
         sql = 'SELECT content FROM sld_template WHERE id=' + id;
-    //console.log("readTemplate SQL: ", sql);
     return (self.db.queryResult(sql));
 };
 
@@ -269,11 +265,6 @@ exports.download_config = function (id, client, cb) {
                 for (var key in ruleTags) {
                     if (rule.hasOwnProperty(key)) {
                         var tagOffset = calculateOffsetForTag(ruleSubstring, ruleTags[key]);
-
-                        if (rule[key] && rule[key].indexOf('tertiaryRoad') > -1) {
-                            console.log("whad ? "+tagOffset+" "+ruleSubstring+" "+key+" "+ruleTags[key]+" "+rule[key]);
-                        }
-
                         if (tagOffset > -1) {
                             downloader.data.push([parseInt(ruleStartOffset)+parseInt(tagOffset) - 1, rule[key]]);
                         } 
@@ -289,11 +280,6 @@ exports.download_config = function (id, client, cb) {
         var tagStartRegex = new RegExp(tagStartRegexString, 'i');
         var tagOffset = ruleTemplate.toLowerCase().search(tagStartRegex);
         var startTagFullName = ruleTemplate.match(tagStartRegex);
-
-
-        if (tagName === 'Name') {
-//            console.log("WT? "+tagStartRegexString+" "+tagOffset+" "+JSON.stringify(startTagFullName));
-        }
 
         if (tagOffset > -1) {
             return tagOffset + startTagFullName[0].length;
@@ -316,7 +302,6 @@ exports.download_config = function (id, client, cb) {
 
     // Generate an SLD file
     var ready = rulesReadThen.then(function () {
-//        console.log("PERKELE "+templateGlobal[0].content);
         return (downloader.generateSld(templateGlobal[0].content));
     });
 
