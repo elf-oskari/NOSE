@@ -470,4 +470,27 @@ html, body {
     float: right;
 }
 
+/* SLD legend */
 
+.symbolizer-preview {
+    height: 30px;
+    display: inline-block;
+}
+
+.SLD-legend-module {
+    margin-left: 10px;
+    margin-top: 5px;
+}
+
+.SLD-legend-label {
+    padding-top: 10px;
+}
+
+.legend-panel {
+    padding-top: 15px;
+}
+
+.legend-panel-subpanel {
+    max-height: 620px;
+    overflow: auto;
+}

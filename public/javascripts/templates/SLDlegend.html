@@ -1,0 +1,39 @@
+
+<!-- legend template -->
+<div class="view">
+    <div class="panel legend-panel">
+      <div class="panel-heading main-heading">
+        <h3 class="panel-title">
+        <i class="fa fa-times pull-right cursor-pointer closeLegend"></i>Legend - <%= configName %></h3>
+      </div>
+      <div class="panel-body container-panel legend-panel-subpanel">
+        <% _.forEach(SLDfeaturetypeTree, function(SLDfeatureType) {
+        %>
+        <div class="panel panel-default sld-tree-panel">
+          <div class="panel-heading legend-heading">
+            <h4 class="panel-title"><%= SLDfeatureType.name %></h4>
+          </div>
+          <div class="panel-body legend-panel-body">
+            <% if (SLDfeatureType.rules.length === 0) { %>
+                <p><%= locale.sldtree.noRules %></p>
+            <%  } else { %>
+            <% _.forEach(SLDfeatureType.rules, function(SLDrule) { %>
+                <div class="row SLD-legend-module">
+                  <div class="col-md-5">
+                    <label class="SLD-legend-label"><%= SLDrule.title %></label>
+                  </div>
+                    <% _.forEach(SLDrule.symbolizers, function(symbolizer) { %>
+                  <div class="col-md-2">
+                        <div class="symbolizer-preview" id="symbolizer-preview-<%=symbolizer.id%>"></div>
+                  </div>
+                <% }); %>
+                </div>
+            <%});
+            } %>
+          </div>
+        </div>
+        <% }); %>
+      </div>
+    </div>
+</div>
+

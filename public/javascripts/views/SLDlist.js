@@ -7,8 +7,9 @@ define([
     'text!templates/SLDListButtons.html',
     'models/sld_config',
     'views/SLDeditor',
+    'views/SLDlegend',
     'bootstrap'
-], function(_, Backbone, $, locale, SLDListTemplate, SLDListButtons, SLDconfigModel, SLDeditor) {
+], function(_, Backbone, $, locale, SLDListTemplate, SLDListButtons, SLDconfigModel, SLDeditor, SLDLegendView) {
     var SLDListView = Backbone.View.extend({
         el: '.container-main',
         template: _.template(SLDListTemplate),
@@ -20,6 +21,7 @@ define([
             'click .fa-plus-circle': 'newConfig',
             'click .btn.create-config': 'createNewConfig',
             'click .edit': 'editConfig',
+            'click .showLegend' : 'renderLegend',
             'click .btn.delete-config': 'deleteConfig',
             'click .download': 'downloadConfig',
             'click .signout-list-page': 'logoutFromListView',
@@ -31,6 +33,8 @@ define([
             _.bindAll(this, 'render');
             this.configs = params.configs;
             this.templates = params.templates;
+            this.dispatcher = params.dispatcher;
+            this.legendView = new SLDLegendView({'configs': this.configs, 'templates': this.templates, 'dispatcher': this.dispatcher});
         },
         render: function() {
             var localization = locale;
@@ -40,8 +44,21 @@ define([
             this.$el.html(this.template({_: _, SLDtemplates: templateConfigTree, SLDlist_i18n: localization, userName: this.userName, userrole: this.userRole}));
             var buttonOptions = {SLDModel: null, SLDConfigModel: null, SLDlist_i18n: locale, userrole: this.userRole};
             this.renderButtons(buttonOptions);
+            this.assign(this.legendView, '.SLDlegend');
             return this;
         },
+
+        /*
+        * assign is basically just setElement, which calls delegateEvents for you.
+        * But with a nicer API and an automatic call to render.
+        * Based on http://ianstormtaylor.com/rendering-views-in-backbonejs-isnt-always-simple/
+        */
+        assign: function(view, selector) {
+            view
+                .setElement(this.$(selector))
+                .render();
+        },
+        
         renderButtons: function(options) {
             //Update the action buttons navbar according to the selection.
             $("#sld_buttons_navbar").html(_.template(SLDListButtons, options));
@@ -196,6 +213,12 @@ define([
             event.preventDefault();
             Backbone.history.navigate('/edit/' + $(event.currentTarget).data('id'), true);
         },
+
+        renderLegend: function (event) {
+            event.preventDefault();
+            this.dispatcher.trigger("renderLegend", event);
+        },
+
         downloadConfig: function (event) {
             event.preventDefault();
             var apiUrl = "./api/v1/configs/";
