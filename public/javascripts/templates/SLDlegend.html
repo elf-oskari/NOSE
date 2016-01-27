@@ -17,16 +17,22 @@
             <% if (SLDfeatureType.rules.length === 0) { %>
                 <p><%= locale.sldtree.noRules %></p>
             <%  } else { %>
-            <% _.forEach(SLDfeatureType.rules, function(SLDrule) { %>
+            <% _.forEach(SLDfeatureType.rules, function(SLDrule) { 
+              var ruleNameList = SLDrule.title.split('.').join(' ');
+              %>
                 <div class="row SLD-legend-module">
-                  <div class="col-md-5">
-                    <label class="SLD-legend-label"><%= SLDrule.title %></label>
+                  <div class="col-xs-12 col-sm-7 col-md-7 col-lg-7">
+                    <label class="SLD-legend-label"><%= ruleNameList %></label>
                   </div>
-                    <% _.forEach(SLDrule.symbolizers, function(symbolizer) { %>
-                  <div class="col-md-2">
-                        <div class="symbolizer-preview" id="symbolizer-preview-<%=symbolizer.id%>"></div>
+                  <div class="col-xs-12 col-sm-5 col-md-5 col-lg-5">
+                    <div class = "row">
+                      <% _.forEach(SLDrule.symbolizers, function(symbolizer) { %>
+                      <div class="col-md-4">
+                            <div class="symbolizer-preview" id="symbolizer-preview-<%=symbolizer.id%>"></div>
+                      </div>
+                    <% }); %>
+                    </div>
                   </div>
-                <% }); %>
                 </div>
             <%});
             } %>

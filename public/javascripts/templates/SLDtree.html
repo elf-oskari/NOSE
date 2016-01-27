@@ -17,20 +17,23 @@
           <div class="panel-body sld-tree">
             <% _.forEach(SLDfeaturetypeTree, function(SLDfeatureType) {
               panelNumber = panelNumber + 1;
+              var nameList = SLDfeatureType.name.split('.').join(' ');
             %>
             <div class="panel panel-default sld-tree-panel">
               <div class="panel-heading cursor-pointer">
-                <h4 class="panel-title collapse-panel collapse-panel-tree" data-toggle="collapse" data-target="#featuretype-id-<%=SLDfeatureType.id%>"><i class="fa fa-caret-right pull-left"></i><%= panelNumber + ". " + SLDfeatureType.name %></h4>
+                <h4 class="panel-title collapse-panel collapse-panel-tree" data-toggle="collapse" data-target="#featuretype-id-<%=SLDfeatureType.id%>"><i class="fa fa-caret-right pull-left"></i><%= panelNumber + ". " + nameList %></h4>
               </div>
               <div id="featuretype-id-<%=SLDfeatureType.id%>" class="panel-collapse collapse">
                 <div class="panel-body">
                   <% if (SLDfeatureType.rules.length === 0) { %>
                       <p><%= locale.sldtree.noRules %></p>
                   <%  } else { %>
-                  <% _.forEach(SLDfeatureType.rules, function(SLDrule) { %>
+                  <% _.forEach(SLDfeatureType.rules, function(SLDrule) { 
+                    var ruleNameList = SLDrule.title.split('.').join(' ');
+                    %>
                   <div class="panel second-level sld-tree-panel">
                     <div class="panel-heading cursor-pointer second-level">
-                      <h4 class="panel-title collapse-panel collapse-panel-tree <%=SLDrule.id%>" data-toggle="collapse" data-target="#rule-id-<%=SLDrule.id%>"><i class="fa fa-caret-right pull-left"></i><%= SLDrule.title %></h4>
+                      <h4 class="panel-title collapse-panel collapse-panel-tree <%=SLDrule.id%>" data-toggle="collapse" data-target="#rule-id-<%=SLDrule.id%>"><i class="fa fa-caret-right pull-left"></i><%= ruleNameList %></h4>
                     </div>
                     <div id="rule-id-<%=SLDrule.id%>" class="panel-collapse collapse">
                       <div class="panel-body second-level">

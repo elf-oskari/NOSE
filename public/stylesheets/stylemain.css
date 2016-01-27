@@ -400,7 +400,7 @@ body
 }
 
 .list-group {
-    max-height: 75%;
+    max-height: 650px;
     overflow: auto;
     border: 1px solid #ddd;
 }
@@ -491,6 +491,6 @@ html, body {
 }
 
 .legend-panel-subpanel {
-    max-height: 620px;
+    max-height: 640px;
     overflow: auto;
 }
