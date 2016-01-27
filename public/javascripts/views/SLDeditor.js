@@ -75,6 +75,7 @@ define([
         data = this.attrData;
 
         this.symbolType = type;
+        this.dispatcher.trigger("setSymbolType", this.symbolType);
 
         // Visit all types
         if (type) {
@@ -110,9 +111,9 @@ define([
         });
         if (paramlist) {
           var previewElementId = 'preview';
+          $(this.el).find(".preview-frame").removeClass("hidden");
           this.dispatcher.trigger("renderPreview", paramlist, type, previewElementId);
           $(this.el).find(".symbolizer-chosen").removeClass("hidden");
-          $(this.el).find(".preview-frame").removeClass("hidden");
           $(this.el).find(".info-text").addClass("hidden");
         }
         return this;
@@ -181,7 +182,8 @@ define([
 
       this.SLDTemplateModel = SLDTemplateModel;
       //symbolizerchange -> toggle point, line and polygon layers off by default (they get toggled on as needed when symbolizers of the rule are added)
-      self.dispatcher.trigger("resetVectorLayers");
+      this.dispatcher.trigger("resetVectorLayers");
+      this.dispatcher.trigger("setSymbolizerId", symbolizer.id);
       self.updateEditParams(params, symbolizer, ruletitle);
       self.updateMapSymbolizers(params, SLDTemplateModel);
     },

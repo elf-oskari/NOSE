@@ -203,7 +203,7 @@ define([
                     if (stylesArray.length === 0) {
                         stylesArray.push(points.getStyle());
                     }
-                    points.setStyle(stylesArray);
+                    points.setStyle(stylesArray[0]);
                     points.setVisible(true);
                 }
                 else if (labels && type == 'textsymbolizer') {
@@ -297,7 +297,7 @@ define([
         getPointStyle: function (stylein, params) {
             // Default point params
             var def_params = {
-                    'size': 1,
+                    'size': 10,
                     'opacity': 1.0,
                     'rotation': 0.0,
                     'onlineresource': null,
@@ -307,7 +307,8 @@ define([
                     'external-graphic': null,
                     'stroke': 'rgba(255,255,255,0.9)',
                     'stroke-opacity': 0.9,
-                    'stroke-width': 1,
+                    'stroke-width': 0,
+                    'stroke-width-cross-x': 5,
                     'stroke-linejoin': 'round',   // Line join style: `bevel`, `round`, or `miter`. Default is `round`.
                     'stroke-linecap': 'round',  //Line cap style: `butt`, `round`, or `square`. Default is `round`.
                     'stroke-dasharray-part': null,     // Line dash pattern. Default is `undefined` (no dash). array
@@ -339,6 +340,13 @@ define([
                         def_params[param['name']] = self.transformUnit(def_params[param['name']]);
                         if (def_params[param['name']] < 1)def_params[param['name']] = 1;
                     }
+
+                    if (param['name'] === 'wellknownname') {
+                        def_params[param['name']] = param['value'];
+                        if (def_params['wellknownname'] === 'cross' || def_params['wellknownname'] === 'x') {
+                            def_params['stroke-width-cross-x'] === def_params['stroke-width'];
+                        }
+                    }   
                 });
             }
 
@@ -356,15 +364,75 @@ define([
                 lineDash: this.toDashArray(def_params[ 'stroke-dasharray-part']),
                 miterlimit: Number(def_params[  'stroke-dashoffset'])});
 
-            style = new ol.style.Style({
-                image: new ol.style.Circle({
-                    radius: Number(def_params['size']),
-                    fill: fill,
-                    stroke: stroke
-                })
-            });
+            if (def_params['wellknownname'] === 'cross' || def_params['wellknownname'] === 'x') {
+                stroke.setWidth(def_params['stroke-width-cross-x']);
+                stroke.setColor(def_params['fill']);
+            }
 
+            var styles = {
+                'circle': [new ol.style.Style({
+                    image: new ol.style.Circle(({
+                        radius: Number(def_params['size']),
+                        fill: fill,
+                        stroke: stroke
+                    }))
+                })],
+                'square': [new ol.style.Style({
+                    image: new ol.style.RegularShape(
+                        /** @type {olx.style.RegularShapeOptions} */({
+                          fill: fill,
+                          stroke: stroke,
+                          points: 4,
+                          radius: Number(def_params['size']),
+                          angle: Math.PI / 4
+                    }))
+                })],
+                'triangle': [new ol.style.Style({
+                    image: new ol.style.RegularShape(
+                    /** @type {olx.style.RegularShapeOptions} */({
+                        fill: fill,
+                        stroke: stroke,
+                        points: 3,
+                        radius: Number(def_params['size']),
+                        angle: 0
+                    }))
+                })],
+                'star': [new ol.style.Style({
+                    image: new ol.style.RegularShape(
+                    /** @type {olx.style.RegularShapeOptions} */({
+                        fill: fill,
+                        stroke: stroke,
+                        points: 5,
+                        radius: Number(def_params['size']),
+                        radius2: (0.4 * Number(def_params['size'])),
+                        angle: 0
+                    }))
+                })],
+                'cross': [new ol.style.Style({
+                    image: new ol.style.RegularShape(
+                    /** @type {olx.style.RegularShapeOptions} */({
+                        fill: fill,
+                        stroke: stroke,
+                        points: 4,
+                        radius: Number(def_params['size']),
+                        radius2: 0,
+                        angle: 0
+                    }))
+                })],
+                'x': [new ol.style.Style({
+                    image: new ol.style.RegularShape(
+                    /** @type {olx.style.RegularShapeOptions} */({
+                        fill: fill,
+                        stroke: stroke,
+                        points: 4,
+                        radius: Number(def_params['size']),
+                        radius2: 0,
+                        angle: Math.PI / 4
+                    }))
+                })]
+            };
 
+            var style = styles[def_params['wellknownname']];
             return style;
 
         },
@@ -576,6 +644,7 @@ define([
                     visible: false
                 });
 
+
                 var vectorPoints = new ol.layer.Vector({
                     source: new ol.source.Vector({
                         format: new ol.format.GeoJSON(),
@@ -586,6 +655,7 @@ define([
                     style: self.getPointStyle(),
                     visible: false
                 });
+
                 var vectorLabels = new ol.layer.Vector({
                     source: new ol.source.Vector({
                         format: new ol.format.GeoJSON(),

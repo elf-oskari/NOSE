@@ -20,7 +20,9 @@ define([
 	    this.listenTo(this.dispatcher, "renderLegend", this.renderLegend);
 	    this.listenTo(this.dispatcher, "renderPreview", this.renderPreview);
 	    this.listenTo(this.dispatcher, "setParam", this.setParam);
+	    this.listenTo(this.dispatcher, "setSymbolType", this.setSymbolType);
 	    this.listenTo(this.dispatcher, "symbolizerChanged", this.symbolizerChanged);
+	    this.listenTo(this.dispatcher, "setSymbolizerId", this.setSymbolizerId);
 	    this.listenTo(this.dispatcher, "all", this.logger);
 	    this.configs = params.configs;
 	    this.templates = params.templates;
@@ -204,8 +206,18 @@ define([
 	updatePreview: function () {
 	    if (_.has(this.attributes, "stroke") && (this.symbolType === "pointsymbolizer" || this.symbolType === "polygonsymbolizer")) {
 	      this.attributes["stroke-width"] = 3;
+	    } else if (_.has(this.attributes, "size")) {
+	    	this.attributes["size"] = 50;
 	    }
 	    this.previewElement.attr(this.attributes);
+	},
+
+	setSymbolType: function (symbolType) {
+		this.symbolType = symbolType;
+	},
+
+	setSymbolizerId: function (id) {
+		this.symbolizerId = id;
 	},
 
 	setParam: function(event) {
@@ -239,7 +251,7 @@ define([
             validateFunctions.handleValidParam(element);
           }
           this.renderWellKnownName(newvalue);
-          this.dispatcher.trigger("updateMapStyle",[{'name':'wellknownname','value': newvalue}],this.symbolType );
+          this.dispatcher.trigger("updateMapStyleByParam",[{'name':'wellknownname','value': newvalue}],this.symbolType, this.symbolizerId);
         }
       } else {
         element = $(event.currentTarget).find(".form-control")[0];
