@@ -88,11 +88,9 @@ define([
 	      if (params[i].attributeName === "wellknownname") {
 	        hasWellKnownName = true;
 	        var wellknownname = params[i].value
-	      } else if (params[i].attributeName === "size") {
-	        this.elementSize = params[i].value;
 	      } else if (params[i].attributeName === "rotation") {
 	        this.elementRotation = params[i].value;
-	      } else {
+	      } else if (params[i].attributeName !== "size"){
 	        var attribute = params[i].attributeName;
 	        var attributeValue = params[i].value;
 	        this.attributes[attribute] = attributeValue;
@@ -269,9 +267,6 @@ define([
         if (param_css_parameter === "rotation") {
           this.elementRotation = newvalue;
           this.previewElement.transform({rotation: this.elementRotation});
-        // we don't want preview to update size
-        } else if (param_css_parameter === "size") {
-          this.elementSize = parseInt(newvalue);
         // we don't want preview to update stroke-width
         } else if (param_css_parameter === "stroke-width") {
           //in case we need this later
@@ -283,7 +278,7 @@ define([
           newvalue = jQuery('input#stroke-dasharray-length').val()+' '+jQuery('input#stroke-dasharray-space').val();
           this.attributes["stroke-dasharray"] = newvalue;
           this.updatePreview();
-        } else {
+        } else if (param_css_parameter !== "size") {
           this.attributes[param_css_parameter] = newvalue;
           this.updatePreview();
         }
