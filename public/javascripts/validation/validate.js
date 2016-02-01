@@ -20,7 +20,7 @@ define([
 	        validateResult = this.validateUrl(newvalue);
 	      } else if (element.type === "select-one") {
 	        if (param_name === "stroke-linecap") {
-	          validateResult = this.validateLinecap(newValue);
+	          validateResult = this.validateLinecap(newvalue);
 	        } else if (param_name === "graphic-symbol") {
 	          validateResult = this.validateGraphicsymbol(newvalue);
 	        } else if (param_name === "stroke-linejoin") {
