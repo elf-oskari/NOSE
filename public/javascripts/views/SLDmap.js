@@ -18,7 +18,7 @@ define([
         },
         /**
          * @method resetVectorLayers
-         * Hide the point, line and polygon layers by default (they get toggled on as needed when symbolizers of the rule are added)
+         * Hide the point, label, line and polygon layers by default (they get toggled on as needed when symbolizers of the rule are added)
          * Also reset the styles set previously
          */
         resetVectorLayers: function() {
@@ -37,6 +37,10 @@ define([
                     if (l.get('title') == 'Points') {
                         l.setVisible(false);
                         l.setStyle(self.getPointStyle(null));
+                    }
+                    if (l.get('title') == 'Labels') {
+                        l.setVisible(false);
+                        l.setStyle(self.getTextStyle(null));
                     }
                 });
             }
@@ -97,19 +101,63 @@ define([
             this.setMapLayerStyle(type, true);
         },
         /**
+         * transform scale into resolution
+         */
+        calculateScaleForResolution: function(resolution, units) {
+            var dpi = 25.4 / 0.28;
+            var mpu = ol.proj.METERS_PER_UNIT[units];
+            var inchesPerMeter = 39.37;
+            var scale = (mpu * inchesPerMeter * dpi * resolution);
+
+            scale = scale * 10000;
+            scale = Math.round(scale);
+            scale = scale / 10000; 
+            return scale.toFixed();
+        },
+        /**
+         * transform resolution into scale
+         */
+        calculateResolutionForScale: function(scale, units) {
+            var dpi = 25.4 / 0.28;
+            var mpu = ol.proj.METERS_PER_UNIT[units];
+            var inchesPerMeter = 39.37;
+            var resolution = parseFloat(scale) / (mpu * inchesPerMeter * dpi);
+            return resolution;
+        },
+
+        /**
          * @method setMapLayerStyle
          * Set or update map layer style for ol3 layers
          * @param {String} type; type of symbolizer.
          * @param {Boolean} update; true:update case, false: init case (sld template symbolizer default values).
          */
         setMapLayerStyle: function (type, update) {
+            var minScale = $('input[id=minScaleDenominator]').val();
+            var maxScale = $('input[id=maxScaleDenominator]').val();
             var self = this;
             if (this.map) {
-                var polygons, points, lines, cur_style;
+                var polygons, points, lines, labels, cur_style;
                 this.map.getLayers().forEach(function (l) {
                     if (l.get('title') == 'Polygons') polygons = l;
                     if (l.get('title') == 'Lines') lines = l;
                     if (l.get('title') == 'Points') points = l;
+                    if (l.get('title') == 'Labels') labels = l;
+
+                    if (l.get('title') === 'Polygons' || l.get('title') == 'Lines' || l.get('title') == 'Points' || l.get('title') == 'Labels') {
+                        if (minScale) {
+                            var minResolution = self.calculateResolutionForScale(minScale, 'm');
+                            l.setMinResolution(minResolution);
+                        } else {
+                            l.setMinResolution(0);
+                        }
+
+                        if (maxScale) {
+                            var maxResolution = self.calculateResolutionForScale(maxScale, 'm');
+                            l.setMaxResolution(maxResolution);
+                        } else {
+                            l.setMaxResolution(Infinity);
+                        }
+                    }
                 });
                 if (polygons && type == 'polygonsymbolizer') {
                     var stylesArray = [];
@@ -125,6 +173,7 @@ define([
                     }
 
                     polygons.setStyle(stylesArray);
+
                     polygons.setVisible(true);
                 }
                 else if (lines && type == 'linesymbolizer') {
@@ -154,29 +203,26 @@ define([
                     if (stylesArray.length === 0) {
                         stylesArray.push(points.getStyle());
                     }
-                    points.setStyle(stylesArray);
+                    points.setStyle(stylesArray[0]);
                     points.setVisible(true);
                 }
-                else if (type == 'textsymbolizer') {
+                else if (labels && type == 'textsymbolizer') {
                     var stylesArray = [];
                     if (update) {
                         for (var key in this.params[type]) {
-                            var style = this.getPointTextStyle(null, this.params[type][key]);
+                            var style = this.getTextStyle(labels.getStyle(), this.params[type][key]);
                             stylesArray.push(style);
                         }
                     }
+
                     //no styles -> use default.
                     if (stylesArray.length === 0) {
-                        stylesArray.push(points.getStyle());
+                        stylesArray.push(labels.getStyle());
                     }
-                    points.setStyle(stylesArray);
-                    points.setVisible(true);
+                    labels.setStyle(stylesArray);
+                    labels.setVisible(true);
                 }
-                
-
             }
-
-
         },
        /* Get style for polygons or lines
         * Replace ol3 style params defined in this.params array
@@ -188,10 +234,10 @@ define([
             // Default fill stroke params
             var def_params = {
                     'fill': 'rgba(255,255,255,0.0)',
-                    'fill-opacity': 0.0,
+                    'fill-opacity': 0.9,
                     'external-graphic': null,
                     'stroke': 'rgba(255,255,255,0.0)',
-                    'stroke-opacity': 0.0,
+                    'stroke-opacity': 0.9,
                     'stroke-width': 1,
                     'stroke-linejoin': 'round',   // Line join style: `bevel`, `round`, or `miter`. Default is `round`.
                     'stroke-linecap': 'round',  //Line cap style: `butt`, `round`, or `square`. Default is `round`.
@@ -199,6 +245,7 @@ define([
                     'stroke-dashoffset': 10   //* Miter limit. Default is `10`. ??
                 },
                 style,
+                color,
                 fill,
                 stroke,
                 self = this;
@@ -216,10 +263,15 @@ define([
                 });
             }
 
-
-
             // Create style
             fill = new ol.style.Fill({color: def_params['fill'], opacity: def_params['fill-opacity'] });
+            // no opacity in OL3, use color alpha
+             color = ol.color.asArray(fill.getColor());
+             color = color.slice();
+             color[3] = def_params['fill-opacity'];
+             //fill.setColor('rgba('+color.join() + ')'); not implemented
+             fill = new ol.style.Fill({color: 'rgba(' + color.join() + ')' });
+
             stroke = new ol.style.Stroke({color: def_params['stroke'],
                 width: Number(def_params['stroke-width']),
                 lineJoin: def_params[ 'stroke-linejoin'],
@@ -245,29 +297,37 @@ define([
         getPointStyle: function (stylein, params) {
             // Default point params
             var def_params = {
-                    'size': 1,
+                    'size': 10,
                     'opacity': 1.0,
                     'rotation': 0.0,
                     'onlineresource': null,
                     'wellknownname': 'circle',
-                    'fill': 'rgba(255,255,255,0.0)',
-                    'fill': 'rgba(255,255,255,0.0)',
-                    'fill-opacity': 0.0,
+                    'fill': 'rgba(255,255,255,0.9)',
+                    'fill-opacity': 0.9,
                     'external-graphic': null,
-                    'stroke': 'rgba(255,255,255,0.0)',
-                    'stroke-opacity': 0.0,
-                    'stroke-width': 1,
+                    'stroke': 'rgba(255,255,255,0.9)',
+                    'stroke-opacity': 0.9,
+                    'stroke-width': 0,
+                    'stroke-width-cross-x': 5,
                     'stroke-linejoin': 'round',   // Line join style: `bevel`, `round`, or `miter`. Default is `round`.
                     'stroke-linecap': 'round',  //Line cap style: `butt`, `round`, or `square`. Default is `round`.
                     'stroke-dasharray-part': null,     // Line dash pattern. Default is `undefined` (no dash). array
                     'stroke-dashoffset': 10   //* Miter limit. Default is `10`. ??
                 },
                 style,
+                color,
                 fill,
                 stroke,
                 self = this;
             // pass updated value to current values
-            if (stylein) def_params = this.getCurrentPointParams(def_params, stylein);
+            if (stylein) {
+
+                if (stylein instanceof Array) {
+                    stylein = stylein[0];
+                }
+                def_params = this.getCurrentPointParams(def_params, stylein);
+
+            }
 
             if (params) {
                 params.forEach(function (param) {
@@ -280,11 +340,23 @@ define([
                         def_params[param['name']] = self.transformUnit(def_params[param['name']]);
                         if (def_params[param['name']] < 1)def_params[param['name']] = 1;
                     }
+
+                    if (param['name'] === 'wellknownname') {
+                        def_params[param['name']] = param['value'];
+                        if (def_params['wellknownname'] === 'cross' || def_params['wellknownname'] === 'x') {
+                            def_params['stroke-width-cross-x'] === def_params['stroke-width'];
+                        }
+                    }   
                 });
             }
 
             // Create style
             fill = new ol.style.Fill({color: def_params['fill'], opacity: def_params['fill-opacity'] });
+            // no opacity in OL3, use color alpha
+            color = ol.color.asArray(fill.getColor());
+            color = color.slice();
+            color[3] = def_params['fill-opacity'];
+            fill = new ol.style.Fill({color: 'rgba(' + color.join() + ')' });
             stroke = new ol.style.Stroke({color: def_params['stroke'],
                 width: Number(def_params['stroke-width']),
                 lineJoin: def_params[ 'stroke-linejoin'],
@@ -292,15 +364,75 @@ define([
                 lineDash: this.toDashArray(def_params[ 'stroke-dasharray-part']),
                 miterlimit: Number(def_params[  'stroke-dashoffset'])});
 
-            style = new ol.style.Style({
-                image: new ol.style.Circle({
-                    radius: Number(def_params['size']),
-                    fill: fill,
-                    stroke: stroke
-                })
-            });
+            if (def_params['wellknownname'] === 'cross' || def_params['wellknownname'] === 'x') {
+                stroke.setWidth(def_params['stroke-width-cross-x']);
+                stroke.setColor(def_params['fill']);
+            }
 
+            var styles = {
+                'circle': [new ol.style.Style({
+                    image: new ol.style.Circle(({
+                        radius: Number(def_params['size']),
+                        fill: fill,
+                        stroke: stroke
+                    }))
+                })],
+                'square': [new ol.style.Style({
+                    image: new ol.style.RegularShape(
+                        /** @type {olx.style.RegularShapeOptions} */({
+                          fill: fill,
+                          stroke: stroke,
+                          points: 4,
+                          radius: Number(def_params['size']),
+                          angle: Math.PI / 4
+                    }))
+                })],
+                'triangle': [new ol.style.Style({
+                    image: new ol.style.RegularShape(
+                    /** @type {olx.style.RegularShapeOptions} */({
+                        fill: fill,
+                        stroke: stroke,
+                        points: 3,
+                        radius: Number(def_params['size']),
+                        angle: 0
+                    }))
+                })],
+                'star': [new ol.style.Style({
+                    image: new ol.style.RegularShape(
+                    /** @type {olx.style.RegularShapeOptions} */({
+                        fill: fill,
+                        stroke: stroke,
+                        points: 5,
+                        radius: Number(def_params['size']),
+                        radius2: (0.4 * Number(def_params['size'])),
+                        angle: 0
+                    }))
+                })],
+                'cross': [new ol.style.Style({
+                    image: new ol.style.RegularShape(
+                    /** @type {olx.style.RegularShapeOptions} */({
+                        fill: fill,
+                        stroke: stroke,
+                        points: 4,
+                        radius: Number(def_params['size']),
+                        radius2: 0,
+                        angle: 0
+                    }))
+                })],
+                'x': [new ol.style.Style({
+                    image: new ol.style.RegularShape(
+                    /** @type {olx.style.RegularShapeOptions} */({
+                        fill: fill,
+                        stroke: stroke,
+                        points: 4,
+                        radius: Number(def_params['size']),
+                        radius2: 0,
+                        angle: Math.PI / 4
+                    }))
+                })]
+            };
 
+            var style = styles[def_params['wellknownname']];
             return style;
 
         },
@@ -312,7 +444,8 @@ define([
          * @return {Object} edited ol3 style  */
         getTextStyle: function (stylein, params) {
             // Default text params
-            var def_params = { 'align': 'Center',
+            var def_params = { 
+                    'align': 'Center',
                     'baseline': 'Middle',
                     'font-size': '12px',
                     'pointplacement-displacementx': 0,
@@ -325,12 +458,16 @@ define([
                     'fill': '#000000',
                     'outlineColor': 'black',
                     'outlineWidth': 0,
-                    'text': 'Label text'},
+                    'text': 'Label text'
+                },
                 style,
                 tstyle;
 
             // pass updated values
             if (stylein) {
+                if (stylein instanceof Array) {
+                    stylein = stylein[0];
+                }
                 // get current values
                 tstyle = stylein.getText();
                 if (tstyle) def_params = this.getCurrentTextParams(def_params, tstyle);
@@ -344,30 +481,20 @@ define([
                 });
             }
 
-            style = new ol.style.Text({
-                textAlign: def_params['align'],
-                textBaseline: def_params['baseline'],
-                font: def_params['font-weight'] + ' ' + def_params['font-size'] + ' ' + def_params['font-family'],
-                text: def_params['text'],
-                fill: new ol.style.Fill({color: def_params['fill']}),
-                //stroke: new ol.style.Stroke({color: def_params['outlineColor'], width: def_params['outlineWidth']}),
-                offsetX: def_params['pointplacement-displacementx'],
-                offsetY: def_params['pointplacement-displacementy'],
-                rotation: def_params['pointplacement-rotation']
-            });
-            return style;
-        },
-        /* Get style for ol3 points with labels
-           * Replace ol3 style params defined in this.params array
-            * and returns edited style for ol3 points with labels
-            * @param {Object} stylein;  current ol3 style
-            * @return {Object} edited ol3 style
-         */
-        getPointTextStyle: function (stylein) {
-            // add TextStyle - no set function in ol3 ???
-            var style = new ol.style.Style({
-                image: this.getPointStyle(stylein).getImage(),
-                text: this.getTextStyle(stylein)
+            style = new ol.style.Style({
+                text: new ol.style.Text({
+                    textAlign: def_params['align'],
+                    textBaseline: def_params['baseline'],
+                    //font-style font-variant font-weight font-size font-family
+                    font: def_params['font-style'] + ' Normal ' + def_params['font-weight'] + ' ' + def_params['font-size'] + ' ' + def_params['font-family'],
+                    text: def_params['text'],
+                    fill: new ol.style.Fill({color: def_params['fill']}),
+                    //stroke: new ol.style.Stroke({color: def_params['outlineColor'], width: def_params['outlineWidth']}),
+                    offsetX: def_params['pointplacement-displacementx'],
+                    offsetY: def_params['pointplacement-displacementy'],
+                    rotation: def_params['pointplacement-rotation']
+                })
+
             });
             return style;
         },
@@ -496,32 +623,49 @@ define([
 
                 console.log('render --Map');
                 var vectorPolygons = new ol.layer.Vector({
-                    source: new ol.source.GeoJSON({
+                    source: new ol.source.Vector({
+                        format: new ol.format.GeoJSON(),
                         projection: 'EPSG:3857',
                         url: 'data/geojson/polygon-samples.geojson'
                     }),
                     title: 'Polygons',
-                    style: self.getPolygonOrLineStyle()
+                    style: self.getPolygonOrLineStyle(),
+                    visible: false
                 });
 
                 var vectorLines = new ol.layer.Vector({
-                    source: new ol.source.GeoJSON({
+                    source: new ol.source.Vector({
+                        format: new ol.format.GeoJSON(),
                         projection: 'EPSG:3857',
                         url: 'data/geojson/line-samples.geojson'
                     }),
                     title: 'Lines',
-                    style: self.getPolygonOrLineStyle()
+                    style: self.getPolygonOrLineStyle(),
+                    visible: false
                 });
 
+
                 var vectorPoints = new ol.layer.Vector({
-                    source: new ol.source.GeoJSON({
+                    source: new ol.source.Vector({
+                        format: new ol.format.GeoJSON(),
                         projection: 'EPSG:3857',
                         url: 'data/geojson/point-samples.geojson'
                     }),
                     title: 'Points',
-                    style: self.getPointStyle()
+                    style: self.getPointStyle(),
+                    visible: false
                 });
-                
+
+                var vectorLabels = new ol.layer.Vector({
+                    source: new ol.source.Vector({
+                        format: new ol.format.GeoJSON(),
+                        projection: 'EPSG:3857',
+                        url: 'data/geojson/point-samples.geojson'
+                    }),
+                    title: 'Labels',
+                    style: self.getTextStyle(),
+                    visible: false
+                });
                 this.map = new ol.Map({
                     controls: ol.control.defaults().extend([new ol.control.ScaleLine()]),
                     layers: [
@@ -533,6 +677,9 @@ define([
                         vectorPolygons,
                         vectorLines,
                         vectorPoints
+                        ,
+                        vectorLabels
+
                     ],
                     target: 'map',
                     view: new ol.View({
@@ -548,6 +695,7 @@ define([
                 this.map.getView().on('change:resolution', function(event) {
                     self.mapResolutionChanged(event);
                 });
+                this.mapResolutionChanged();
             } else {
                 // map node has been detached.
                 // Note! event handling might not function properly, but since we currently do not have any map specific
@@ -561,15 +709,18 @@ define([
                 this.map.getView().setCenter([2776000, 8444000]);
                 this.map.getView().setZoom(13);
                 this.map.render();
+                this.mapResolutionChanged();
             }
         },
         mapResolutionChanged: function(event) {
-
             var self = this;
             _.each(this.params, function(symbolizer, key) {
                 self.setMapLayerStyle(key, true);
             });
 
+            var headerElement = $(this.el).parent().parent().find('div.panel-heading.main-heading');
+            var scaleLabel = headerElement.html().split('-')[0] +' - 1:'+self.calculateScaleForResolution(self.map.getView().getResolution(), 'm');
+            headerElement.html(scaleLabel);
         }
     });
     return SLDMapView;

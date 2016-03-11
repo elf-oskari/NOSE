@@ -146,21 +146,6 @@ SldInserter.prototype.finish=function() {
 	return(this.db.commit()); //.then(bindToScope(this.db,this.db.close)));
 };
 
-/** Read a file and retuŕn its contents in a promise.
-  * @param {string} path File to read.
-  * @param {string} name Description of the file for error messages.
-  * @return {Promise} */
-/**
-SldInserter.prototype.readFile=function(path, name) {
-	var defer=new Deferred();
-
-	fs.readFile(path,{encoding:'utf-8'},function(err, data) {
-		if(err) defer.reject('Unable to read '+name+' from '+path+': '+err);
-		defer.resolve(data);
-	})
-
-	return(defer.promise);
-}; */
 
 /** Read entire text contents of an SLD template and insert them into a single
   * database row.
@@ -169,8 +154,8 @@ SldInserter.prototype.readFile=function(path, name) {
   * @return {Promise} */
 SldInserter.prototype.insertSldConfig=function(outputPath, fields, uuid) {
     
-	console.log("name: " , fields.name);
-	console.log("templateId: " , fields.template_id);
+//	console.log("name: " , fields.name);
+//	console.log("templateId: " , fields.template_id);
 	return(this.db.querySingle(
 		'INSERT INTO sld_config (template_id,name,output_path, uuid)'+
  			'VALUES ($1,$2,$3,$4)'+
@@ -182,7 +167,7 @@ SldInserter.prototype.insertSldConfig=function(outputPath, fields, uuid) {
 /** @param {number} templateId Refers to a template in the database.
   * @return {Promise} */
 SldInserter.prototype.insertSldValue=function(configId,paramId,value) {
-    console.log("inserting: ", configId,paramId,value);
+    //console.log("inserting: ", configId,paramId,value);
 	return(this.db.querySingle(
 		'INSERT INTO sld_value (config_id,param_id,value)'+
 			' VALUES ($1,$2,$3)'+
@@ -190,7 +175,42 @@ SldInserter.prototype.insertSldValue=function(configId,paramId,value) {
 	));
 };
 
+SldInserter.prototype.insertRules = function(templateId, configId) {
+	var self = this;
+	var sql = 
+		'SELECT sld_rule.* from sld_rule, sld_featuretype WHERE '+
+			'sld_featuretype.template_id = '+templateId+' AND '+
+			'sld_rule.featuretype_id = sld_featuretype.id AND '+
+			'sld_rule.config_id IS NULL';
 
+	var listOfRuleInsertionPromises = [];
+	var query = this.db.client.query(sql, function(error, result) {
+		if (result && result.rows && result.rows.length) {
+			var row = null;
+			for (var i = 0; i < result.rows.length; i++) {
+				row = result.rows[i];
+				var insertSql = "INSERT INTO sld_rule(featuretype_id, name, title, abstract, minscaledenominator, maxscaledenominator, config_id, template_rule_id, template_offset) VALUES "+
+						"("+
+							"'"+row.featuretype_id+"', "+
+							"'"+row.name+"', "+
+							"'"+row.title+"', "+
+							"'"+row.abstract+"', "+
+							row.minscaledenominator+", "+
+							row.maxscaledenominator+", "+
+							configId+","+
+							row.id+","+
+							row.template_offset+
+						");"
+				//console.log('insertSql: '+insertSql);
+				listOfRuleInsertionPromises.push(
+					self.db.querySingle(insertSql)
+				);
+			}
+		}
+
+	});
+	return listOfRuleInsertionPromises;
+}
 
 /** Insert rule and parameter descriptions from parse.js into the database.
   * @param {string} sldConfig Entire config file text content to parse.
@@ -203,11 +223,19 @@ SldInserter.prototype.parseConfig=function(sldConfig, config_id) {
 	/** A separate promise for each database INSERT command to track them. */
 	var promiseList=[];
 	console.log("configin name: ", sldConfig.name);
-
+	
 	var lineList;
 	var lineNum,lineCount;
 	var fieldList;
 	var featureTypeInserted,ruleInserted,fieldInserted,symbolizerInserted;
+
+	//copy the rules from template
+	rulesInserted = this.insertRules(sldConfig.template_id, config_id);
+	
+
+	if (rulesInserted && rulesInserted.length) {
+		promiseList = promiseList.concat(rulesInserted);
+	}
 
 	lineList=sldConfig.sld_values;  //.split(/\r?\n/);
 	lineCount=lineList.length;

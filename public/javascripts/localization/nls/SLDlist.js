@@ -6,7 +6,8 @@ define({
 			"upload" : "Import Style",
 			"saving" : "Saving...",
 			"creating" : "Creating new config...",
-			"logout": "Sign out"
+			"logout": "Sign out",
+			"noConfigs": "No visualizations created"
 		},
 		"buttons" : {
 			"create": "Create new",
@@ -15,7 +16,8 @@ define({
 			"download": "Create output SLD",
 			"upload": "Upload",
 			"cancel": "Cancel",
-			"ok": "OK"
+			"ok": "OK",
+			"searchConfig": "search visualization"
 		},
 		"tooltips" : {
 			"deleteTemplate" : "Delete the highlighted template",

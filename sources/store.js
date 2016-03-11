@@ -91,6 +91,7 @@ PgDatabase.prototype.exec=function() {
 
 /** Send query to database and read a single result row. */
 PgDatabase.prototype.querySingle=function() {
+	console.log("querySingle, arguments", arguments);
 	var query=this.client.query.apply(this.client,arguments);
 	var defer=new Deferred();
 	var result;
@@ -187,11 +188,13 @@ SldInserter.prototype.insertTemplate=function(templatePath, name, tname) {
 /** @param {number} templateId Refers to a template in the database.
   * @return {Promise} */
 SldInserter.prototype.insertFeatureType=function(templateId,fieldList) {
-    var order = fieldList[1];
+    var name = fieldList[1],
+    	title = fieldList[2],
+    	order = fieldList[3];
 	return(this.db.querySingle(
 		'INSERT INTO sld_featuretype (template_id,name,title,featuretype_name, feature_order)'+
 		' VALUES ($1,$2,$3,$4, $5)'+
-		' RETURNING id',[templateId,'','','', order]
+		' RETURNING id',[templateId,name,title,'', order]
 	));
 };
 
@@ -203,13 +206,23 @@ SldInserter.prototype.insertRule=function(featureTypeInserted,fieldList) {
 	var self=this;
 
 	return(featureTypeInserted.then(function(featureTypeId) {
-		var nameList=fieldList[3].split(';');
+//		var nameList=fieldList[3].split(';');
+		var nameList=fieldList[3].split('^');
 		if(!nameList[1] && nameList[0]) nameList[1]=nameList[0];
         if(!nameList[1]) nameList[1]=fieldList[4];
+	
+		//no minscaledenominator
+        if (!nameList[3] || nameList[3].length === 0) {
+        	nameList[3] = null;
+        }
+		//no maxscaledenominator
+        if (!nameList[4] || nameList[4].length === 0) {
+        	nameList[4] = null;
+        }
 		return(self.db.querySingle(
-			'INSERT INTO sld_rule (featuretype_id,name,title,abstract)'+
-			' VALUES ($1,$2,$3,$4)'+
-			' RETURNING id',[featureTypeId.id,nameList[0],nameList[1],nameList[2]]
+			'INSERT INTO sld_rule (featuretype_id,name,title,abstract, minscaledenominator, maxscaledenominator, template_offset)'+
+			' VALUES ($1,$2,$3,$4,$5,$6, $7)'+
+			' RETURNING id',[featureTypeId.id,nameList[0],nameList[1],nameList[2], nameList[3], nameList[4], fieldList[2]]
 		));
 	}));
 };
@@ -256,21 +269,6 @@ SldInserter.prototype.insertParam=function(symbolizerInserted,fieldList) {
 			});
 		});
 
-	/*	typeFound.catch(function() {
-			return(self.db.querySingle(
-				'INSERT INTO sld_type (name,symbolizer_parameter)'+
-				' VALUES ($1,$2)'+
-				' RETURNING id',['',fieldList[4]]
-			));
-		}).then(function(typeRow) {
-			self.db.querySingle(
-				'INSERT INTO sld_param (symbolizer_id,template_offset,type_id,default_value)'+
-				' VALUES ($1,$2,$3,$4)'+
-				' RETURNING id',[symbolizerId.id,fieldList[3],typeRow.id,fieldList[5]]
-			).then(function() {
-				defer.resolve();
-			});
-		}).catch(function(err) {defer.reject(err);}); */
 	});
 
 	return(defer.promise);
@@ -346,11 +344,7 @@ SldInserter.prototype.parseConfig=function(sldConfig,templateId) {
 SldInserter.prototype.insertConfig=function(params,templateId) {
 	var self=this;
 
-   // var inputReady=this.setParams(params);
-
- //   return(inputReady.then(function(sldConfig) {
-        return(self.parseConfig(params,templateId));
-  //  }));
+    return(self.parseConfig(params,templateId));
 
 };
 
@@ -361,6 +355,8 @@ SldInserter.prototype.insertConfig=function(params,templateId) {
  * @param cb {function} status cb
  * */
 exports.store = function(params, client, name, tname, tfile, cb) {
+
+	console.log("Store");
 	var inserter=new SldInserter();
 
 	var connected=inserter.connect(client);

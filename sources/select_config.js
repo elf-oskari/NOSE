@@ -43,17 +43,10 @@ PgDatabase.prototype.connect=function(client) {
     var defer=new Deferred();
 
     this.client=client;
-    /*	this.client.connect(function(err) {
-     if(err) return(defer.reject('Unable to connect to database: '+err));
-     defer.resolve();
-     }); */
     defer.resolve();
     return(defer.promise);
 }
 
-/* PgDatabase.prototype.close=function(conf) {
-	return(Promise.resolve(this.client.end()));
-} */
 
 /** Execute query without reading any results. */
 PgDatabase.prototype.exec=function() {
@@ -156,15 +149,22 @@ SldSelecter.prototype.selectValues=function(id) {
     return(self.db.queryResult(value_sql));
 };
 
+SldSelecter.prototype.selectRules=function(config_id) {
+    var self = this;
+    var sql = 'SELECT ID, FEATURETYPE_ID, NAME, TITLE, ABSTRACT, MINSCALEDENOMINATOR, MAXSCALEDENOMINATOR, CONFIG_ID, TEMPLATE_RULE_ID FROM ' +
+        'SLD_RULE WHERE CONFIG_ID='+config_id;
+    return(self.db.queryResult(sql));
+};
+
 
 /** Roll back current transaction and close connection. */
 SldSelecter.prototype.abort=function() {
-    return(this.db.rollback()); //.then(bindToScope(this.db,this.db.close)));
+    return(this.db.rollback()); 
 };
 
 /** Commit current transaction and close connection. */
 SldSelecter.prototype.finish=function() {
-    return(this.db.commit()); //.then(bindToScope(this.db,this.db.close)));
+    return(this.db.commit()); 
 };
 
 
@@ -175,7 +175,7 @@ SldSelecter.prototype.finish=function() {
 exports.select_config = function(id, uuid, client, cb) {
 
 
-    console.log("in select_config "+uuid);
+  console.log("in select_config "+uuid);
 
 	var selecter=new SldSelecter(),
         cb = cb,
@@ -192,26 +192,32 @@ exports.select_config = function(id, uuid, client, cb) {
 
 
     var ready = configSelected.then(function (configResult) {
-       //Loop templates
-            var ind = 0;
-            var maxind = configResult.lenght;
-            var feaSelected = null;
+        //Loop templates
+        var ind = 0;
+        var feaSelected = null;
         configResult.forEach(function(row){
             result.push(row);
             valuesSelected = subSelectValues(ind, row.id);
+            rulesSelected = subSelectRules(ind, row.id);
             ind++;
         });
-        return valuesSelected;
-    }); 
+        return rulesSelected;
+    });
 
     function subSelectValues(ind, id) {
         var featuretypeSelected = selecter.selectValues(id);
         var allSelected = featuretypeSelected.then(function (valueResult) {
-            //console.log("valueResult: ", valueResult);
             result[ind].sld_values = valueResult;
-
         });
         console.log("allSelected: ", allSelected);
+        return allSelected;
+    };
+
+    function subSelectRules(ind, id) {
+        var rulesSelected = selecter.selectRules(id);
+        var allSelected = rulesSelected.then(function (featureResult) {
+            result[ind].sld_rules = featureResult;
+        });
         return allSelected;
     };
 

@@ -20,7 +20,7 @@ define([
 	        validateResult = this.validateUrl(newvalue);
 	      } else if (element.type === "select-one") {
 	        if (param_name === "stroke-linecap") {
-	          validateResult = this.validateLinecap(newValue);
+	          validateResult = this.validateLinecap(newvalue);
 	        } else if (param_name === "graphic-symbol") {
 	          validateResult = this.validateGraphicsymbol(newvalue);
 	        } else if (param_name === "stroke-linejoin") {
@@ -164,12 +164,16 @@ define([
 	    validateFontFamily: function (value) {
 	      var errormsg,
 	          locale = localeValidation;
-	      if (value === "Arial" || value === "Geneva" || value === "sans-serif" || value === "Verdana") {
+	          //font-family is a select, probably never invalid...
+	          return ["valid"];
+	          /*
+	      if (value === "Arial" || value === "Geneva" || value === "sans-serif" || value === "Verdana" || value === "Gothica") {
 	        return ["valid"];
 	      } else {
 	        errormsg = locale.select['invalidFontfamily'];
 	        return ["invalid", errormsg];
 	      }
+	      */
 	    },
 
 	    validateFontWeight: function (value) {
@@ -193,5 +197,13 @@ define([
 	        return ["invalid", errormsg];
 	      }
 	    },
+
+	    validateMinMax: function(minValue, maxValue) {
+	    	if (minValue && maxValue && parseFloat(minValue) > parseFloat(maxValue)) {
+	    		return ["invalid", localeValidation.scales.minscalegreaterthanmaxscale]
+	    	} else {
+	    		return ["valid"];
+	    	}
+	    }
 	};
 });

@@ -3,7 +3,7 @@ define([
   'backbone',
   'jquery',
   'ol3'
-], function(_, Backbone, $, ol3) {
+], function(_, Backbone, $, ol) {
   var WMSPreviewView = Backbone.View.extend({
   	el: 'map',
   	url: null,

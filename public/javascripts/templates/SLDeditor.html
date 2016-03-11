@@ -44,9 +44,33 @@ var toggleAdvanced = function(divClass) {
                     <div class="form-group">
                         <label for="SLDConfigName" class="col-md-12 editor-label-heading"><%= ruletitle + ":  " + symbolType%></label>
                     </div>
+
+                    <!-- rule specific stuff, scale denominators etc. -->
+                    <% if (rule) { %>
+                        <div class="form-group">
+                            <label class="col-md-3 editor-label"><%= editSLD.rulepreview['rule'] %></label>
+                        </div>
+                        <div class="form-group">
+                            <input type="hidden" id="ruleId" value="<%=rule.id%>"/>
+
+                            <% if (rule.minscaledenominator) { %>
+                                <label for="minScaleDenominator" class="col-md-3 control-label edit-sld-label"><%= editSLD.rulepreview['minScaleDenominator'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <input type="number" class="form-control rule-input" id="minScaleDenominator" value="<%= rule.minscaledenominator %>"/>
+                                </div>
+                            <% } %>
+
+                            <% if (rule.maxscaledenominator) { %>
+                                <label for="maxScaleDenominator" class="col-md-3 control-label edit-sld-label"><%= editSLD.rulepreview['maxScaleDenominator'] %></label>
+                                <div class="col-md-7 col-md-offset-1">
+                                    <input type="number" class="form-control rule-input" id="maxScaleDenominator" value="<%= rule.maxscaledenominator %>"/>
+                                </div>
+                            <% } %>
+                        </div>
+                    <% } %>
                     <div class="form-group">
                         <label for="unit" class="col-md-3 control-label edit-sld-label"><%= editSLD.common['unit'] %></label>
-                        <div class="col-md-9">
+                        <div class="col-md-7 col-md-offset-1">
                             
                             <input type="hidden" id="unit" class="form-control" <%=generateOptionValue("metre",symbolUnit) %>/>
                             <input type="text" class="form-control" disabled="true" value="<%= editSLD.common['metre'] %>"/>
@@ -58,6 +82,9 @@ var toggleAdvanced = function(divClass) {
                             <div class="form-group <%= attrData.graphic.class %>">
                                 <label class="col-md-3 editor-label"><%= editSLD.point['label'] %></label>
                             </div>
+                            <div class="form-group param <%= attrData.graphic.values['wellknownname'].class %>">
+                            </div>
+
                             <div class="form-group param <%= attrData.graphic.values['wellknownname'].class %>">
                                 <label class="col-md-3 control-label edit-sld-label" for="graphic-symbol"><%= editSLD.point['symbol'] %></label>
                                 <div class="col-md-7 col-md-offset-1">
@@ -223,18 +250,31 @@ var toggleAdvanced = function(divClass) {
                             <div class="form-group param">
                                 <label class="control-label col-md-3 edit-sld-label" for="font-family"><%= editSLD.text['font'] %></label>
                                 <div class="col-md-7 col-md-offset-1">
-                                    <select id="font-family" data-css-parameter="font-family" class="form-control">
+                                    <select id="font-family" data-css-parameter="font-family" data-param-id="<%= attrData.text.values['font-family'].param_id %>" class="form-control">
                                         <option <%= generateOptionValue("Arial",attrData.text.values['font-family'].value) %>>Arial</option>
+                                        <option <%= generateOptionValue("Arial Narrow",attrData.text.values['font-family'].value) %>>Arial Narrow</option>
+                                        <option <%= generateOptionValue("Century Gothic",attrData.text.values['font-family'].value) %>>Century Gothic</option>
+                                        <option <%= generateOptionValue("Calibri",attrData.text.values['font-family'].value) %>>Calibri</option>
+                                        <option <%= generateOptionValue("Courier New",attrData.text.values['font-family'].value) %>>Courier New</option>
                                         <option <%= generateOptionValue("Geneva",attrData.text.values['font-family'].value) %>>Geneva</option>
+                                        <option <%= generateOptionValue("Impact",attrData.text.values['font-family'].value) %>>Impact</option>
+                                        <option <%= generateOptionValue("Lucida Bright",attrData.text.values['font-family'].value) %>>Lucida Bright</option>
                                         <option <%= generateOptionValue("sans-serif",attrData.text.values['font-family'].value) %>>sans-serif</option>
+                                        <option <%= generateOptionValue("Tahoma",attrData.text.values['font-family'].value) %>>Tahoma</option>
+                                        <option <%= generateOptionValue("Times New Roman",attrData.text.values['font-family'].value) %>>Times New Roman</option>
                                         <option <%= generateOptionValue("Verdana",attrData.text.values['font-family'].value) %>>Verdana</option>
                                     </select>
+                                </div>
+                                <div class="col-md-1">
+                                    <a>
+                                        <i class="fa fa-info-circle fa-2x" title="Please note, that the selected font must also be supported by the actual service this sld is to be used in."></i>
+                                    </a>
                                 </div>
                             </div>
                             <div class="form-group param">
                                 <label class="control-label col-md-3 edit-sld-label" for="font-style"><%= editSLD.text['style'] %></label>
                                 <div class="col-md-7 col-md-offset-1">
-                                    <select id="font-style" data-css-parameter="font-style" class="form-control">
+                                    <select id="font-style" data-css-parameter="font-style" data-param-id="<%= attrData.text.values['font-style'].param_id %>" class="form-control">
                                         <option <%= generateOptionValue("normal",attrData.text.values['font-style'].value) %>><%= editSLD.text['style-normal'] %></option>
                                         <option <%= generateOptionValue("italic",attrData.text.values['font-style'].value) %>><%= editSLD.text['style-italic'] %></option>
                                         <option <%= generateOptionValue("oblique",attrData.text.values['font-style'].value) %>><%= editSLD.text['style-oblique'] %></option>
@@ -244,7 +284,7 @@ var toggleAdvanced = function(divClass) {
                             <div class="form-group param">
                                 <label class="control-label col-md-3 edit-sld-label" for="font-weight"><%= editSLD.text['weight'] %></label>
                                 <div class="col-md-7 col-md-offset-1">
-                                    <select id="font-weight" data-css-parameter="font-weight" class="form-control">
+                                    <select id="font-weight" data-css-parameter="font-weight" data-param-id="<%= attrData.text.values['font-weight'].param_id %>" class="form-control">
                                         <option <%= generateOptionValue("normal",attrData.text.values['font-weight'].value) %>><%= editSLD.text['weight-normal'] %></option>
                                         <option <%= generateOptionValue("bold",attrData.text.values['font-weight'].value) %>><%= editSLD.text['weight-bold'] %></option>
                                     </select>
@@ -283,7 +323,8 @@ var toggleAdvanced = function(divClass) {
                                     <input type="number" class="form-control" min="0" id="halo-radius" data-css-parameter="halo-radius" data-param-id="<%= attrData.text.values['halo-radius'].param_id %>" value="<%= attrData.text.values['halo-radius'].value %>">
                                 </div>
                             </div>
-                            <span class="label label-info" onclick="(<%= toggleAdvanced %>)('text-advanced')"><%= editSLD.text['advanced'] %></span>
+                            <!-- The next is for text advanced settings. It is hidden for now because we don't have yet processing for it-->
+                            <span class="label label-info hidden" onclick="(<%= toggleAdvanced %>)('text-advanced')"><%= editSLD.text['advanced'] %></span>
                             <div class="form-group param text-advanced hidden-advanced <%= attrData.text.values['pointplacement-anchorpointx'].class %>">
                                 <label class="control-label col-md-3 edit-sld-label" for="pointplacement-anchorpointx"><%= editSLD.text['pointplacement-anchorpointx'] %></label>
                                 <div class="col-md-7 col-md-offset-1">

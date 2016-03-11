@@ -118,7 +118,17 @@ SldDownloader.prototype.connect = function (client) {
 SldDownloader.prototype.readValues = function (id) {
     var self = this,
         sql = 'SELECT param_id, value FROM sld_value WHERE config_id=' + id;
-    //console.log("readValues SQL: ", sql);
+    return (self.db.queryResult(sql));
+};
+
+/**
+ * Read rule values from database
+ * @param id config id
+ * @returns {Promise}
+ */
+SldDownloader.prototype.readRules = function (id) {
+    var self = this,
+        sql = 'SELECT name, title, abstract, minscaledenominator, maxscaledenominator, template_offset FROM sld_rule WHERE config_id=' + id;
     return (self.db.queryResult(sql));
 };
 
@@ -130,7 +140,6 @@ SldDownloader.prototype.readValues = function (id) {
 SldDownloader.prototype.readOffset = function (id) {
     var self = this,
         sql = 'SELECT template_offset FROM sld_param WHERE id=' + id;
-    //console.log("readOffset SQL: ", sql);
     return (self.db.queryResult(sql));
 };
 
@@ -142,7 +151,6 @@ SldDownloader.prototype.readOffset = function (id) {
 SldDownloader.prototype.readTemplateId = function (id) {
     var self = this,
         sql = 'SELECT template_id FROM sld_config WHERE id=' + id;
-    //console.log("readTemplateId SQL: ", sql);
     return (self.db.queryResult(sql));
 };
 
@@ -154,7 +162,6 @@ SldDownloader.prototype.readTemplateId = function (id) {
 SldDownloader.prototype.readTemplate = function (id) {
     var self = this,
         sql = 'SELECT content FROM sld_template WHERE id=' + id;
-    //console.log("readTemplate SQL: ", sql);
     return (self.db.queryResult(sql));
 };
 
@@ -236,9 +243,84 @@ exports.download_config = function (id, client, cb) {
         return (downloader.readTemplate(templateId[0].template_id));
     });
 
+    var ruleTags = {
+        'name':'Name',
+        'title':'Title',
+        'abstract':'Abstract',
+        'minscaledenominator':'MinScaleDenominator',
+        'maxscaledenominator':'MaxScaleDenominator'
+    };
+    var calculateOffsetsForRuleTags = function(rule, template) {
+        //only search for tags inside this particular rule
+        var ruleStartOffset = rule.template_offset;
+        //regex for rule ending tag (with or without namespace)
+        var ruleEndRegex = /(<\/)(.)*rule>/i;
+        var ruleEndOffset = template.substr(ruleStartOffset, template.length).toLowerCase().search(ruleEndRegex);
+        var ruleSubstring = null;
+        
+        if (ruleEndOffset > -1) {
+            ruleEndOffset = parseInt(ruleStartOffset) + parseInt(ruleEndOffset);
+            ruleSubstring = template.substr(ruleStartOffset, ruleEndOffset - ruleStartOffset);
+            if (ruleSubstring) {
+                for (var key in ruleTags) {
+                    if (rule.hasOwnProperty(key)) {
+                        var tagOffset = calculateOffsetForTag(ruleSubstring, ruleTags[key]);
+                        if (tagOffset > -1) {
+                            downloader.data.push([parseInt(ruleStartOffset)+parseInt(tagOffset) - 1, rule[key]]);
+                        } 
+                    }
+                }
+            }
+        }
+        return;
+    };
+    calculateOffsetForTag = function(ruleTemplate, tagName) {
+        //either exact match or something ending with : and an exact match after that
+        //case <rule><name> vs. <rule>....<wellknownname>
+        var regexStrings = [
+            '(<)'+tagName.toLowerCase()+'(.)*(>)[$]',
+            '(<)(.)*(:)'+tagName.toLowerCase()+'(.)*(>)[$]'            
+        ];
+        var startTagFullName = "";
+        for (var i = 0; i < regexStrings.length; i++) {
+            var regex = new RegExp(regexStrings[i], 'i');
+            var offset = ruleTemplate.toLowerCase().search(regex);
+            if (offset > -1) {
+                startTagFullName = ruleTemplate.match(regex);
+                return offset + startTagFullName[0].length;
+            }
+        }
+        return -1;
+    };
+
+    calculateOffsetForTag_old = function(ruleTemplate, tagName) {
+        //with or without namespace and ending to the placeholder
+        var tagStartRegexString = '(<)(.)*'+tagName.toLowerCase()+'(.)[$]';
+        var tagStartRegex = new RegExp(tagStartRegexString, 'i');
+        var tagOffset = ruleTemplate.toLowerCase().search(tagStartRegex);
+        var startTagFullName = ruleTemplate.match(tagStartRegex);
+
+        if (tagOffset > -1) {
+            return tagOffset + startTagFullName[0].length;
+        }
+        return tagOffset;
+    };
+
+    var templateGlobal = null;
+    var rulesRead = templateRead.then(function (template) {
+        templateGlobal = template;
+        return (downloader.readRules(id));
+    });
+
+    var rulesReadThen = rulesRead.then(function(rules) {
+        return (rules.forEach(function(rule) {
+            return calculateOffsetsForRuleTags(rule, templateGlobal[0].content);
+        }));
+    });
+
     // Generate an SLD file
-    var ready = templateRead.then(function (template) {
-        return (downloader.generateSld(template[0].content));
+    var ready = rulesReadThen.then(function () {
+        return (downloader.generateSld(templateGlobal[0].content));
     });
 
     ready.catch(function (err) {

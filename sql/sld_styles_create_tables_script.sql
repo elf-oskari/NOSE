@@ -1,11 +1,8 @@
 -- Create scripts for sld_styles Postgres db
 
 CREATE DATABASE sld_styles
-  WITH OWNER = "MBLOMBERG"
-       ENCODING = 'UTF8'
+  WITH ENCODING = 'UTF8'
        TABLESPACE = pg_default
-       LC_COLLATE = 'Finnish_Finland.1252'
-       LC_CTYPE = 'Finnish_Finland.1252'
        CONNECTION LIMIT = -1;
 
 -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ sld_users
@@ -53,8 +50,6 @@ CREATE TABLE sld_users
 WITH (
 OIDS=FALSE
 );
-ALTER TABLE sld_users
-OWNER TO liferay;
 
 -- Trigger: trigger_sld_users on sld_users
 
@@ -249,6 +244,11 @@ CREATE TABLE sld_rule
   name character varying(256) NOT NULL,
   title character varying(256) NOT NULL,
   abstract character varying(512) NOT NULL,
+  minscaledenominator bigint,
+  maxscaledenominator bigint,
+  config_id bigint,
+  template_rule_id bigint,  
+  template_offset bigint,
   CONSTRAINT sld_rule_pkey PRIMARY KEY (id),
   CONSTRAINT featuretype_id_fkey FOREIGN KEY (featuretype_id)
       REFERENCES sld_featuretype (id) MATCH SIMPLE
@@ -379,7 +379,12 @@ CREATE VIEW sld_params_view AS
     c.featuretype_id,
     c.name,
     c.title,
-    c.abstract
+    c.abstract,
+    c.minscaledenominator,
+    c.maxscaledenominator,
+    c.config_id,
+    c.template_rule_id,
+    c.template_offset
    FROM sld_template a,
     sld_featuretype b,
     sld_rule c
@@ -412,10 +417,10 @@ INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'size', 
 INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'size', 'Graphic/Size', '"Graphic","Size"');
 INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'stroke-linecal', 'Stroke/CssParameter(stroke-linecap)', '"Stroke","CssParameter",{"name":"stroke-linecap"}');
 INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'fill', 'Fill/CssParameter(fill)', '"Fill","CssParameter",{"name":"fill"}');
-INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'font-family', 'Fill/CssParameter(font-family)', '"Font","CssParameter",{"name":"font-family"}');
-INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'font-size', 'Fill/CssParameter(font-size)', '"Font","CssParameter",{"name":"font-size"}');
-INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'font-style', 'Fill/CssParameter(font-style)', '"Font","CssParameter",{"name":"font-style"}');
-INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'font-weight', 'Fill/CssParameter(font-weight)', '"Font","CssParameter",{"name":"font-weight"}');
+INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'font-family', 'Font/CssParameter(font-family)', '"Font","CssParameter",{"name":"font-family"}');
+INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'font-size', 'Font/CssParameter(font-size)', '"Font","CssParameter",{"name":"font-size"}');
+INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'font-style', 'Font/CssParameter(font-style)', '"Font","CssParameter",{"name":"font-style"}');
+INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'font-weight', 'Font/CssParameter(font-weight)', '"Font","CssParameter",{"name":"font-weight"}');
 INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'fill-opacity', 'Fill/CssParameter(fill-opacity)', '"Fill","CssParameter",{"name":"fill-opacity"}');
 
 INSERT INTO sld_type ( name, symbolizer_parameter, search_tag) VALUES ( 'label', 'Label/PropertyName', '"Label","PropertyName"');

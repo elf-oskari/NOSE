@@ -26,7 +26,7 @@ define({
 			"Config-name": "SLD visualization name:",
 			"SLDmap-heading": "Rule preview",
 			"SLDtree-name": "name",
-			"featuretype_id": "Featuretype id",
+			"featuretype_style": "Feature type style",
 			"SLD-features-heading": "Features",
 			"unit": "Unit",
 			"foot": "Foot",
@@ -36,9 +36,15 @@ define({
 			"saving" : "Saving...",
 			"logout": "Sign out"
 		},
+		"rulepreview": {
+			"rule":"Rule",
+			"minScaleDenominator":"Min scale",
+			"maxScaleDenominator":"Max scale"
+		},
 		"sldtree": {
 			"noRules": "No rules defined",
-			"noSymbolizers": "No symbolizers defined"
+			"noSymbolizers": "No symbolizers defined",
+			"featuretypeWithoutName": "[No name defined]"
 		},
 		"point": {
 			"label": "Point",

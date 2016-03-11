@@ -14,7 +14,7 @@ define([
     template: _.template(SLDTreeTemplate),
     events: {
       'click .btn.sld_symbolizer': 'updateSLDeditor',
-      'click .collapse-panel': 'panelClicked',
+      'click .collapse-panel-tree': 'panelClicked',
       'change .chosen-select': 'updateSLDtree'
     },
     initialize: function(params) {
@@ -26,10 +26,12 @@ define([
     },
 
     setModels: function(models) {
-        this.SLDtemplatemodel = models.SLDtemplatemodel;
-        this.SLDconfigmodel = models.SLDconfigmodel;
-        this.SLDfeaturetypeTree = this.SLDtemplatemodel.getFeaturetypeTree();
-        return this;
+      var me = this;
+      this.SLDtemplatemodel = models.SLDtemplatemodel;
+      this.SLDconfigmodel = models.SLDconfigmodel;
+      this.SLDfeaturetypeTree = this.SLDtemplatemodel.getFeaturetypeTree();
+
+      return this;
     },
 
     render: function() {

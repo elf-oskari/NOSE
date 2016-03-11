@@ -64,6 +64,43 @@ define(['lodash','backbone'], function(_, Backbone) {
 					return newparam;
 				});
 			return valueslist;
+		},
+        /**
+         * @method getRuleById
+         * @return {Object} the rule matching the id or null if not found
+         */
+        getRuleById: function(ruleId) {
+        	var me = this;
+        	var rules = _.where(me.get('sld_rules'), { id: ruleId });      	
+			return (rules && rules.length === 1) ? rules[0] : null;
+        },
+        /**
+	 	 * Get the rule of this config-instance, that corresponds to the rule of the template that the symbolizer is bound to...Beautiful...
+	 	 * TODO: refactor the whole db - make symbolizers (and thus params and thus values as well) be per config, not per template
+         */
+        getRuleCorrespondingToTemplateRule: function(templateRule) {
+        	var me = this;
+        	var rules = _.where(me.get('sld_rules'), {
+        		template_rule_id: templateRule.id 
+        	});
+
+        	return rules && rules.length === 1 ? rules[0] : null;
+        },
+		getFeaturetypeTreeRules: function(SLDTemplateModel, SLDFeatureType) {
+			var me = this;
+			var SLDrules = _.where(this.get('sld_rules'), {featuretype_id: SLDFeatureType.id});
+			var SLDsymbolizers = SLDTemplateModel.get('sld_symbolizers');
+
+			var rules = _.map(SLDrules, function (SLDrule) {
+				var rule = _.pick(SLDrule, 'id', 'title');
+				var symbolizers = _.where(SLDsymbolizers, {rule_id: SLDrule.template_rule_id});
+				rule.symbolizers = _.map(symbolizers, function (SLDsymbolizer) {
+					var symbolizer = _.pick(SLDsymbolizer, 'id', 'type');
+					return symbolizer;
+				});
+				return rule;
+			});
+			return rules;
 		}
 	});
 

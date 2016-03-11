@@ -1,11 +1,18 @@
+<%
+  var isAdmin = (userrole && userrole == "ADMIN");
+%>
+
 <!-- List template -->
 <div class="view" id="sld-list">
   <div class="panel editor-panel list-panel">
     <div class="panel-heading editor-page-header">
       SLD Editor
-      <h4 class="sld-list-signout-link signout-list-page">
-        <%=userName%>&nbsp;-&nbsp;<%= SLDlist_i18n.texts.logout%>
-        <i class="fa fa-sign-out pull-right"></i>
+      <h4 class="sld-list-links">
+        <a class="userguide" href="SLD_Editor_User_Guide_20160128.pdf" target="_blank">User guide</a>
+        <span class="signout-list-page">
+          <%=userName%>&nbsp;-&nbsp;<%= SLDlist_i18n.texts.logout%>
+          <i class="fa fa-sign-out pull-right"></i>
+        </span>
       </h4>
       </a>
     </div>
@@ -20,15 +27,48 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-sm-12 col-md-12 col-lg-7">
-          <div class="list-group">
-            <% _.forEach(SLDtemplates, function(SLDtemplateModel) { %>
-                <a data-id="<%=SLDtemplateModel.id%>" class="list-group-item"><%= SLDtemplateModel.name %></a>
+        <div class="col-sm-12 col-md-12 col-lg-6">
+          <div class="panel-body">
+            <select id="config-select" class="chosen-select form-control" data-placeholder="<%= SLDlist_i18n.buttons['searchConfig'] %>">
+              <option></option>
+                <% _.forEach(SLDtemplates, function(SLDtemplateModel) { %>
+                      <% _.forEach(SLDtemplateModel.configs, function(SLDconfigModel) { %>
+                              <option value='<%=SLDtemplateModel.id%>' data-config-id="<%= SLDconfigModel.id %>"><%= SLDconfigModel.name %></option>
+                      <% }); %>
+                <% }); %>
+            </select>
+            <div class="list-group">
+              <% _.forEach(SLDtemplates, function(SLDtemplateModel) { %>
+              <div class="panel panel-default sld-tree-panel">
+                <div class="panel-heading cursor-pointer list-group-item" data-id="<%=SLDtemplateModel.id%>">
+                  <h4 data-toggle="collapse" data-target="#SLDtemplate-id-<%=SLDtemplateModel.id%>" class="panel-title collapse-panel collapse-panel-list">
+                  <% if (SLDtemplateModel.configs.length !== 0) { %>
+                    <i class="fa fa-caret-right pull-left"></i>
+                  <% } %>
+                  <% if (isAdmin) { %>
+                    <i data-id="<%= SLDtemplateModel.id %>" data-target="#deleteTemplateModal" class="fa fa-times pull-right delete"></i>
+                  <% } %>
+                    <i data-id="<%=SLDtemplateModel.id%>" data-target="#createConfigModal" class="fa fa-plus-circle pull-right"></i><%=SLDtemplateModel.name %></h4>
+                </div>
+                <div id="SLDtemplate-id-<%=SLDtemplateModel.id%>" class="panel-collapse collapse">
+                  <div class="panel-body container-panel">
                     <% _.forEach(SLDtemplateModel.configs, function(SLDconfigModel) { %>
-                      <a class="list-group-item list-group-item-config" data-id="<%=SLDconfigModel.id%>"><%= SLDconfigModel.name %></a>
-                    <% }); %>
-            <% }); %>
+                       <a id="SLDconfig-id-<%=SLDconfigModel.id%>" class="list-group-item list-group-item-config" data-id="<%=SLDconfigModel.id%>"><%= SLDconfigModel.name %>
+                         <i data-id="<%= SLDconfigModel.id %>" data-target="#deleteConfigModal" class="fa fa-times pull-right fa-2x delete"></i>
+                         <i data-id="<%= SLDconfigModel.id %>" data-target="#uploadModal" class="fa fa-download fa-2x pull-right download"></i>
+                         <i data-id="<%= SLDconfigModel.id %>" data-target="#uploadModal" class="fa fa-pencil-square-o fa-2x pull-right edit"></i>
+                         <i data-id="<%= SLDconfigModel.id %>" data-target="#uploadModal" class="fa fa-eye fa-2x pull-right showLegend"></i>
+                        </a>
+                    <% });%>
+                  </div>
+                </div>
+              </div>
+              <% });%>
+            </div>
           </div>
+        </div>
+        <div class="col-sm-12 col-md-12 col-lg-6">
+          <div class="SLDlegend"></div>
         </div>
       </div>
     </div>

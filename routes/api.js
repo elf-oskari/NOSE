@@ -298,7 +298,8 @@ module.exports = function (app, path, client, data, libs) {
                     console.log('An error occurred:', error);
                     return res.send(500);
                 }
-                console.log("result: ", result);
+                //print a sld which is downloaded by a user
+                //console.log("result: ", result);
                 res.status(200);
                 res.setHeader('Content-disposition', 'attachment; filename=download.sld');
                 res.setHeader('Content-type', 'text/plain; charset=utf-8');

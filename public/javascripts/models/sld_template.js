@@ -1,4 +1,4 @@
-define(['lodash','backbone'], function(_, Backbone) {
+define(['lodash','backbone','i18n!localization/nls/SLDeditor'], function(_, Backbone, locale) {
 	var SLDtemplateModel = Backbone.Model.extend({
 		defaults: {
 			id: null,
@@ -41,6 +41,9 @@ define(['lodash','backbone'], function(_, Backbone) {
 
 			return _.map(SLDfeaturetypes, function (SLDfeatureType) {
 				var featuretype = _.pick(SLDfeatureType, 'id', 'name');
+				if (featuretype.name === "") {
+					featuretype.name = locale.sldtree.featuretypeWithoutName;
+				}
 				var rules = _.where(SLDrules, {featuretype_id: featuretype.id});
 				featuretype.rules = _.map(rules, function (SLDrule) {
 					var rule = _.pick(SLDrule, 'id', 'title');
@@ -87,6 +90,16 @@ define(['lodash','backbone'], function(_, Backbone) {
 		  //pluck the rule id from the symbolizers' array
 	      return _.uniq(_.pluck(_.flatten(symbolizers), 'rule_id'))[0];
         },
+        /**
+         * @method getRuleById
+         * @return {Object} the rule matching the id or null if not found
+         */
+        getRuleById: function(ruleId) {
+        	var me = this;
+        	var rules = _.where(me.get('sld_rules'), { id: ruleId });      	
+			return (rules && rules.length === 1) ? rules[0] : null;
+        },
+        
         /**
          * @method getRuleIdByParams
          * @return {Array} all symbolizers of the currently selected rule
