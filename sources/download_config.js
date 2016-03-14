@@ -275,6 +275,25 @@ exports.download_config = function (id, client, cb) {
         return;
     };
     calculateOffsetForTag = function(ruleTemplate, tagName) {
+        //either exact match or something ending with : and an exact match after that
+        //case <rule><name> vs. <rule>....<wellknownname>
+        var regexStrings = [
+            '(<)'+tagName.toLowerCase()+'(.)*(>)[$]',
+            '(<)(.)*(:)'+tagName.toLowerCase()+'(.)*(>)[$]'            
+        ];
+        var startTagFullName = "";
+        for (var i = 0; i < regexStrings.length; i++) {
+            var regex = new RegExp(regexStrings[i], 'i');
+            var offset = ruleTemplate.toLowerCase().search(regex);
+            if (offset > -1) {
+                startTagFullName = ruleTemplate.match(regex);
+                return offset + startTagFullName[0].length;
+            }
+        }
+        return -1;
+    };
+
+    calculateOffsetForTag_old = function(ruleTemplate, tagName) {
         //with or without namespace and ending to the placeholder
         var tagStartRegexString = '(<)(.)*'+tagName.toLowerCase()+'(.)[$]';
         var tagStartRegex = new RegExp(tagStartRegexString, 'i');
@@ -285,7 +304,6 @@ exports.download_config = function (id, client, cb) {
             return tagOffset + startTagFullName[0].length;
         }
         return tagOffset;
-
     };
 
     var templateGlobal = null;
